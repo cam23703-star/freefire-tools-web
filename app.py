@@ -40,8 +40,8 @@ AES_KEY = bytes([89,103,38,116,99,37,68,69,117,104,54,37,90,99,94,56])
 AES_IV  = bytes([54,111,121,90,68,114,50,50,69,51,121,99,104,106,77,37])
 
 # Firebase configuration
-FIREBASE_URL = "https://freefiretooldev-default-rtdb.asia-southeast1.firebasedatabase.app"
-FIREBASE_SECRET = "LFLFXQYJN0sn3XPy82Qcqyn3G9EDLDGYMGRQe5T7"
+FIREBASE_URL = "https://tool-free-fire-by-default-rtdb.asia-southeast1.firebasedatabase.app"
+FIREBASE_SECRET = ""
 
 # Firebase helper functions
 def firebase_get(path):
@@ -994,8 +994,8 @@ def process_login(access_token):
         return {"success": False, "message": f"Unexpected error: {str(e)}"}
 
 #Admin Dashboard Password (hashed)
-ADMIN_USERNAME = "minhdev"  # Thêm username admin cố định
-ADMIN_PASSWORD_HASH = hashlib.sha256("minhcodedev".encode()).hexdigest()
+ADMIN_USERNAME = "chip"  # Thêm username admin cố định
+ADMIN_PASSWORD_HASH = hashlib.sha256("moimoimoi111".encode()).hexdigest()
 
 def check_tool_pro(username, tool_name):
     """Check if user has Pro access to a specific tool"""
