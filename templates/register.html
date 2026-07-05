@@ -6,6 +6,10 @@
     <title>Đăng ký | Free Fire Tools</title>
     <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Google Sign-In -->
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+    
     <style>
         *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
@@ -41,18 +45,12 @@
             line-height: 1.6;
         }
 
-        /* ════════════════════════════
-           LAYOUT
-        ════════════════════════════ */
         .auth-layout {
             display: grid;
             grid-template-columns: 57fr 43fr;
             min-height: 100vh;
         }
 
-        /* ════════════════════════════
-           LEFT PANEL (identical to auth.html)
-        ════════════════════════════ */
         .auth-left {
             position: relative;
             display: flex;
@@ -163,9 +161,6 @@
         }
         .badge-pill i { font-size: 0.68rem; color: var(--secondary); }
 
-        /* ════════════════════════════
-           RIGHT PANEL
-        ════════════════════════════ */
         .auth-right {
             display: flex;
             align-items: center;
@@ -174,9 +169,6 @@
             background: var(--bg);
         }
 
-        /* ════════════════════════════
-           AUTH CARD
-        ════════════════════════════ */
         .auth-card {
             width: 100%;
             max-width: 420px;
@@ -221,7 +213,59 @@
         }
         .card-heading p { font-size: 0.86rem; color: var(--muted); }
 
-        /* ─── Fields ─── */
+        /* Google Button */
+        .google-btn {
+            width: 100%;
+            height: 48px;
+            background: #fff;
+            color: #1f1f1f;
+            font-family: inherit;
+            font-size: 0.95rem;
+            font-weight: 600;
+            border: 2px solid #dadce0;
+            border-radius: 11px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.75rem;
+            transition: all 0.2s;
+            margin-bottom: 1.25rem;
+        }
+        .google-btn:hover {
+            background: #f8f9fa;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        .google-btn:active {
+            background: #e8eaed;
+        }
+        .google-btn img {
+            width: 20px;
+            height: 20px;
+        }
+        .google-btn .google-text {
+            font-size: 0.9rem;
+        }
+
+        /* Divider */
+        .divider {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin: 1.25rem 0;
+        }
+        .divider-line {
+            flex: 1;
+            height: 1px;
+            background: rgba(255,255,255,0.1);
+        }
+        .divider-text {
+            font-size: 0.8rem;
+            color: var(--muted);
+            white-space: nowrap;
+        }
+
+        /* Fields */
         .field-group { margin-bottom: 0.95rem; }
         .field-group label {
             display: block;
@@ -265,7 +309,6 @@
         }
         .eye-btn:hover { color: var(--secondary); }
 
-        /* password strength bar */
         .strength-bar {
             display: flex; gap: 3px;
             margin-top: 0.45rem;
@@ -287,7 +330,6 @@
         }
         .field-err.show { display: block; }
 
-        /* ─── Submit button ─── */
         .submit-btn {
             width: 100%; height: 48px;
             background: var(--grad-btn);
@@ -327,7 +369,6 @@
         .submit-btn.is-loading .btn-label { display: none; }
         @keyframes spin-anim { to { transform: rotate(360deg); } }
 
-        /* ─── Result box ─── */
         .result-box {
             margin-top: 1rem; padding: 0.85rem 1rem;
             border-radius: 10px; font-size: 0.83rem;
@@ -346,7 +387,6 @@
         }
         .result-box i { font-size: 0.88rem; margin-top: 0.1rem; flex-shrink: 0; }
 
-        /* ─── Card footer ─── */
         .card-footer {
             text-align: center; margin-top: 1.4rem;
             padding-top: 1.2rem;
@@ -359,9 +399,6 @@
         }
         .card-footer a:hover { color: var(--accent); }
 
-        /* ════════════════════════════
-           RESPONSIVE
-        ════════════════════════════ */
         @media (max-width: 900px) {
             .auth-layout { grid-template-columns: 1fr; }
             .auth-left   { display: none; }
@@ -377,14 +414,13 @@
 
 <div class="auth-layout">
 
-    <!-- ══════════ LEFT ══════════ -->
+    <!-- LEFT PANEL -->
     <div class="auth-left">
         <div class="blob-1"></div>
         <div class="blob-2"></div>
         <div class="grid-overlay"></div>
 
         <div class="left-inner">
-
             <a href="/" class="left-brand">
                 <div class="brand-icon"><i class="fas fa-fire"></i></div>
                 <span class="brand-text">Free Fire <span>Tools</span></span>
@@ -406,11 +442,10 @@
                 <div class="badge-pill"><i class="fas fa-bolt"></i> Tốc độ cao</div>
                 <div class="badge-pill"><i class="fas fa-headset"></i> Hỗ trợ 24/7</div>
             </div>
-
         </div>
     </div>
 
-    <!-- ══════════ RIGHT ══════════ -->
+    <!-- RIGHT PANEL -->
     <div class="auth-right">
         <div class="auth-card">
 
@@ -421,7 +456,19 @@
 
             <div class="card-heading">
                 <h1>Tạo tài khoản mới</h1>
-                <p>Đăng ký để truy cập công cụ</p>
+                <p>Đăng ký nhanh bằng Google hoặc email</p>
+            </div>
+
+            <!-- GOOGLE SIGN-UP BUTTON -->
+            <div id="googleSignUpBtn" class="google-btn">
+                <img src="https://www.google.com/favicon.ico" alt="Google">
+                <span class="google-text">Đăng ký với Google</span>
+            </div>
+
+            <div class="divider">
+                <div class="divider-line"></div>
+                <span class="divider-text">hoặc đăng ký bằng email</span>
+                <div class="divider-line"></div>
             </div>
 
             <form id="registerForm" novalidate>
@@ -483,8 +530,14 @@
 
 </div>
 
+<!-- Google Identity Services -->
+<script src="https://accounts.google.com/gsi/client" async defer></script>
+
 <script>
 (function () {
+    /* ── GOOGLE CLIENT ID - THAY BẰNG CLIENT ID CỦA BẠN ── */
+    const GOOGLE_CLIENT_ID = 'YOUR_GOOGLE_CLIENT_ID.apps.googleusercontent.com';
+
     /* ── Eye toggles ── */
     document.querySelectorAll('.eye-btn').forEach(btn => {
         btn.addEventListener('click', () => {
@@ -524,7 +577,7 @@
         if (pwd.length >= 10) score++;
         if (/[A-Z]/.test(pwd) && /[a-z]/.test(pwd)) score++;
         if (/[0-9]/.test(pwd) && /[^A-Za-z0-9]/.test(pwd)) score++;
-        return score; // 0-4
+        return score;
     }
 
     const pwdInput = $('password');
@@ -544,16 +597,81 @@
         if (this.value) setErr(this, $('emailErr'), !emailPat.test(this.value));
     });
 
-    /* ── Submit ── */
+    /* ── GOOGLE SIGN-UP ── */
+    function handleGoogleResponse(response) {
+        // Gửi Google token lên server
+        const submitBtn = $('submitBtn');
+        submitBtn.disabled = true;
+        submitBtn.classList.add('is-loading');
+        $('resultBox').className = 'result-box';
+
+        const urlParams = new URLSearchParams(window.location.search);
+        const redirect  = urlParams.get('redirect') || '/auth';
+
+        fetch('/api/auth/google', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ 
+                credential: response.credential,
+                action: 'register'
+            })
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.success) {
+                showResult('ok', 'Đăng ký Google thành công! Đang chuyển hướng...');
+                setTimeout(() => {
+                    window.location.href = redirect;
+                }, 1400);
+            } else {
+                showResult('fail', data.error || 'Đăng ký Google thất bại.');
+            }
+        })
+        .catch(() => {
+            showResult('fail', 'Lỗi kết nối server.');
+        })
+        .finally(() => {
+            submitBtn.disabled = false;
+            submitBtn.classList.remove('is-loading');
+        });
+    }
+
+    // Khởi tạo Google Sign-In
+    if (GOOGLE_CLIENT_ID !== 'YOUR_GOOGLE_CLIENT_ID.apps.googleusercontent.com') {
+        google.accounts.id.initialize({
+            client_id: GOOGLE_CLIENT_ID,
+            callback: handleGoogleResponse,
+            auto_select: false,
+            context: 'signup'
+        });
+
+        google.accounts.id.renderButton(
+            document.getElementById('googleSignUpBtn'),
+            { 
+                theme: 'outline', 
+                size: 'large',
+                text: 'signup_with',
+                shape: 'rectangular',
+                width: '100%'
+            }
+        );
+    } else {
+        // Nếu chưa cấu hình Google Client ID
+        $('googleSignUpBtn').addEventListener('click', () => {
+            showResult('fail', 'Google Sign-In chưa được cấu hình. Vui lòng liên hệ admin.');
+        });
+    }
+
+    /* ── Email/Password Submit ── */
     const form      = $('registerForm');
     const submitBtn = $('submitBtn');
 
     form.addEventListener('submit', async (e) => {
         e.preventDefault();
 
-        const username         = $('username').value.trim();
-        const email            = $('email').value.trim();
-        const password         = $('password').value;
+        const username = $('username').value.trim();
+        const email    = $('email').value.trim();
+        const password = $('password').value;
 
         let hasErr = false;
         if (username.length < 3 || username.length > 20) {
@@ -592,7 +710,7 @@
             } else {
                 showResult('fail', data.error || 'Đăng ký thất bại. Vui lòng thử lại.');
             }
-        } catch {
+        } catch (err) {
             showResult('fail', 'Không thể kết nối đến server. Vui lòng thử lại.');
         } finally {
             submitBtn.disabled = false;
@@ -603,4 +721,4 @@
 </script>
 
 </body>
-</html>
+        </html>
