@@ -994,8 +994,8 @@ def process_login(access_token):
         return {"success": False, "message": f"Unexpected error: {str(e)}"}
 
 #Admin Dashboard Password (hashed)
-ADMIN_USERNAME = "chip"  # Thêm username admin cố định
-ADMIN_PASSWORD_HASH = hashlib.sha256("moimoimoi111".encode()).hexdigest()
+ADMIN_USERNAME = "ngvanducthinh"  # Thêm username admin cố định
+ADMIN_PASSWORD_HASH = hashlib.sha256("21062013???".encode()).hexdigest()
 
 def check_tool_pro(username, tool_name):
     """Check if user has Pro access to a specific tool"""
