@@ -4,38 +4,148 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Dashboard | Free Fire Tools</title>
-    <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
         :root {
             --primary: #8b5cf6;
-            --dark: #0b0f14;
-            --dark-card: #161a1f;
-            --dark-border: rgba(255, 255, 255, 0.08);
-            --text: #e2e8f0;
-            --text-muted: #94a3b8;
+            --primary-dark: #7c3aed;
+            --primary-light: #a78bfa;
+            --primary-gradient: linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%);
+            --primary-glow: rgba(139, 92, 246, 0.3);
+            --dark: #070a0e;
+            --dark-card: #0f1319;
+            --dark-card-hover: #171e28;
+            --dark-border: rgba(255, 255, 255, 0.06);
+            --text: #e8edf5;
+            --text-muted: #8892a0;
+            --text-dim: #4a5568;
+            --success: #10b981;
+            --success-light: rgba(16, 185, 129, 0.15);
+            --danger: #ef4444;
+            --danger-light: rgba(239, 68, 68, 0.15);
+            --warning: #f59e0b;
+            --warning-light: rgba(245, 158, 11, 0.15);
+            --info: #3b82f6;
+            --info-light: rgba(59, 130, 246, 0.15);
+            --radius: 20px;
+            --radius-sm: 12px;
+            --shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+            --shadow-glow: 0 0 60px rgba(139, 92, 246, 0.1);
+            --transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
 
         body {
             font-family: 'Be Vietnam Pro', sans-serif;
             background: var(--dark);
             color: var(--text);
-            margin: 0;
             display: flex;
+            min-height: 100vh;
+            background-image: 
+                radial-gradient(ellipse at 10% 20%, rgba(139, 92, 246, 0.05) 0%, transparent 50%),
+                radial-gradient(ellipse at 90% 80%, rgba(139, 92, 246, 0.03) 0%, transparent 50%);
         }
 
-        /* Sidebar */
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 4px;
+            height: 4px;
+        }
+        ::-webkit-scrollbar-track {
+            background: var(--dark);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: var(--primary);
+            border-radius: 10px;
+        }
+
+        /* ==================== SIDEBAR ==================== */
         .sidebar {
-            width: 260px;
+            width: 280px;
             height: 100vh;
             background: var(--dark-card);
             border-right: 1px solid var(--dark-border);
-            padding: 2rem 1rem;
+            padding: 2rem 1.2rem;
             position: fixed;
+            display: flex;
+            flex-direction: column;
+            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 100;
+            backdrop-filter: blur(20px);
+            overflow-y: auto;
         }
 
-        .sidebar h2 { color: var(--primary); margin-bottom: 3rem; text-align: center; }
+        .sidebar::-webkit-scrollbar {
+            width: 2px;
+        }
+
+        .sidebar-brand {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 0 0.5rem 2rem 0.5rem;
+            border-bottom: 1px solid var(--dark-border);
+            margin-bottom: 2rem;
+        }
+
+        .sidebar-brand .brand-icon {
+            width: 48px;
+            height: 48px;
+            background: var(--primary-gradient);
+            border-radius: var(--radius-sm);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            color: white;
+            box-shadow: 0 4px 20px var(--primary-glow);
+            flex-shrink: 0;
+        }
+
+        .sidebar-brand .brand-text {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .sidebar-brand .brand-text h2 {
+            font-size: 1.2rem;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .sidebar-brand .brand-text span {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            font-weight: 400;
+            -webkit-text-fill-color: var(--text-muted);
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+
+        .nav-section {
+            flex: 1;
+        }
+
+        .nav-label {
+            font-size: 0.65rem;
+            text-transform: uppercase;
+            color: var(--text-dim);
+            padding: 0 0.8rem;
+            margin-bottom: 0.8rem;
+            letter-spacing: 1.5px;
+            font-weight: 600;
+        }
 
         .nav-link {
             display: flex;
@@ -44,346 +154,1673 @@
             padding: 12px 1rem;
             color: var(--text-muted);
             text-decoration: none;
-            border-radius: 10px;
-            margin-bottom: 0.5rem;
-            transition: 0.3s;
+            border-radius: var(--radius-sm);
+            margin-bottom: 0.2rem;
+            transition: var(--transition);
+            cursor: pointer;
+            position: relative;
+            font-weight: 500;
+            font-size: 0.9rem;
         }
 
-        .nav-link:hover, .nav-link.active {
-            background: rgba(139, 92, 246, 0.1);
+        .nav-link .nav-icon {
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.03);
+            transition: var(--transition);
+            flex-shrink: 0;
+        }
+
+        .nav-link i {
+            font-size: 1.1rem;
+            transition: var(--transition);
+        }
+
+        .nav-link .nav-text {
+            flex: 1;
+        }
+
+        .nav-link .nav-badge {
+            background: var(--primary);
+            color: white;
+            font-size: 0.65rem;
+            padding: 2px 10px;
+            border-radius: 20px;
+            font-weight: 600;
+        }
+
+        .nav-link:hover {
+            background: rgba(139, 92, 246, 0.08);
+            color: var(--text);
+            transform: translateX(4px);
+        }
+
+        .nav-link:hover .nav-icon {
+            background: rgba(139, 92, 246, 0.15);
+        }
+
+        .nav-link.active {
+            background: rgba(139, 92, 246, 0.12);
+            color: var(--primary-light);
+        }
+
+        .nav-link.active .nav-icon {
+            background: var(--primary-gradient);
+            box-shadow: 0 4px 16px var(--primary-glow);
+        }
+
+        .nav-link.active .nav-icon i {
+            color: white;
+        }
+
+        .nav-link.active::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 3px;
+            height: 30px;
+            background: var(--primary-gradient);
+            border-radius: 0 4px 4px 0;
+        }
+
+        .nav-link.logout {
+            margin-top: 0.5rem;
+            border-top: 1px solid var(--dark-border);
+            padding-top: 1.5rem;
+            color: var(--danger);
+        }
+
+        .nav-link.logout:hover {
+            background: var(--danger-light);
+            color: var(--danger);
+        }
+
+        .nav-link.logout:hover .nav-icon {
+            background: var(--danger-light);
+        }
+
+        /* User profile in sidebar */
+        .sidebar-user {
+            padding: 1rem 0.5rem;
+            border-top: 1px solid var(--dark-border);
+            margin-top: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .sidebar-user .avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--primary-gradient);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 1.1rem;
+            color: white;
+            flex-shrink: 0;
+        }
+
+        .sidebar-user .user-info {
+            flex: 1;
+        }
+
+        .sidebar-user .user-info .name {
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .sidebar-user .user-info .role {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+        }
+
+        /* ==================== SIDEBAR TOGGLE ==================== */
+        .sidebar-toggle {
+            display: none;
+            position: fixed;
+            top: 1rem;
+            left: 1rem;
+            z-index: 101;
+            background: var(--dark-card);
+            border: 1px solid var(--dark-border);
+            color: var(--text);
+            padding: 12px 16px;
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            font-size: 1.2rem;
+            transition: var(--transition);
+            backdrop-filter: blur(10px);
+        }
+
+        .sidebar-toggle:hover {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+            transform: scale(1.05);
+        }
+
+        .sidebar-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 99;
+            backdrop-filter: blur(4px);
+        }
+
+        /* ==================== MAIN CONTENT ==================== */
+        .main-content {
+            margin-left: 280px;
+            padding: 2rem 2.5rem;
+            width: 100%;
+            min-height: 100vh;
+        }
+
+        /* ==================== TOP BAR ==================== */
+        .topbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2.5rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid var(--dark-border);
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .topbar-left {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .topbar-left .page-title {
+            font-size: 1.6rem;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+        }
+
+        .topbar-left .page-title .highlight {
+            color: var(--primary-light);
+        }
+
+        .topbar-left .page-subtitle {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            font-weight: 400;
+            margin-top: 2px;
+        }
+
+        .topbar-right {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .topbar-right .datetime {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            padding: 8px 16px;
+            background: var(--dark-card);
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--dark-border);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .topbar-right .datetime i {
             color: var(--primary);
         }
 
-        /* Main Content */
-        .main-content {
-            margin-left: 260px;
-            padding: 2rem;
-            width: 100%;
+        /* ==================== TAB CONTENT ==================== */
+        .tab-content {
+            display: none;
+            animation: fadeSlideIn 0.5s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        .tab-content { display: none; }
-        .tab-content.active { display: block; }
+        .tab-content.active {
+            display: block;
+        }
 
+        @keyframes fadeSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px) scale(0.98);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        /* ==================== STATS GRID ==================== */
         .stats-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
             gap: 1.5rem;
-            margin-bottom: 3rem;
+            margin-bottom: 2.5rem;
         }
 
         .stat-card {
             background: var(--dark-card);
-            padding: 1.5rem;
-            border-radius: 15px;
+            padding: 1.8rem;
+            border-radius: var(--radius);
+            border: 1px solid var(--dark-border);
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+            cursor: default;
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: var(--primary-gradient);
+            opacity: 0;
+            transition: var(--transition);
+        }
+
+        .stat-card:hover {
+            border-color: rgba(139, 92, 246, 0.2);
+            transform: translateY(-4px);
+            box-shadow: var(--shadow);
+        }
+
+        .stat-card:hover::before {
+            opacity: 1;
+        }
+
+        .stat-card .stat-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 1rem;
+        }
+
+        .stat-card .stat-label {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .stat-card .stat-icon-wrapper {
+            width: 48px;
+            height: 48px;
+            border-radius: var(--radius-sm);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.4rem;
+            flex-shrink: 0;
+        }
+
+        .stat-card .stat-icon-wrapper.purple {
+            background: rgba(139, 92, 246, 0.15);
+            color: var(--primary);
+        }
+
+        .stat-card .stat-icon-wrapper.green {
+            background: var(--success-light);
+            color: var(--success);
+        }
+
+        .stat-card .stat-icon-wrapper.blue {
+            background: var(--info-light);
+            color: var(--info);
+        }
+
+        .stat-card .stat-icon-wrapper.orange {
+            background: var(--warning-light);
+            color: var(--warning);
+        }
+
+        .stat-card .stat-value {
+            font-size: 2.2rem;
+            font-weight: 800;
+            letter-spacing: -1px;
+            margin-bottom: 0.2rem;
+        }
+
+        .stat-card .stat-value.purple { color: var(--primary-light); }
+        .stat-card .stat-value.green { color: var(--success); }
+        .stat-card .stat-value.blue { color: var(--info); }
+        .stat-card .stat-value.orange { color: var(--warning); }
+
+        .stat-card .stat-change {
+            font-size: 0.7rem;
+            font-weight: 600;
+            padding: 2px 10px;
+            border-radius: 20px;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .stat-card .stat-change.up {
+            color: var(--success);
+            background: var(--success-light);
+        }
+
+        .stat-card .stat-change.down {
+            color: var(--danger);
+            background: var(--danger-light);
+        }
+
+        .stat-card .stat-desc {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin-top: 0.5rem;
+        }
+
+        /* ==================== TABLE ==================== */
+        .table-wrapper {
+            background: var(--dark-card);
+            border-radius: var(--radius);
+            border: 1px solid var(--dark-border);
+            overflow: hidden;
+            overflow-x: auto;
+            transition: var(--transition);
+        }
+
+        .table-wrapper:hover {
+            border-color: rgba(139, 92, 246, 0.1);
+        }
+
+        .table-toolbar {
+            padding: 1.2rem 1.8rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+            border-bottom: 1px solid var(--dark-border);
+            background: rgba(255, 255, 255, 0.01);
+        }
+
+        .table-toolbar .search-box {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: var(--dark);
+            padding: 8px 16px;
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--dark-border);
+            transition: var(--transition);
+            min-width: 250px;
+        }
+
+        .table-toolbar .search-box:focus-within {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px var(--primary-glow);
+        }
+
+        .table-toolbar .search-box input {
+            background: none;
+            border: none;
+            color: var(--text);
+            outline: none;
+            font-size: 0.9rem;
+            width: 100%;
+            font-family: inherit;
+        }
+
+        .table-toolbar .search-box input::placeholder {
+            color: var(--text-muted);
+        }
+
+        .table-toolbar .search-box i {
+            color: var(--text-muted);
+        }
+
+        .table-toolbar .toolbar-actions {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+        }
+
+        .table-toolbar .table-info {
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            padding: 6px 14px;
+            background: var(--dark);
+            border-radius: 20px;
             border: 1px solid var(--dark-border);
         }
 
-        .stat-card h3 { font-size: 0.9rem; color: var(--text-muted); margin-bottom: 0.5rem; }
-        .stat-card p { font-size: 1.8rem; font-weight: bold; color: var(--primary); margin: 0; }
-
-        /* Tables */
         table {
             width: 100%;
             border-collapse: collapse;
-            background: var(--dark-card);
-            border-radius: 15px;
-            overflow: hidden;
         }
 
-        th, td { padding: 1rem; text-align: left; border-bottom: 1px solid var(--dark-border); }
-        th { background: rgba(255,255,255,0.02); color: var(--text-muted); font-weight: 500; }
+        thead {
+            background: rgba(255, 255, 255, 0.02);
+        }
 
+        th {
+            padding: 1rem 1.8rem;
+            text-align: left;
+            color: var(--text-muted);
+            font-weight: 600;
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            border-bottom: 1px solid var(--dark-border);
+            white-space: nowrap;
+        }
+
+        td {
+            padding: 1rem 1.8rem;
+            border-bottom: 1px solid var(--dark-border);
+            font-size: 0.9rem;
+            vertical-align: middle;
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        tr:hover td {
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        /* ==================== BUTTONS ==================== */
         .btn {
-            padding: 6px 12px;
-            border-radius: 8px;
+            padding: 8px 18px;
+            border-radius: var(--radius-sm);
             border: none;
             cursor: pointer;
             font-size: 0.85rem;
-            transition: 0.3s;
+            font-weight: 600;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+            font-family: inherit;
         }
 
-        .btn-edit { background: rgba(139, 92, 246, 0.2); color: var(--primary); }
-        .btn-delete { background: rgba(239, 68, 68, 0.2); color: #ef4444; }
-        .btn-add { background: var(--primary); color: white; padding: 10px 20px; }
-
-        .badge {
-            padding: 2px 8px;
-            border-radius: 4px;
-            font-size: 0.75rem;
-            font-weight: bold;
-        }
-        .badge-pro { background: #8b5cf6; color: white; }
-        .badge-free { background: #475569; color: white; }
-
-        /* Modal / Form */
-        .form-group { margin-bottom: 1rem; }
-        .form-group label { display: block; margin-bottom: 0.5rem; color: var(--text-muted); }
-        .form-group input, .form-group select {
-            width: 100%;
-            padding: 10px;
-            background: #1e293b;
-            border: 1px solid var(--dark-border);
-            border-radius: 8px;
+        .btn-primary {
+            background: var(--primary-gradient);
             color: white;
+            box-shadow: 0 4px 16px var(--primary-glow);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 32px var(--primary-glow);
+        }
+
+        .btn-outline {
+            background: transparent;
+            color: var(--text-muted);
+            border: 1px solid var(--dark-border);
+        }
+
+        .btn-outline:hover {
+            background: var(--dark-card-hover);
+            color: var(--text);
+            border-color: var(--text-muted);
+        }
+
+        .btn-ghost {
+            background: transparent;
+            color: var(--text-muted);
+        }
+
+        .btn-ghost:hover {
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text);
+        }
+
+        .btn-icon {
+            padding: 8px 10px;
+            border-radius: 10px;
+        }
+
+        .btn-sm {
+            padding: 6px 12px;
+            font-size: 0.75rem;
+        }
+
+        .btn-edit {
+            background: rgba(139, 92, 246, 0.12);
+            color: var(--primary-light);
+            transition: var(--transition);
+        }
+
+        .btn-edit:hover {
+            background: rgba(139, 92, 246, 0.25);
+            transform: scale(1.08);
+            box-shadow: 0 4px 16px var(--primary-glow);
+        }
+
+        .btn-delete {
+            background: var(--danger-light);
+            color: var(--danger);
+            transition: var(--transition);
+        }
+
+        .btn-delete:hover {
+            background: rgba(239, 68, 68, 0.25);
+            transform: scale(1.08);
+            box-shadow: 0 4px 16px rgba(239, 68, 68, 0.2);
+        }
+
+        .btn-success {
+            background: var(--success);
+            color: white;
+        }
+
+        .btn-success:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 16px rgba(16, 185, 129, 0.3);
+        }
+
+        .btn-refresh {
+            background: var(--dark-card);
+            color: var(--text-muted);
+            border: 1px solid var(--dark-border);
+            padding: 10px 14px;
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .btn-refresh:hover {
+            background: var(--dark-card-hover);
+            color: var(--text);
+            transform: rotate(45deg);
+        }
+
+        .btn-refresh .fa-spin {
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* ==================== BADGES ==================== */
+        .badge {
+            padding: 4px 14px;
+            border-radius: 20px;
+            font-size: 0.65rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+            display: inline-block;
+        }
+
+        .badge-pro {
+            background: var(--primary-gradient);
+            color: white;
+            box-shadow: 0 2px 12px var(--primary-glow);
+        }
+
+        .badge-free {
+            background: var(--dark-card-hover);
+            color: var(--text-muted);
+            border: 1px solid var(--dark-border);
+        }
+
+        .badge-success {
+            background: var(--success-light);
+            color: var(--success);
+        }
+
+        .badge-danger {
+            background: var(--danger-light);
+            color: var(--danger);
+        }
+
+        .badge-warning {
+            background: var(--warning-light);
+            color: var(--warning);
+        }
+
+        .badge-info {
+            background: var(--info-light);
+            color: var(--info);
+        }
+
+        /* ==================== CODE ==================== */
+        code {
+            background: var(--dark);
+            padding: 4px 12px;
+            border-radius: 8px;
+            font-size: 0.8rem;
+            color: var(--primary-light);
+            font-family: 'Courier New', monospace;
+            border: 1px solid var(--dark-border);
+        }
+
+        /* ==================== SKELETON ==================== */
+        .skeleton {
+            background: linear-gradient(90deg, var(--dark-card) 25%, var(--dark-card-hover) 50%, var(--dark-card) 75%);
+            background-size: 200% 100%;
+            animation: shimmer 1.5s ease-in-out infinite;
+            border-radius: 8px;
+        }
+
+        @keyframes shimmer {
+            0% { background-position: -200% 0; }
+            100% { background-position: 200% 0; }
+        }
+
+        .skeleton-text {
+            height: 14px;
+            width: 100%;
+            margin: 4px 0;
+            border-radius: 6px;
+        }
+
+        .skeleton-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+        }
+
+        /* ==================== EMPTY STATE ==================== */
+        .empty-state {
+            text-align: center;
+            padding: 4rem 1rem;
+        }
+
+        .empty-state .empty-icon {
+            font-size: 4rem;
+            color: var(--text-dim);
+            opacity: 0.3;
+            margin-bottom: 1.5rem;
+        }
+
+        .empty-state h3 {
+            font-size: 1.2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .empty-state p {
+            color: var(--text-muted);
+            max-width: 400px;
+            margin: 0 auto;
+        }
+
+        /* ==================== RESPONSIVE ==================== */
+        @media (max-width: 1024px) {
+            .main-content {
+                padding: 1.5rem 2rem;
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            }
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+                width: 300px;
+            }
+
+            .sidebar.open {
+                transform: translateX(0);
+            }
+
+            .sidebar-overlay.active {
+                display: block;
+            }
+
+            .sidebar-toggle {
+                display: block;
+            }
+
+            .main-content {
+                margin-left: 0;
+                padding: 1rem;
+                padding-top: 5rem;
+            }
+
+            .topbar {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 0.5rem;
+            }
+
+            .topbar-left .page-title {
+                font-size: 1.3rem;
+            }
+
+            .topbar-right {
+                width: 100%;
+                flex-wrap: wrap;
+            }
+
+            .topbar-right .datetime {
+                font-size: 0.7rem;
+                padding: 6px 12px;
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+                gap: 1rem;
+            }
+
+            .stat-card {
+                padding: 1.2rem;
+            }
+
+            .stat-card .stat-value {
+                font-size: 1.6rem;
+            }
+
+            .table-toolbar {
+                padding: 1rem;
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .table-toolbar .search-box {
+                min-width: unset;
+                width: 100%;
+            }
+
+            .table-toolbar .toolbar-actions {
+                flex-wrap: wrap;
+                justify-content: space-between;
+            }
+
+            th, td {
+                padding: 0.75rem 1rem;
+                font-size: 0.8rem;
+            }
+
+            .btn {
+                font-size: 0.75rem;
+                padding: 6px 12px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .stats-grid {
+                grid-template-columns: 1fr 1fr;
+                gap: 0.75rem;
+            }
+
+            .stat-card {
+                padding: 1rem;
+            }
+
+            .stat-card .stat-value {
+                font-size: 1.3rem;
+            }
+
+            .stat-card .stat-label {
+                font-size: 0.65rem;
+            }
+
+            .stat-card .stat-icon-wrapper {
+                width: 36px;
+                height: 36px;
+                font-size: 1rem;
+            }
+
+            .topbar-left .page-title {
+                font-size: 1.1rem;
+            }
+
+            .topbar-left .page-subtitle {
+                font-size: 0.75rem;
+            }
         }
     </style>
 </head>
 <body>
-    <div class="sidebar">
-        <h2>Admin Panel</h2>
-        <a href="#" class="nav-link active" onclick="showTab('users')"><i class="fas fa-users"></i> Người dùng</a>
-        <a href="#" class="nav-link" onclick="showTab('keys')"><i class="fas fa-key"></i> Quản lý Key</a>
-        <a href="#" class="nav-link" style="margin-top: auto; color: #ef4444;" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Đăng xuất</a>
-    </div>
+    <!-- Sidebar Toggle -->
+    <button class="sidebar-toggle" onclick="toggleSidebar()" aria-label="Toggle sidebar">
+        <i class="fas fa-bars"></i>
+    </button>
 
-    <div class="main-content">
-        <div id="users-tab" class="tab-content active">
-            <h1 style="margin-bottom: 2rem;">Quản lý Người dùng</h1>
-            <div class="stats-grid" id="user-stats"></div>
-            
-            <table>
-                <thead>
-                    <tr>
-                        <th>Username</th>
-                        <th>Email</th>
-                        <th>Trạng thái</th>
-                        <th>Sử dụng (Ban7/Spam)</th>
-                        <th>Hành động</th>
-                    </tr>
-                </thead>
-                <tbody id="users-list"></tbody>
-            </table>
+    <!-- Sidebar Overlay -->
+    <div class="sidebar-overlay" onclick="toggleSidebar()"></div>
+
+    <!-- Sidebar -->
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-brand">
+            <div class="brand-icon">
+                <i class="fas fa-crown"></i>
+            </div>
+            <div class="brand-text">
+                <h2>AdminPanel</h2>
+                <span>Free Fire Tools</span>
+            </div>
         </div>
 
-        <div id="keys-tab" class="tab-content">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
-                <h1>Quản lý Key</h1>
-                <button class="btn btn-add" onclick="openCreateKeyModal()"><i class="fas fa-plus"></i> Tạo Key mới</button>
+        <div class="nav-section">
+            <div class="nav-label">Điều hướng</div>
+            <a href="#" class="nav-link active" data-tab="users" onclick="showTab('users')">
+                <span class="nav-icon"><i class="fas fa-users"></i></span>
+                <span class="nav-text">Người dùng</span>
+                <span class="nav-badge" id="user-badge">0</span>
+            </a>
+            <a href="#" class="nav-link" data-tab="keys" onclick="showTab('keys')">
+                <span class="nav-icon"><i class="fas fa-key"></i></span>
+                <span class="nav-text">Quản lý Key</span>
+                <span class="nav-badge" id="key-badge">0</span>
+            </a>
+        </div>
+
+        <div class="sidebar-user">
+            <div class="avatar">A</div>
+            <div class="user-info">
+                <div class="name">Administrator</div>
+                <div class="role">Super Admin</div>
             </div>
-            
-            <table>
-                <thead>
-                    <tr>
-                        <th>Mã Key</th>
-                        <th>Tính năng</th>
-                        <th>Thời hạn</th>
-                        <th>Trạng thái</th>
-                        <th>Hành động</th>
-                    </tr>
-                </thead>
-                <tbody id="keys-list"></tbody>
-            </table>
+            <a href="#" onclick="logout()" style="color: var(--text-muted); font-size: 1.1rem; transition: var(--transition);">
+                <i class="fas fa-sign-out-alt"></i>
+            </a>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Top Bar -->
+        <div class="topbar">
+            <div class="topbar-left">
+                <div>
+                    <div class="page-title">
+                        <span id="page-title">Quản lý <span class="highlight">Người dùng</span></span>
+                        <div class="page-subtitle" id="page-subtitle">Quản lý tài khoản và quyền truy cập</div>
+                    </div>
+                </div>
+            </div>
+            <div class="topbar-right">
+                <div class="datetime">
+                    <i class="fas fa-calendar-alt"></i>
+                    <span id="datetime-display"></span>
+                </div>
+                <button class="btn-refresh" onclick="refreshCurrentTab()" title="Làm mới">
+                    <i class="fas fa-sync-alt" id="refresh-icon"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Users Tab -->
+        <div id="users-tab" class="tab-content active">
+            <div class="stats-grid" id="user-stats">
+                <div class="stat-card">
+                    <div class="stat-top">
+                        <div class="stat-label">Tổng Người Dùng</div>
+                        <div class="stat-icon-wrapper purple">
+                            <i class="fas fa-users"></i>
+                        </div>
+                    </div>
+                    <div class="stat-value purple" id="stat-total">0</div>
+                    <div class="stat-desc">Tất cả tài khoản</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-top">
+                        <div class="stat-label">User PRO</div>
+                        <div class="stat-icon-wrapper orange">
+                            <i class="fas fa-crown"></i>
+                        </div>
+                    </div>
+                    <div class="stat-value orange" id="stat-pro">0</div>
+                    <div class="stat-desc"><span class="stat-change up"><i class="fas fa-arrow-up"></i> Premium</span></div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-top">
+                        <div class="stat-label">User FREE</div>
+                        <div class="stat-icon-wrapper blue">
+                            <i class="fas fa-user"></i>
+                        </div>
+                    </div>
+                    <div class="stat-value blue" id="stat-free">0</div>
+                    <div class="stat-desc">Miễn phí cơ bản</div>
+                </div>
+            </div>
+
+            <div class="table-wrapper">
+                <div class="table-toolbar">
+                    <div class="search-box">
+                        <i class="fas fa-search"></i>
+                        <input type="text" id="user-search" placeholder="Tìm kiếm theo username hoặc email..." oninput="filterUsers()">
+                    </div>
+                    <div class="toolbar-actions">
+                        <span class="table-info" id="user-count">Đang tải...</span>
+                    </div>
+                </div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Username</th>
+                            <th>Email</th>
+                            <th>Trạng thái</th>
+                            <th>Sử dụng (Ban7 / Spam)</th>
+                            <th style="text-align: center; width: 120px;">Hành động</th>
+                        </tr>
+                    </thead>
+                    <tbody id="users-list"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Keys Tab -->
+        <div id="keys-tab" class="tab-content">
+            <div class="stats-grid" id="key-stats">
+                <div class="stat-card">
+                    <div class="stat-top">
+                        <div class="stat-label">Tổng Key</div>
+                        <div class="stat-icon-wrapper purple">
+                            <i class="fas fa-keys"></i>
+                        </div>
+                    </div>
+                    <div class="stat-value purple" id="stat-keys-total">0</div>
+                    <div class="stat-desc">Tất cả key đã tạo</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-top">
+                        <div class="stat-label">Key Chưa Dùng</div>
+                        <div class="stat-icon-wrapper green">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                    </div>
+                    <div class="stat-value green" id="stat-keys-available">0</div>
+                    <div class="stat-desc"><span class="stat-change up"><i class="fas fa-check"></i> Có sẵn</span></div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-top">
+                        <div class="stat-label">Key Đã Dùng</div>
+                        <div class="stat-icon-wrapper orange">
+                            <i class="fas fa-check-double"></i>
+                        </div>
+                    </div>
+                    <div class="stat-value orange" id="stat-keys-used">0</div>
+                    <div class="stat-desc">Đã kích hoạt</div>
+                </div>
+            </div>
+
+            <div class="table-wrapper">
+                <div class="table-toolbar">
+                    <div class="search-box">
+                        <i class="fas fa-search"></i>
+                        <input type="text" id="key-search" placeholder="Tìm kiếm mã key..." oninput="filterKeys()">
+                    </div>
+                    <div class="toolbar-actions">
+                        <span class="table-info" id="key-count">Đang tải...</span>
+                        <button class="btn btn-primary" onclick="openCreateKeyModal()">
+                            <i class="fas fa-plus"></i> Tạo Key
+                        </button>
+                    </div>
+                </div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Mã Key</th>
+                            <th>Tính năng</th>
+                            <th>Thời hạn</th>
+                            <th>Trạng thái</th>
+                            <th style="text-align: center; width: 120px;">Hành động</th>
+                        </tr>
+                    </thead>
+                    <tbody id="keys-list"></tbody>
+                </table>
+            </div>
         </div>
     </div>
 
     <script>
+        // ============ STATE ============
+        let state = {
+            users: { data: null, cache: null, lastFetch: 0, filter: '' },
+            keys: { data: null, cache: null, lastFetch: 0, filter: '' },
+            currentTab: 'users'
+        };
+
+        const CACHE_DURATION = 30000;
+
+        // ============ DATETIME ============
+        function updateDateTime() {
+            const now = new Date();
+            const options = { 
+                weekday: 'short', 
+                year: 'numeric', 
+                month: 'short', 
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit'
+            };
+            document.getElementById('datetime-display').textContent = now.toLocaleDateString('vi-VN', options);
+        }
+        updateDateTime();
+        setInterval(updateDateTime, 1000);
+
+        // ============ SIDEBAR ============
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.querySelector('.sidebar-overlay');
+            sidebar.classList.toggle('open');
+            overlay.classList.toggle('active');
+        }
+
+        // ============ TAB ============
         function showTab(tabId) {
+            state.currentTab = tabId;
+
             document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
-            document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
             document.getElementById(tabId + '-tab').classList.add('active');
-            event.currentTarget.classList.add('active');
-            
-            if(tabId === 'users') loadUsers();
-            if(tabId === 'keys') loadKeys();
-        }
 
-        async function loadUsers() {
-            const res = await fetch('/api/admin/get_users');
-            const data = await res.json();
-            if (data.success) {
-                const list = document.getElementById('users-list');
-                list.innerHTML = '';
-                
-                let total = 0, proCount = 0;
-                
-                for (const username in data.users) {
-                    total++;
-                    const user = data.users[username];
-                    const usage = data.usages[username] || {ban7: 0, spam_log: 0, is_pro: false};
-                    const isPro = user.is_pro || usage.is_pro;
-                    if(isPro) proCount++;
-                    
-                    const tr = document.createElement('tr');
-                    tr.innerHTML = `
-                        <td>${username}</td>
-                        <td>${user.email}</td>
-                        <td><span class="badge ${isPro ? 'badge-pro' : 'badge-free'}">${isPro ? 'PRO' : 'FREE'}</span></td>
-                        <td>${usage.ban7 || 0} / ${usage.spam_log || 0}</td>
-                        <td>
-                            <button class="btn btn-edit" onclick="editUser('${username}', '${user.email}', ${isPro})"><i class="fas fa-edit"></i></button>
-                            <button class="btn btn-delete" onclick="deleteUser('${username}')"><i class="fas fa-trash"></i></button>
-                        </td>
-                    `;
-                    list.appendChild(tr);
-                }
-                
-                document.getElementById('user-stats').innerHTML = `
-                    <div class="stat-card"><h3>Tổng User</h3><p>${total}</p></div>
-                    <div class="stat-card"><h3>User PRO</h3><p>${proCount}</p></div>
-                    <div class="stat-card"><h3>User FREE</h3><p>${total - proCount}</p></div>
-                `;
-            }
-        }
-
-        async function loadKeys() {
-            const res = await fetch('/api/admin/get_keys');
-            const data = await res.json();
-            if (data.success) {
-                const list = document.getElementById('keys-list');
-                list.innerHTML = '';
-                
-                if (data.keys) {
-                    for (const code in data.keys) {
-                        const key = data.keys[code];
-                        const tr = document.createElement('tr');
-                        tr.innerHTML = `
-                            <td><code>${code}</code></td>
-                            <td>${key.tool_name === 'all' ? 'Tất cả' : key.tool_name}</td>
-                            <td>${key.is_lifetime ? 'Vĩnh viễn' : key.expiry}</td>
-                            <td>${key.is_used ? '<span style="color: #ef4444">Đã dùng (' + key.used_by + ')</span>' : '<span style="color: #22c55e">Chưa dùng</span>'}</td>
-                            <td>
-                                <button class="btn btn-edit" onclick="editKey('${code}', '${key.expiry}')"><i class="fas fa-clock"></i></button>
-                                <button class="btn btn-delete" onclick="deleteKey('${code}')"><i class="fas fa-trash"></i></button>
-                            </td>
-                        `;
-                        list.appendChild(tr);
-                    }
-                }
-            }
-        }
-
-        async function editUser(username, email, isPro) {
-            const { value: formValues } = await Swal.fire({
-                title: 'Chỉnh sửa User: ' + username,
-                html: `
-                    <div class="form-group">
-                        <label>Email</label>
-                        <input id="swal-email" class="swal2-input" value="${email}">
-                    </div>
-                    <div class="form-group">
-                        <label>Đổi mật khẩu (để trống nếu không đổi)</label>
-                        <input id="swal-pass" type="password" class="swal2-input" placeholder="Mật khẩu mới">
-                    </div>
-                    <div class="form-group">
-                        <label>Gói tài khoản</label>
-                        <select id="swal-pro" class="swal2-input">
-                            <option value="false" ${!isPro ? 'selected' : ''}>FREE</option>
-                            <option value="true" ${isPro ? 'selected' : ''}>PRO</option>
-                        </select>
-                    </div>
-                `,
-                focusConfirm: false,
-                preConfirm: () => {
-                    return {
-                        email: document.getElementById('swal-email').value,
-                        password: document.getElementById('swal-pass').value,
-                        is_pro: document.getElementById('swal-pro').value === 'true'
-                    }
-                }
+            document.querySelectorAll('.nav-link[data-tab]').forEach(l => {
+                l.classList.toggle('active', l.dataset.tab === tabId);
             });
 
-            if (formValues) {
-                const res = await fetch('/api/admin/update_user', {
-                    method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({
-                        username: username,
-                        new_data: { email: formValues.email, is_pro: formValues.is_pro },
-                        new_password: formValues.password || null
-                    })
-                });
-                const result = await res.json();
-                if(result.success) {
-                    Swal.fire('Thành công', result.message, 'success');
-                    loadUsers();
-                }
+            // Update title
+            const titles = {
+                users: { title: 'Quản lý <span class="highlight">Người dùng</span>', sub: 'Quản lý tài khoản và quyền truy cập' },
+                keys: { title: 'Quản lý <span class="highlight">Key</span>', sub: 'Tạo và quản lý các mã kích hoạt' }
+            };
+            document.getElementById('page-title').innerHTML = titles[tabId].title;
+            document.getElementById('page-subtitle').textContent = titles[tabId].sub;
+
+            if (window.innerWidth <= 768) {
+                document.getElementById('sidebar').classList.remove('open');
+                document.querySelector('.sidebar-overlay').classList.remove('active');
+            }
+
+            if (tabId === 'users') loadUsers();
+            if (tabId === 'keys') loadKeys();
+        }
+
+        function refreshCurrentTab() {
+            const icon = document.getElementById('refresh-icon');
+            icon.classList.add('fa-spin');
+            
+            if (state.currentTab === 'users') {
+                state.users.cache = null;
+                loadUsers(true).finally(() => icon.classList.remove('fa-spin'));
+            } else if (state.currentTab === 'keys') {
+                state.keys.cache = null;
+                loadKeys(true).finally(() => icon.classList.remove('fa-spin'));
             }
         }
 
-        async function deleteUser(username) {
-            if (confirm('Xác nhận xóa người dùng ' + username + '?')) {
-                const res = await fetch('/api/admin/delete_user', {
-                    method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({username: username})
-                });
-                const result = await res.json();
-                if(result.success) {
-                    Swal.fire('Đã xóa', result.message, 'success');
-                    loadUsers();
+        // ============ LOAD USERS ============
+        async function loadUsers(force = false) {
+            const now = Date.now();
+
+            if (!force && state.users.cache && (now - state.users.lastFetch < CACHE_DURATION)) {
+                renderUsers(state.users.cache);
+                return;
+            }
+
+            try {
+                showSkeleton('users-list', 5);
+
+                const res = await fetch('/api/admin/get_users');
+                const data = await res.json();
+
+                if (data.success) {
+                    state.users.cache = data;
+                    state.users.lastFetch = now;
+                    renderUsers(data);
+                } else {
+                    showError('users-list', 'Không thể tải dữ liệu người dùng');
                 }
+            } catch (error) {
+                showError('users-list', 'Lỗi kết nối đến server');
             }
         }
 
-        async function openCreateKeyModal() {
+        function renderUsers(data) {
+            const list = document.getElementById('users-list');
+            const fragment = document.createDocumentFragment();
+
+            let total = 0, proCount = 0;
+            const searchTerm = state.users.filter.toLowerCase();
+
+            for (const username in data.users) {
+                const user = data.users[username];
+                const usage = data.usages[username] || { ban7: 0, spam_log: 0, is_pro: false };
+                const isPro = user.is_pro || usage.is_pro;
+
+                if (searchTerm && !username.toLowerCase().includes(searchTerm) &&
+                    !(user.email || '').toLowerCase().includes(searchTerm)) {
+                    continue;
+                }
+
+                total++;
+                if (isPro) proCount++;
+
+                const tr = document.createElement('tr');
+                tr.style.transition = 'all 0.3s ease';
+                tr.innerHTML = `
+                    <td><strong style="font-weight: 600;">${escapeHtml(username)}</strong></td>
+                    <td style="color: var(--text-muted);">${escapeHtml(user.email || '—')}</td>
+                    <td><span class="badge ${isPro ? 'badge-pro' : 'badge-free'}">${isPro ? 'PRO' : 'FREE'}</span></td>
+                    <td>
+                        <span style="display: inline-flex; gap: 8px;">
+                            <span style="background: var(--danger-light); color: var(--danger); padding: 2px 10px; border-radius: 12px; font-size: 0.75rem; font-weight: 600;">${usage.ban7 || 0}</span>
+                            <span style="background: var(--info-light); color: var(--info); padding: 2px 10px; border-radius: 12px; font-size: 0.75rem; font-weight: 600;">${usage.spam_log || 0}</span>
+                        </span>
+                    </td>
+                    <td style="text-align: center; white-space: nowrap;">
+                        <button class="btn btn-edit btn-icon btn-sm" onclick="editUser('${escapeHtml(username)}', '${escapeHtml(user.email || '')}', ${isPro})" title="Chỉnh sửa">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="btn btn-delete btn-icon btn-sm" onclick="deleteUser('${escapeHtml(username)}')" title="Xóa">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </td>
+                `;
+                fragment.appendChild(tr);
+            }
+
+            list.innerHTML = '';
+            list.appendChild(fragment);
+
+            if (total === 0 && !searchTerm) {
+                showEmpty(list, 'Chưa có người dùng nào', 'fa-users');
+            } else if (total === 0 && searchTerm) {
+                showEmpty(list, 'Không tìm thấy người dùng phù hợp', 'fa-search');
+            }
+
+            // Update stats
+            document.getElementById('stat-total').textContent = total;
+            document.getElementById('stat-pro').textContent = proCount;
+            document.getElementById('stat-free').textContent = total - proCount;
+            document.getElementById('user-count').textContent = `${total} người dùng`;
+            document.getElementById('user-badge').textContent = total;
+        }
+
+        // ============ LOAD KEYS ============
+        async function loadKeys(force = false) {
+            const now = Date.now();
+
+            if (!force && state.keys.cache && (now - state.keys.lastFetch < CACHE_DURATION)) {
+                renderKeys(state.keys.cache);
+                return;
+            }
+
+            try {
+                showSkeleton('keys-list', 5);
+
+                const res = await fetch('/api/admin/get_keys');
+                const data = await res.json();
+
+                if (data.success) {
+                    state.keys.cache = data;
+                    state.keys.lastFetch = now;
+                    renderKeys(data);
+                } else {
+                    showError('keys-list', 'Không thể tải dữ liệu key');
+                }
+            } catch (error) {
+                showError('keys-list', 'Lỗi kết nối đến server');
+            }
+        }
+
+        function renderKeys(data) {
+            const list = document.getElementById('keys-list');
+            const fragment = document.createDocumentFragment();
+            const searchTerm = state.keys.filter.toLowerCase();
+
+            let count = 0, available = 0, used = 0;
+
+            if (data.keys) {
+                for (const code in data.keys) {
+                    const key = data.keys[code];
+
+                    if (searchTerm && !code.toLowerCase().includes(searchTerm)) {
+                        continue;
+                    }
+
+                    count++;
+                    if (key.is_used) used++;
+                    else available++;
+
+                    const tr = document.createElement('tr');
+                    const statusHtml = key.is_used
+                        ? `<span class="badge badge-danger">Đã dùng <span style="font-weight: 400;">(${escapeHtml(key.used_by || '?')})</span></span>`
+                        : `<span class="badge badge-success">Chưa dùng</span>`;
+
+                    const expiryHtml = key.is_lifetime
+                        ? `<span class="badge badge-warning"><i class="fas fa-infinity"></i> Vĩnh viễn</span>`
+                        : `<span style="color: var(--text-muted); font-size: 0.8rem;">${escapeHtml(key.expiry || '—')}</span>`;
+
+                    tr.innerHTML = `
+                        <td><code>${escapeHtml(code)}</code></td>
+                        <td><span style="font-weight: 500;">${key.tool_name === 'all' ? 'Tất cả' : escapeHtml(key.tool_name)}</span></td>
+                        <td>${expiryHtml}</td>
+                        <td>${statusHtml}</td>
+                        <td style="text-align: center; white-space: nowrap;">
+                            <button class="btn btn-edit btn-icon btn-sm" onclick="editKey('${escapeHtml(code)}')" title="Gia hạn">
+                                <i class="fas fa-clock"></i>
+                            </button>
+                            <button class="btn btn-delete btn-icon btn-sm" onclick="deleteKey('${escapeHtml(code)}')" title="Xóa">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </td>
+                    `;
+                    fragment.appendChild(tr);
+                }
+            }
+
+            list.innerHTML = '';
+            list.appendChild(fragment);
+
+            if (count === 0 && !searchTerm) {
+                showEmpty(list, 'Chưa có key nào được tạo', 'fa-key');
+            } else if (count === 0 && searchTerm) {
+                showEmpty(list, 'Không tìm thấy key phù hợp', 'fa-search');
+            }
+
+            document.getElementById('stat-keys-total').textContent = count;
+            document.getElementById('stat-keys-available').textContent = available;
+            document.getElementById('stat-keys-used').textContent = used;
+            document.getElementById('key-count').textContent = `${count} key`;
+            document.getElementById('key-badge').textContent = count;
+        }
+
+        // ============ FILTER ============
+        function filterUsers() {
+            state.users.filter = document.getElementById('user-search').value;
+            if (state.users.cache) renderUsers(state.users.cache);
+        }
+
+        function filterKeys() {
+            state.keys.filter = document.getElementById('key-search').value;
+            if (state.keys.cache) renderKeys(state.keys.cache);
+        }
+
+        // ============ SKELETON / EMPTY / ERROR ============
+        function showSkeleton(listId, rows) {
+            const list = document.getElementById(listId);
+            list.innerHTML = '';
+            for (let i = 0; i < rows; i++) {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td><div class="skeleton skeleton-text" style="width: 70%;"></div></td>
+                    <td><div class="skeleton skeleton-text" style="width: 50%;"></div></td>
+                    <td><div class="skeleton skeleton-text" style="width: 40%;"></div></td>
+                    <td><div class="skeleton skeleton-text" style="width: 30%;"></div></td>
+                    <td><div class="skeleton skeleton-text" style="width: 60%;"></div></td>
+                `;
+                list.appendChild(tr);
+            }
+        }
+
+        function showEmpty(list, message, icon = 'fa-inbox') {
+            list.innerHTML = `
+                <tr><td colspan="5">
+                    <div class="empty-state">
+                        <div class="empty-icon"><i class="fas ${icon}"></i></div>
+                        <h3>${message}</h3>
+                        <p>Hãy bắt đầu tạo mới hoặc kiểm tra lại dữ liệu</p>
+                    </div>
+                </td></tr>
+            `;
+        }
+
+        function showError(listId, message) {
+            const list = document.getElementById(listId);
+            list.innerHTML = `
+                <tr><td colspan="5">
+                    <div class="empty-state" style="color: var(--danger);">
+                        <div class="empty-icon" style="color: var(--danger);"><i class="fas fa-exclamation-triangle"></i></div>
+                        <h3 style="color: var(--danger);">${message}</h3>
+                        <p>Vui lòng kiểm tra kết nối và thử lại</p>
+                        <button class="btn btn-primary" style="margin-top: 1.5rem;" onclick="location.reload()">
+                            <i class="fas fa-redo"></i> Thử lại
+                        </button>
+                    </div>
+                </td></tr>
+            `;
+        }
+
+        // ============ UTILITY ============
+        function escapeHtml(str) {
+            if (!str) return '';
+            const div = document.createElement('div');
+            div.textContent = str;
+            return div.innerHTML;
+        }
+
+        // ============ EDIT USER ============
+        async function editUser(username, email, isPro) {
             const { value: formValues } = await Swal.fire({
-                title: 'Tạo Key mới',
+                title: '✏️ Chỉnh sửa Người dùng',
                 html: `
-                    <div class="form-group">
-                        <label>Áp dụng cho tính năng</label>
-                        <select id="key-tool" class="swal2-input">
-                            <option value="ban7">Ban 7 Ngày</option>
-                            <option value="spam_log">Spam Log</option>
-                            <option value="all">Tất cả tính năng</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label>Thời hạn</label>
-                        <select id="key-type" class="swal2-input" onchange="document.getElementById('key-expiry-wrap').style.display = this.value === 'temp' ? 'block' : 'none'">
-                            <option value="life">Vĩnh viễn (Lifetime)</option>
-                            <option value="temp">Có thời hạn</option>
-                        </select>
-                    </div>
-                    <div id="key-expiry-wrap" style="display: none">
-                        <div class="form-group">
-                            <label>Ngày hết hạn (YYYY-MM-DD HH:MM:SS)</label>
-                            <input id="key-expiry" class="swal2-input" placeholder="2026-12-31 23:59:59">
+                    <div style="text-align: left; padding: 0.5rem 0;">
+                        <p style="color: var(--text-muted); margin-bottom: 1.5rem; font-size: 0.9rem;">
+                            Đang chỉnh sửa: <strong style="color: var(--primary-light);">${escapeHtml(username)}</strong>
+                        </p>
+                        <div class="form-group" style="margin-bottom: 1.2rem;">
+                            <label style="display: block; margin-bottom: 0.4rem; font-weight: 500; font-size: 0.85rem; color: var(--text-muted);">
+                                <i class="fas fa-envelope" style="margin-right: 6px;"></i> Email
+                            </label>
+                            <input id="swal-email" class="swal2-input" value="${escapeHtml(email)}" placeholder="Email người dùng" style="width: 100%; padding: 10px 14px; background: var(--dark); border: 1px solid var(--dark-border); border-radius: 10px; color: var(--text);">
+                        </div>
+                        <div class="form-group" style="margin-bottom: 1.2rem;">
+                            <label style="display: block; margin-bottom: 0.4rem; font-weight: 500; font-size: 0.85rem; color: var(--text-muted);">
+                                <i class="fas fa-lock" style="margin-right: 6px;"></i> Mật khẩu mới (để trống nếu không đổi)
+                            </label>
+                            <input id="swal-pass" type="password" class="swal2-input" placeholder="Nhập mật khẩu mới..." style="width: 100%; padding: 10px 14px; background: var(--dark); border: 1px solid var(--dark-border); border-radius: 10px; color: var(--text);">
+                        </div>
+                        <div class="form-group" style="margin-bottom: 0.5rem;">
+                            <label style="display: block; margin-bottom: 0.4rem; font-weight: 500; font-size: 0.85rem; color: var(--text-muted);">
+                                <i class="fas fa-crown" style="margin-right: 6px;"></i> Gói tài khoản
+                            </label>
+                            <select id="swal-pro" class="swal2-input" style="width: 100%; padding: 10px 14px; background: var(--dark); border: 1px solid var(--dark-border); border-radius: 10px; color: var(--text);">
+                                <option value="false" ${!isPro ? 'selected' : ''}>FREE</option>
+                                <option value="true" ${isPro ? 'selected' : ''}>PRO</option>
+                            </select>
                         </div>
                     </div>
                 `,
+                confirmButtonText: '<i class="fas fa-save"></i> Cập nhật',
+                cancelButtonText: 'Hủy',
+                showCancelButton: true,
+                background: 'var(--dark-card)',
+                color: 'var(--text)',
+                focusConfirm: false,
                 preConfirm: () => {
-                    return {
-                        tool_name: document.getElementById('key-tool').value,
-                        is_lifetime: document.getElementById('key-type').value === 'life',
-                        expiry: document.getElementById('key-expiry').value
+                    const email = document.getElementById('swal-email').value;
+                    if (!email) {
+                        Swal.showValidationMessage('Vui lòng nhập email');
+                        return false;
                     }
+                    return {
+                        email: email,
+                        password: document.getElementById('swal-pass').value,
+                        is_pro: document.getElementById('swal-pro').value === 'true'
+                    };
                 }
             });
 
             if (formValues) {
-                const res = await fetch('/api/admin/create_key', {
-                    method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify(formValues)
-                });
-                const result = await res.json();
-                if(result.success) {
-                    Swal.fire('Đã tạo Key', result.key, 'success');
-                    loadKeys();
+                try {
+                    const res = await fetch('/api/admin/update_user', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            username: username,
+                            new_data: { email: formValues.email, is_pro: formValues.is_pro },
+                            new_password: formValues.password || null
+                        })
+                    });
+                    const result = await res.json();
+                    if (result.success) {
+                        await Swal.fire({
+                            title: '✅ Thành công',
+                            text: result.message,
+                            icon: 'success',
+                            background: 'var(--dark-card)',
+                            color: 'var(--text)',
+                            confirmButtonColor: '#8b5cf6'
+                        });
+                        state.users.cache = null;
+                        loadUsers(true);
+                    } else {
+                        Swal.fire('Lỗi', result.message || 'Có lỗi xảy ra', 'error');
+                    }
+                } catch (error) {
+                    Swal.fire('Lỗi', 'Không thể kết nối đến server', 'error');
                 }
             }
         }
 
+        // ============ DELETE USER ============
+        async function deleteUser(username) {
+            const result = await Swal.fire({
+                title: '⚠️ Xóa người dùng?',
+                html: `Bạn có chắc muốn xóa <strong>${escapeHtml(username)}</strong>?<br><span style="color: var(--text-muted); font-size: 0.9rem;">Hành động này không thể hoàn tác.</span>`,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#ef4444',
+                confirmButtonText: '<i class="fas fa-trash"></i> Xóa ngay',
+                cancelButtonText: 'Hủy',
+                background: 'var(--dark-card)',
+                color: 'var(--text)'
+            });
+
+            if (result.isConfirmed) {
+                try {
+                    const res = await fetch('/api/admin/delete_user', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ username: username })
+                    });
+                    const result = await res.json();
+                    if (result.success) {
+                        await Swal.fire('✅ Đã xóa', result.message, 'success');
+                        state.users.cache = null;
+                        loadUsers(true);
+                    } else {
+                        Swal.fire('Lỗi', result.message || 'Có lỗi xảy ra', 'error');
+                    }
+                } catch (error) {
+                    Swal.fire('Lỗi', 'Không thể kết nối đến server', 'error');
+                }
+            }
+        }
+
+        // ============ CREATE KEY ============
+        async function openCreateKeyModal() {
+            const { value: formValues } = await Swal.fire({
+                title: '🔑 Tạo Key mới',
+                html: `
+                    <div style="text-align: left; padding: 0.5rem 0;">
+                        <div class="form-group" style="margin-bottom: 1.2rem;">
+                            <label style="display: block; margin-bottom: 0.4rem; font-weight: 500; font-size: 0.85rem; color: var(--text-muted);">
+                                <i class="fas fa-wrench" style="margin-right: 6px;"></i> Tính năng
+                            </label>
+                            <select id="key-tool" class="swal2-input" style="width: 100%; padding: 10px 14px; background: var(--dark); border: 1px solid var(--dark-border); border-radius: 10px; color: var(--text);">
+                                <option value="ban7">Ban 7 Ngày</option>
+                                <option value="spam_log">Spam Log</option>
+                                <option value="all">Tất cả tính năng</option>
+                            </select>
+                        </div>
+                        <div class="form-group" style="margin-bottom: 1.2rem;">
+                            <label style="display: block; margin-bottom: 0.4rem; font-weight: 500; font-size: 0.85rem; color: var(--text-muted);">
+                                <i class="fas fa-clock" style="margin-right: 6px;"></i> Loại key
+                            </label>
+                            <select id="key-type" class="swal2-input" onchange="document.getElementById('key-expiry-wrap').style.display = this.value === 'temp' ? 'block' : 'none'" style="width: 100%; padding: 10px 14px; background: var(--dark); border: 1px solid var(--dark-border); border-radius: 10px; color: var(--text);">
+                                <option value="life">♾️ Vĩnh viễn (Lifetime)</option>
+                                <option value="temp">📅 Có thời hạn</option>
+                            </select>
+                        </div>
+                        <div id="key-expiry-wrap" style="display: none;">
+                            <div class="form-group" style="margin-bottom: 0.5rem;">
+                                <label style="display: block; margin-bottom: 0.4rem; font-weight: 500; font-size: 0.85rem; color: var(--text-muted);">
+                                    <i class="fas fa-calendar-day" style="margin-right: 6px;"></i> Ngày hết hạn
+                                </label>
+                                <input id="key-expiry" class="swal2-input" placeholder="YYYY-MM-DD HH:MM:SS" value="${new Date(Date.now() + 30*24*60*60*1000).toISOString().slice(0, 10)} 23:59:59" style="width: 100%; padding: 10px 14px; background: var(--dark); border: 1px solid var(--dark-border); border-radius: 10px; color: var(--text);">
+                            </div>
+                        </div>
+                    </div>
+                `,
+                confirmButtonText: '<i class="fas fa-plus"></i> Tạo Key',
+                cancelButtonText: 'Hủy',
+                showCancelButton: true,
+                background: 'var(--dark-card)',
+                color: 'var(--text)',
+                focusConfirm: false,
+                preConfirm: () => {
+                    const tool = document.getElementById('key-tool').value;
+                    const type = document.getElementById('key-type').value;
+                    const expiry = document.getElementById('key-expiry').value;
+
+                    if (type === 'temp' && !expiry) {
+                        Swal.showValidationMessage('Vui lòng nhập ngày hết hạn');
+                        return false;
+                    }
+
+                    return {
+                        tool_name: tool,
+                        is_lifetime: type === 'life',
+                        expiry: expiry
+                    };
+                }
+            });
+
+            if (formValues) {
+                try {
+                    const res = await fetch('/api/admin/create_key', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(formValues)
+                    });
+                    const result = await res.json();
+                    if (result.success) {
+                        await Swal.fire({
+                            title: '✅ Key đã được tạo',
+                            html: `<code style="background: var(--dark); padding: 12px 24px; border-radius: 10px; font-size: 1.2rem; display: inline-block; letter-spacing: 1px;">${result.key}</code>`,
+                            icon: 'success',
+                            background: 'var(--dark-card)',
+                            color: 'var(--text)',
+                            confirmButtonColor: '#8b5cf6'
+                        });
+                        state.keys.cache = null;
+                        loadKeys(true);
+                    } else {
+                        Swal.fire('Lỗi', result.message || 'Có lỗi xảy ra', 'error');
+                    }
+                } catch (error) {
+                    Swal.fire('Lỗi', 'Không thể kết nối đến server', 'error');
+                }
+            }
+        }
+
+        // ============ DELETE KEY ============
         async function deleteKey(code) {
-            if (confirm('Xóa key ' + code + '?')) {
-                const res = await fetch('/api/admin/delete_key', {
-                    method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({key_code: code})
-                });
-                const result = await res.json();
-                if(result.success) {
-                    Swal.fire('Đã xóa', result.message, 'success');
-                    loadKeys();
+            const result = await Swal.fire({
+                title: '⚠️ Xóa Key?',
+                text: `Bạn có chắc muốn xóa key "${code}"?`,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#ef4444',
+                confirmButtonText: '<i class="fas fa-trash"></i> Xóa',
+                cancelButtonText: 'Hủy',
+                background: 'var(--dark-card)',
+                color: 'var(--text)'
+            });
+
+            if (result.isConfirmed) {
+                try {
+                    const res = await fetch('/api/admin/delete_key', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ key_code: code })
+                    });
+                    const result = await res.json();
+                    if (result.success) {
+                        await Swal.fire('✅ Đã xóa', result.message, 'success');
+                        state.keys.cache = null;
+                        loadKeys(true);
+                    } else {
+                        Swal.fire('Lỗi', result.message || 'Có lỗi xảy ra', 'error');
+                    }
+                } catch (error) {
+                    Swal.fire('Lỗi', 'Không thể kết nối đến server', 'error');
                 }
             }
         }
 
-        async function logout() {
-            window.location.href = '/admin/login';
+        // ============ EDIT KEY (Gia hạn) ============
+        async function editKey(code) {
+            const { value: expiry } = await Swal.fire({
+                title: '⏰ Gia hạn Key',
+                html: `
+                    <p style="color: var(--text-muted); margin-bottom: 1rem; font-size: 0.9rem;">
+                        Nhập ngày hết hạn mới cho key <strong style="color: var(--primary-light);">${escapeHtml(code)}</strong>
+                    </p>
+                    <p style="color: var(--text-dim); font-size: 0.8rem; margin-bottom: 1rem;">
+                        <i class="fas fa-info-circle"></i> Để trống để chuyển sang vĩnh viễn
+                    </p>
+                    <input id="swal-expiry" class="swal2-input" placeholder="YYYY-MM-DD HH:MM:SS" style="width: 100%; padding: 10px 14px; background: var(--dark); border: 1px solid var(--dark-border); border-radius: 10px; color: var(--text);">
+                `,
+                showCancelButton: true,
+                confirmButtonText: '<i class="fas fa-save"></i> Cập nhật',
+                cancelButtonText: 'Hủy',
+                background: 'var(--dark-card)',
+                color: 'var(--text)',
+                preConfirm: () => {
+                    return document.getElementById('swal-expiry').value;
+                }
+            });
+
+            if (expiry !== undefined) {
+                try {
+                    const res = await fetch('/api/admin/update_key', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            key_code: code,
+                            expiry: expiry || null,
+                            is_lifetime: !expiry
+                        })
+                    });
+                    const result = await res.json();
+                    if (result.success) {
+                        await Swal.fire('✅ Thành công', result.message, 'success');
+                        state.keys.cache = null;
+                        loadKeys(true);
+                    } else {
+                        Swal.fire('Lỗi', result.message || 'Có lỗi xảy ra', 'error');
+                    }
+                } catch (error) {
+                    Swal.fire('Lỗi', 'Không thể kết nối đến server', 'error');
+                }
+            }
         }
 
+        // ============ LOGOUT ============
+        function logout() {
+            Swal.fire({
+                title: 'Đăng xuất?',
+                text: 'Bạn có chắc muốn đăng xuất khỏi hệ thống?',
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonText: '<i class="fas fa-sign-out-alt"></i> Đăng xuất',
+                cancelButtonText: 'Hủy',
+                background: 'var(--dark-card)',
+                color: 'var(--text)',
+                confirmButtonColor: '#ef4444'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    window.location.href = '/admin/login';
+                }
+            });
+        }
+
+        // ============ INIT ============
         loadUsers();
+
+        // Auto refresh every 30 seconds
+        setInterval(() => {
+            if (state.currentTab === 'users') {
+                state.users.cache = null;
+                loadUsers(true);
+            } else if (state.currentTab === 'keys') {
+                state.keys.cache = null;
+                loadKeys(true);
+            }
+        }, 30000);
     </script>
 </body>
 </html>
