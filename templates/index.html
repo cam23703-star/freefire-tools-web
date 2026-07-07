@@ -1087,7 +1087,7 @@
                 </div>
                 <div class="qr-modal-body">
                     <div class="qr-display">
-                        <img src="images/qr.png" alt="nhìn lồn gì nữa" id="qrImage">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/0/09/NO_COPY.svg" alt="nhìn lồn gì nữa" id="qrImage">
                         <div class="qr-info">
                             <p><strong>NHẬN ALL CARD VN</strong></p>
                             <p>Liên hệ mua key ngay tại : https://zalo.me/g/ewhyxayro2mhyxr9sfts</p>
@@ -1407,13 +1407,13 @@
             function downloadQR() {
                 const img = document.getElementById('qrImage');
                 const link = document.createElement('a');
-                link.download = 'qr-mb-bank.html';
+                link.download = 'qhhgl';
                 link.href = img.src;
                 document.body.appendChild(link);
                 link.click();
                 document.body.removeChild(link);
 
-                showCopyNotification('Đã tải xuống QR code!');
+                showCopyNotification('Đéo cho tải xuống QR !');
             }
 
             // Copy QR Image to Clipboard
@@ -1432,14 +1432,14 @@
                         try {
                             const item = new ClipboardItem({ 'image/png': blob });
                             navigator.clipboard.write([item]).then(function () {
-                                showCopyNotification('Đã copy QR code vào clipboard!');
+                                showCopyNotification('Đéo cho copy vào clipboard!');
                             }).catch(function (err) {
                                 console.error('Could not copy image: ', err);
                                 alert('Không thể copy ảnh. Vui lòng tải xuống thay thế.');
                             });
                         } catch (err) {
                             console.error('Clipboard API not supported: ', err);
-                            alert('Trình duyệt không hỗ trợ copy ảnh. Vui lòng tải xuống.');
+                            alert('Trình duyệt không hỗ trợ ảnh.Ngu.');
                         }
                     });
                 };
