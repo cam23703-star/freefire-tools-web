@@ -50,8 +50,8 @@ AES_KEY = bytes([89,103,38,116,99,37,68,69,117,104,54,37,90,99,94,56])
 AES_IV  = bytes([54,111,121,90,68,114,50,50,69,51,121,99,104,106,77,37])
 
 # Firebase configuration
-FIREBASE_URL = "https://freefiredevtooos-default-rtdb.asia-southeast1.firebasedatabase.app"
-FIREBASE_SECRET = "S7xG2wcrw7bsL7gvqf3v9JSMAE3ue5bfgCnH6lwz"
+FIREBASE_URL = "https://tool-free-fire-by-default-rtdb.asia-southeast1.firebasedatabase.app"
+FIREBASE_SECRET = ""
 
 # Firebase helper functions
 def firebase_get(path):
