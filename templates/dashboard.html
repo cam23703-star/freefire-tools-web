@@ -33,7 +33,7 @@
             --radius-sm: 12px;
             --shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
             --shadow-glow: 0 0 60px rgba(139, 92, 246, 0.1);
-            --transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         * {
@@ -53,7 +53,6 @@
                 radial-gradient(ellipse at 90% 80%, rgba(139, 92, 246, 0.03) 0%, transparent 50%);
         }
 
-        /* Scrollbar */
         ::-webkit-scrollbar {
             width: 4px;
             height: 4px;
@@ -66,7 +65,6 @@
             border-radius: 10px;
         }
 
-        /* ==================== SIDEBAR ==================== */
         .sidebar {
             width: 280px;
             height: 100vh;
@@ -245,7 +243,6 @@
             background: var(--danger-light);
         }
 
-        /* User profile in sidebar */
         .sidebar-user {
             padding: 1rem 0.5rem;
             border-top: 1px solid var(--dark-border);
@@ -283,7 +280,6 @@
             color: var(--text-muted);
         }
 
-        /* ==================== SIDEBAR TOGGLE ==================== */
         .sidebar-toggle {
             display: none;
             position: fixed;
@@ -317,7 +313,6 @@
             backdrop-filter: blur(4px);
         }
 
-        /* ==================== MAIN CONTENT ==================== */
         .main-content {
             margin-left: 280px;
             padding: 2rem 2.5rem;
@@ -325,7 +320,6 @@
             min-height: 100vh;
         }
 
-        /* ==================== TOP BAR ==================== */
         .topbar {
             display: flex;
             justify-content: space-between;
@@ -382,10 +376,9 @@
             color: var(--primary);
         }
 
-        /* ==================== TAB CONTENT ==================== */
         .tab-content {
             display: none;
-            animation: fadeSlideIn 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            animation: fadeSlideIn 0.4s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         .tab-content.active {
@@ -395,15 +388,14 @@
         @keyframes fadeSlideIn {
             from {
                 opacity: 0;
-                transform: translateY(20px) scale(0.98);
+                transform: translateY(15px);
             }
             to {
                 opacity: 1;
-                transform: translateY(0) scale(1);
+                transform: translateY(0);
             }
         }
 
-        /* ==================== STATS GRID ==================== */
         .stats-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
@@ -528,7 +520,6 @@
             margin-top: 0.5rem;
         }
 
-        /* ==================== TABLE ==================== */
         .table-wrapper {
             background: var(--dark-card);
             border-radius: var(--radius);
@@ -639,7 +630,7 @@
             background: rgba(255, 255, 255, 0.02);
         }
 
-        /* ==================== BUTTONS ==================== */
+        /* BUTTONS */
         .btn {
             padding: 8px 18px;
             border-radius: var(--radius-sm);
@@ -722,14 +713,46 @@
             box-shadow: 0 4px 16px rgba(239, 68, 68, 0.2);
         }
 
-        .btn-success {
-            background: var(--success);
-            color: white;
+        .btn-ban {
+            background: rgba(239, 68, 68, 0.15);
+            color: #ef4444;
+            transition: var(--transition);
         }
 
-        .btn-success:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 16px rgba(16, 185, 129, 0.3);
+        .btn-ban:hover {
+            background: rgba(239, 68, 68, 0.3);
+            transform: scale(1.08);
+        }
+
+        .btn-unban {
+            background: rgba(34, 197, 94, 0.15);
+            color: #22c55e;
+            transition: var(--transition);
+        }
+
+        .btn-unban:hover {
+            background: rgba(34, 197, 94, 0.3);
+            transform: scale(1.08);
+        }
+
+        .btn-toggle-pro {
+            background: rgba(139, 92, 246, 0.15);
+            color: var(--primary-light);
+            transition: var(--transition);
+        }
+
+        .btn-toggle-pro:hover {
+            background: rgba(139, 92, 246, 0.3);
+            transform: scale(1.08);
+        }
+
+        .btn-toggle-pro.is-pro {
+            background: rgba(251, 191, 36, 0.15);
+            color: #fbbf24;
+        }
+
+        .btn-toggle-pro.is-pro:hover {
+            background: rgba(251, 191, 36, 0.3);
         }
 
         .btn-refresh {
@@ -756,7 +779,6 @@
             to { transform: rotate(360deg); }
         }
 
-        /* ==================== BADGES ==================== */
         .badge {
             padding: 4px 14px;
             border-radius: 20px;
@@ -779,6 +801,12 @@
             border: 1px solid var(--dark-border);
         }
 
+        .badge-banned {
+            background: var(--danger-light);
+            color: var(--danger);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+        }
+
         .badge-success {
             background: var(--success-light);
             color: var(--success);
@@ -799,7 +827,6 @@
             color: var(--info);
         }
 
-        /* ==================== CODE ==================== */
         code {
             background: var(--dark);
             padding: 4px 12px;
@@ -810,7 +837,6 @@
             border: 1px solid var(--dark-border);
         }
 
-        /* ==================== SKELETON ==================== */
         .skeleton {
             background: linear-gradient(90deg, var(--dark-card) 25%, var(--dark-card-hover) 50%, var(--dark-card) 75%);
             background-size: 200% 100%;
@@ -830,13 +856,6 @@
             border-radius: 6px;
         }
 
-        .skeleton-avatar {
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-        }
-
-        /* ==================== EMPTY STATE ==================== */
         .empty-state {
             text-align: center;
             padding: 4rem 1rem;
@@ -860,12 +879,10 @@
             margin: 0 auto;
         }
 
-        /* ==================== RESPONSIVE ==================== */
         @media (max-width: 1024px) {
             .main-content {
                 padding: 1.5rem 2rem;
             }
-
             .stats-grid {
                 grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
             }
@@ -876,79 +893,63 @@
                 transform: translateX(-100%);
                 width: 300px;
             }
-
             .sidebar.open {
                 transform: translateX(0);
             }
-
             .sidebar-overlay.active {
                 display: block;
             }
-
             .sidebar-toggle {
                 display: block;
             }
-
             .main-content {
                 margin-left: 0;
                 padding: 1rem;
                 padding-top: 5rem;
             }
-
             .topbar {
                 flex-direction: column;
                 align-items: flex-start;
                 gap: 0.5rem;
             }
-
             .topbar-left .page-title {
                 font-size: 1.3rem;
             }
-
             .topbar-right {
                 width: 100%;
                 flex-wrap: wrap;
             }
-
             .topbar-right .datetime {
                 font-size: 0.7rem;
                 padding: 6px 12px;
             }
-
             .stats-grid {
                 grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
                 gap: 1rem;
             }
-
             .stat-card {
                 padding: 1.2rem;
             }
-
             .stat-card .stat-value {
                 font-size: 1.6rem;
             }
-
             .table-toolbar {
                 padding: 1rem;
                 flex-direction: column;
                 align-items: stretch;
             }
-
             .table-toolbar .search-box {
                 min-width: unset;
                 width: 100%;
             }
-
             .table-toolbar .toolbar-actions {
                 flex-wrap: wrap;
                 justify-content: space-between;
             }
-
             th, td {
                 padding: 0.75rem 1rem;
                 font-size: 0.8rem;
             }
-
             .btn {
                 font-size: 0.75rem;
                 padding: 6px 12px;
@@ -960,29 +961,23 @@
                 grid-template-columns: 1fr 1fr;
                 gap: 0.75rem;
             }
-
             .stat-card {
                 padding: 1rem;
             }
-
             .stat-card .stat-value {
                 font-size: 1.3rem;
             }
-
             .stat-card .stat-label {
                 font-size: 0.65rem;
             }
-
             .stat-card .stat-icon-wrapper {
                 width: 36px;
                 height: 36px;
                 font-size: 1rem;
             }
-
             .topbar-left .page-title {
                 font-size: 1.1rem;
             }
-
             .topbar-left .page-subtitle {
                 font-size: 0.75rem;
             }
@@ -1111,7 +1106,7 @@
                             <th>Email</th>
                             <th>Trạng thái</th>
                             <th>Sử dụng (Ban7 / Spam)</th>
-                            <th style="text-align: center; width: 120px;">Hành động</th>
+                            <th style="text-align: center; min-width: 200px;">Hành động</th>
                         </tr>
                     </thead>
                     <tbody id="users-list"></tbody>
@@ -1229,7 +1224,6 @@
                 l.classList.toggle('active', l.dataset.tab === tabId);
             });
 
-            // Update title
             const titles = {
                 users: { title: 'Quản lý <span class="highlight">Người dùng</span>', sub: 'Quản lý tài khoản và quyền truy cập' },
                 keys: { title: 'Quản lý <span class="highlight">Key</span>', sub: 'Tạo và quản lý các mã kích hoạt' }
@@ -1290,13 +1284,14 @@
             const list = document.getElementById('users-list');
             const fragment = document.createDocumentFragment();
 
-            let total = 0, proCount = 0;
+            let total = 0, proCount = 0, bannedCount = 0;
             const searchTerm = state.users.filter.toLowerCase();
 
             for (const username in data.users) {
                 const user = data.users[username];
                 const usage = data.usages[username] || { ban7: 0, spam_log: 0, is_pro: false };
                 const isPro = user.is_pro || usage.is_pro;
+                const isBanned = user.is_banned || false;
 
                 if (searchTerm && !username.toLowerCase().includes(searchTerm) &&
                     !(user.email || '').toLowerCase().includes(searchTerm)) {
@@ -1305,13 +1300,23 @@
 
                 total++;
                 if (isPro) proCount++;
+                if (isBanned) bannedCount++;
+
+                let statusBadge = '';
+                if (isBanned) {
+                    statusBadge = `<span class="badge badge-banned">🔒 BANNED</span>`;
+                } else if (isPro) {
+                    statusBadge = `<span class="badge badge-pro">PRO</span>`;
+                } else {
+                    statusBadge = `<span class="badge badge-free">FREE</span>`;
+                }
 
                 const tr = document.createElement('tr');
                 tr.style.transition = 'all 0.3s ease';
                 tr.innerHTML = `
                     <td><strong style="font-weight: 600;">${escapeHtml(username)}</strong></td>
                     <td style="color: var(--text-muted);">${escapeHtml(user.email || '—')}</td>
-                    <td><span class="badge ${isPro ? 'badge-pro' : 'badge-free'}">${isPro ? 'PRO' : 'FREE'}</span></td>
+                    <td>${statusBadge}</td>
                     <td>
                         <span style="display: inline-flex; gap: 8px;">
                             <span style="background: var(--danger-light); color: var(--danger); padding: 2px 10px; border-radius: 12px; font-size: 0.75rem; font-weight: 600;">${usage.ban7 || 0}</span>
@@ -1322,6 +1327,18 @@
                         <button class="btn btn-edit btn-icon btn-sm" onclick="editUser('${escapeHtml(username)}', '${escapeHtml(user.email || '')}', ${isPro})" title="Chỉnh sửa">
                             <i class="fas fa-edit"></i>
                         </button>
+                        <button class="btn ${isPro ? 'btn-toggle-pro is-pro' : 'btn-toggle-pro'} btn-icon btn-sm" onclick="togglePro('${escapeHtml(username)}', ${isPro})" title="${isPro ? 'Hạ cấp Free' : 'Nâng cấp PRO'}">
+                            <i class="fas ${isPro ? 'fa-crown' : 'fa-user-plus'}"></i>
+                        </button>
+                        ${isBanned ? `
+                        <button class="btn btn-unban btn-icon btn-sm" onclick="unbanUser('${escapeHtml(username)}')" title="Mở khóa">
+                            <i class="fas fa-unlock"></i>
+                        </button>
+                        ` : `
+                        <button class="btn btn-ban btn-icon btn-sm" onclick="banUser('${escapeHtml(username)}')" title="Khóa tài khoản">
+                            <i class="fas fa-ban"></i>
+                        </button>
+                        `}
                         <button class="btn btn-delete btn-icon btn-sm" onclick="deleteUser('${escapeHtml(username)}')" title="Xóa">
                             <i class="fas fa-trash"></i>
                         </button>
@@ -1339,11 +1356,10 @@
                 showEmpty(list, 'Không tìm thấy người dùng phù hợp', 'fa-search');
             }
 
-            // Update stats
             document.getElementById('stat-total').textContent = total;
             document.getElementById('stat-pro').textContent = proCount;
             document.getElementById('stat-free').textContent = total - proCount;
-            document.getElementById('user-count').textContent = `${total} người dùng`;
+            document.getElementById('user-count').textContent = `${total} người dùng (${bannedCount} bị khóa)`;
             document.getElementById('user-badge').textContent = total;
         }
 
@@ -1498,6 +1514,171 @@
             const div = document.createElement('div');
             div.textContent = str;
             return div.innerHTML;
+        }
+
+        // ============ BAN USER ============
+        async function banUser(username) {
+            const { value: reason } = await Swal.fire({
+                title: '🔒 Khóa tài khoản',
+                html: `
+                    <p style="color: var(--text-muted); margin-bottom: 1rem;">
+                        Bạn đang khóa tài khoản <strong style="color: var(--danger);">${escapeHtml(username)}</strong>
+                    </p>
+                    <div class="form-group" style="margin-bottom: 0.5rem;">
+                        <label style="display: block; margin-bottom: 0.4rem; font-weight: 500; font-size: 0.85rem; color: var(--text-muted);">
+                            <i class="fas fa-pen" style="margin-right: 6px;"></i> Lý do khóa
+                        </label>
+                        <input id="swal-ban-reason" class="swal2-input" placeholder="Nhập lý do khóa tài khoản..." value="Vi phạm điều khoản sử dụng" style="width: 100%; padding: 10px 14px; background: var(--dark); border: 1px solid var(--dark-border); border-radius: 10px; color: var(--text);">
+                    </div>
+                    <p style="font-size: 0.8rem; color: var(--text-dim); margin-top: 0.5rem;">
+                        ⚠️ Người dùng sẽ bị đăng xuất ngay lập tức và không thể đăng nhập lại.
+                    </p>
+                `,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#ef4444',
+                confirmButtonText: '<i class="fas fa-ban"></i> Khóa ngay',
+                cancelButtonText: 'Hủy',
+                background: 'var(--dark-card)',
+                color: 'var(--text)',
+                preConfirm: () => {
+                    const reason = document.getElementById('swal-ban-reason').value;
+                    if (!reason || reason.trim().length < 3) {
+                        Swal.showValidationMessage('Vui lòng nhập lý do khóa (tối thiểu 3 ký tự)');
+                        return false;
+                    }
+                    return reason.trim();
+                }
+            });
+
+            if (reason) {
+                try {
+                    const res = await fetch('/api/admin/ban_user', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ username: username, reason: reason })
+                    });
+                    const data = await res.json();
+                    if (data.success) {
+                        await Swal.fire({
+                            title: '✅ Đã khóa',
+                            text: data.message,
+                            icon: 'success',
+                            background: 'var(--dark-card)',
+                            color: 'var(--text)',
+                            confirmButtonColor: '#8b5cf6'
+                        });
+                        state.users.cache = null;
+                        loadUsers(true);
+                    } else {
+                        Swal.fire('Lỗi', data.error, 'error');
+                    }
+                } catch (error) {
+                    Swal.fire('Lỗi', 'Không thể kết nối đến server', 'error');
+                }
+            }
+        }
+
+        // ============ UNBAN USER ============
+        async function unbanUser(username) {
+            const result = await Swal.fire({
+                title: '🔓 Mở khóa tài khoản?',
+                html: `Bạn có chắc muốn mở khóa <strong>${escapeHtml(username)}</strong>?`,
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#22c55e',
+                confirmButtonText: '<i class="fas fa-unlock"></i> Mở khóa',
+                cancelButtonText: 'Hủy',
+                background: 'var(--dark-card)',
+                color: 'var(--text)'
+            });
+
+            if (result.isConfirmed) {
+                try {
+                    const res = await fetch('/api/admin/unban_user', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ username: username })
+                    });
+                    const data = await res.json();
+                    if (data.success) {
+                        await Swal.fire({
+                            title: '✅ Đã mở khóa',
+                            text: data.message,
+                            icon: 'success',
+                            background: 'var(--dark-card)',
+                            color: 'var(--text)',
+                            confirmButtonColor: '#8b5cf6'
+                        });
+                        state.users.cache = null;
+                        loadUsers(true);
+                    } else {
+                        Swal.fire('Lỗi', data.error, 'error');
+                    }
+                } catch (error) {
+                    Swal.fire('Lỗi', 'Không thể kết nối đến server', 'error');
+                }
+            }
+        }
+
+        // ============ TOGGLE PRO ============
+        async function togglePro(username, currentStatus) {
+            const newStatus = !currentStatus;
+            const action = newStatus ? 'Nâng cấp PRO' : 'Hạ cấp Free';
+            const icon = newStatus ? '👑' : '⬇️';
+            
+            const result = await Swal.fire({
+                title: `${icon} ${action}?`,
+                html: `
+                    <p style="color: var(--text-muted);">
+                        Bạn có chắc muốn <strong>${action}</strong> tài khoản 
+                        <strong style="color: var(--primary-light);">${escapeHtml(username)}</strong>?
+                    </p>
+                    <p style="font-size: 0.85rem; color: var(--text-dim); margin-top: 0.5rem;">
+                        ${newStatus ? '✅ User sẽ được sử dụng tất cả tính năng PRO' : '❌ User sẽ mất toàn bộ quyền PRO'}
+                    </p>
+                `,
+                icon: newStatus ? 'success' : 'warning',
+                showCancelButton: true,
+                confirmButtonColor: newStatus ? '#22c55e' : '#ef4444',
+                confirmButtonText: newStatus ? 'Nâng PRO' : 'Hạ Free',
+                cancelButtonText: 'Hủy',
+                background: 'var(--dark-card)',
+                color: 'var(--text)'
+            });
+
+            if (result.isConfirmed) {
+                try {
+                    const res = await fetch('/api/admin/toggle_pro', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ 
+                            username: username, 
+                            is_pro: newStatus 
+                        })
+                    });
+                    const data = await res.json();
+                    
+                    if (data.success) {
+                        await Swal.fire({
+                            title: '✅ Thành công',
+                            text: data.message,
+                            icon: 'success',
+                            background: 'var(--dark-card)',
+                            color: 'var(--text)',
+                            confirmButtonColor: '#8b5cf6',
+                            timer: 2000,
+                            timerProgressBar: true
+                        });
+                        state.users.cache = null;
+                        loadUsers(true);
+                    } else {
+                        Swal.fire('Lỗi', data.error, 'error');
+                    }
+                } catch (error) {
+                    Swal.fire('Lỗi', 'Không thể kết nối đến server', 'error');
+                }
+            }
         }
 
         // ============ EDIT USER ============
@@ -1811,16 +1992,8 @@
         // ============ INIT ============
         loadUsers();
 
-        // Auto refresh every 30 seconds
-        setInterval(() => {
-            if (state.currentTab === 'users') {
-                state.users.cache = null;
-                loadUsers(true);
-            } else if (state.currentTab === 'keys') {
-                state.keys.cache = null;
-                loadKeys(true);
-            }
-        }, 30000);
+        // KHÔNG CÓ AUTO REFRESH - Chỉ load 1 lần, user bấm refresh thủ công
+        // Đã xóa setInterval gây lag
     </script>
 </body>
 </html>
