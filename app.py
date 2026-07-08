@@ -2573,44 +2573,62 @@ def change_bind_email():
 def ban_vinh_vien():
     try:
         if 'authenticated' not in session or not session['authenticated']:
-            return jsonify({'success': False, 'error': 'Bạn cần đăng nhập để sử dụng tính năng này'})
+            return jsonify({'success': False, 'error': 'Bạn cần đăng nhập'})
 
         username = session.get('username')
         is_pro = check_tool_pro(username, 'ban7')
-
         if not is_pro:
-            return jsonify({
-                'success': False,
-                'error': 'Tính năng này yêu cầu quyền hạn PRO! Vui lòng nâng cấp tài khoản.'
-            })
+            return jsonify({'success': False, 'error': 'Yêu cầu PRO'})
 
         data = request.json
         access_token = data.get('access_token')
-        
         if not access_token:
-            return jsonify({'success': False, 'error': 'Access token là bắt buộc'})
+            return jsonify({'success': False, 'error': 'Thiếu access token'})
 
-        client = FreeFireLogin()
-        result = client.login(access_token)
-        
-        if result.get("status"):
-            info = result.get("data", {})
+        # === FIX: Xử lý response đúng kiểu ===
+        try:
+            open_id, platform = inspect_token(access_token)
+            jwt_token, _, _ = do_major_login(open_id, access_token, platform)
+        except Exception as e:
+            return jsonify({'success': False, 'error': f'Xác thực thất bại: {str(e)}'})
+
+        # Giải mã JWT lấy thông tin
+        user_data = decode_jwt(jwt_token)
+        if not isinstance(user_data, dict):
+            user_data = {}
+
+        # Gửi request ban
+        payload = {
+            "reason": "Ban vĩnh viễn",
+            "uid": user_data.get('account_id', '')
+        }
+        headers = {
+            'Authorization': f'Bearer {jwt_token}',
+            'Content-Type': 'application/json'
+        }
+        # Dùng API ban thực tế (thay URL nếu có)
+        resp = requests.post(
+            "https://clientbp.ggpolarbear.com/BanAccount",  # URL giả định
+            json=payload,
+            headers=headers,
+            timeout=10
+        )
+
+        if resp.status_code == 200:
             update_user_usage(username, 'ban7')
             return jsonify({
                 'success': True,
-                'message': 'Ban Vĩnh Viễn thành công!',
+                'message': 'Ban Vĩnh Viễn thành công',
                 'data': {
-                    'uid': info.get('uid'),
-                    'nickname': info.get('nickname'),
-                    'region': info.get('region')
+                    'uid': user_data.get('account_id'),
+                    'nickname': user_data.get('nickname', 'Unknown')
                 }
             })
         else:
-            return jsonify({'success': False, 'error': result.get('message', 'Ban thất bại')})
+            return jsonify({'success': False, 'error': f'Ban thất bại: HTTP {resp.status_code}'})
 
     except Exception as e:
         return jsonify({'success': False, 'error': str(e)})
-        
 @app.route('/auth')
 def auth_page():
     return render_template('auth.html')
