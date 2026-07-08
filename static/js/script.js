@@ -530,12 +530,12 @@ document.addEventListener('DOMContentLoaded', function () {
         <div class="loading-content">
             <div class="loading-logo">
                 <i class="fas fa-gamepad"></i>
-                <span>PLong</span>
+                <span>HiHi</span>
             </div>
             <div class="loading-spinner">
                 <div class="spinner"></div>
             </div>
-            <p>Đang khởi tạo Free Fire Tools...</p>
+            <p>Đang khởi tạo HIHI MAIL XÁC THỰC</p>
         </div>
     `;
 
