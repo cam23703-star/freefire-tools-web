@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HIHI MXT</title>
+    <title>Hihimxt — Công cụ Free Fire</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;700;800;900&family=Be+Vietnam+Pro:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
@@ -15,22 +15,26 @@
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
         :root {
-            --primary: #8b5cf6;
-            --primary-dark: #7c3aed;
+            --primary: #7c5cfc;
+            --primary-dark: #6040e0;
             --secondary: #a78bfa;
             --accent: #c084fc;
-            --dark: #0b0f14;
-            --dark-2: #10121b;
-            --dark-card: rgba(16, 18, 27, 0.7);
+            --neon: #b16dff;
+            --dark: #070a10;
+            --dark-2: #0d1020;
+            --dark-card: rgba(13, 16, 28, 0.8);
             --dark-border: rgba(255,255,255,0.06);
-            --border-fire: rgba(139, 92, 246, 0.15);
-            --text: #ffffff;
-            --text-muted: #b0b8c4;
-            --gradient: linear-gradient(135deg, #a78bfa, #7c3aed);
-            --gradient-2: linear-gradient(135deg, #c084fc, #8b5cf6);
-            --glass-blur: 14px;
-            --glow: 0 20px 50px rgba(139, 92, 246, 0.25);
-            --glow-sm: 0 8px 30px rgba(139, 92, 246, 0.15);
+            --border-fire: rgba(124, 92, 252, 0.18);
+            --text: #eef0f8;
+            --text-muted: #8890aa;
+            --gradient: linear-gradient(135deg, #a78bfa, #6040e0);
+            --gradient-2: linear-gradient(135deg, #c084fc, #7c5cfc);
+            --gradient-gold: linear-gradient(135deg, #fbbf24, #f59e0b);
+            --glass-blur: 18px;
+            --glow: 0 20px 60px rgba(124, 92, 252, 0.3);
+            --glow-sm: 0 8px 30px rgba(124, 92, 252, 0.18);
+            --radius: 14px;
+            --radius-sm: 8px;
         }
 
         body {
@@ -42,88 +46,79 @@
             min-height: 100vh;
         }
 
-        /* Scanline overlay */
+        /* ── Background mesh ── */
         body::before {
             content: '';
             position: fixed;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            background: repeating-linear-gradient(
-                0deg,
-                transparent,
-                transparent 3px,
-                rgba(0,0,0,0.08) 3px,
-                rgba(0,0,0,0.08) 4px
-            );
-            z-index: 9998;
-            pointer-events: none;
-            opacity: 0.5;
-        }
-
-        /* Ambient glow */
-        body::after {
-            content: '';
-            position: fixed;
-            width: 80vw; height: 80vw;
-            top: -30%; left: -20%;
-            background: radial-gradient(ellipse at center, rgba(139,92,246,0.15) 0%, transparent 65%);
-            filter: blur(80px);
+            inset: 0;
+            background:
+                radial-gradient(ellipse 60% 50% at 15% 20%, rgba(124,92,252,0.12) 0%, transparent 60%),
+                radial-gradient(ellipse 50% 40% at 85% 80%, rgba(192,132,252,0.08) 0%, transparent 60%),
+                radial-gradient(ellipse 80% 60% at 50% 100%, rgba(96,64,224,0.06) 0%, transparent 60%);
             z-index: -2;
             pointer-events: none;
         }
 
+        /* ── Grain texture ── */
+        body::after {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+            z-index: -1;
+            pointer-events: none;
+            opacity: 0.5;
+        }
+
         .bg-animation {
             position: fixed;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
+            inset: 0;
             pointer-events: none;
             z-index: -3;
-            background:
-                radial-gradient(ellipse 70% 40% at 90% 110%, rgba(139,92,246,0.12) 0%, transparent 60%),
-                radial-gradient(ellipse 50% 40% at -5% 60%, rgba(167,139,250,0.08) 0%, transparent 60%);
         }
 
         .particle {
             position: absolute;
-            width: 2px; height: 2px;
+            width: 2px;
+            height: 2px;
             background: var(--primary);
             border-radius: 50%;
             animation: float 22s infinite linear;
-            box-shadow: 0 0 8px var(--primary);
+            box-shadow: 0 0 6px var(--primary);
         }
 
-        .particle:nth-child(1) { left: 20%; animation-delay: 0s; animation-duration: 18s; }
-        .particle:nth-child(2) { left: 40%; animation-delay: 5s; animation-duration: 24s; background: var(--secondary); box-shadow: 0 0 6px var(--secondary); }
-        .particle:nth-child(3) { left: 60%; animation-delay: 10s; animation-duration: 30s; background: var(--accent); box-shadow: 0 0 6px var(--accent); opacity: 0.6; }
-        .particle:nth-child(4) { left: 80%; animation-delay: 15s; animation-duration: 20s; }
-        .particle:nth-child(5) { left: 10%; animation-delay: 8s; animation-duration: 26s; background: var(--secondary); box-shadow: 0 0 6px var(--secondary); }
+        .particle:nth-child(1) { left: 18%; animation-delay: 0s; animation-duration: 20s; background: var(--secondary); }
+        .particle:nth-child(2) { left: 38%; animation-delay: 4s; animation-duration: 26s; background: var(--accent); opacity: 0.7; }
+        .particle:nth-child(3) { left: 55%; animation-delay: 10s; animation-duration: 32s; opacity: 0.5; }
+        .particle:nth-child(4) { left: 75%; animation-delay: 14s; animation-duration: 22s; background: var(--secondary); }
+        .particle:nth-child(5) { left: 88%; animation-delay: 7s; animation-duration: 28s; background: var(--accent); opacity: 0.6; }
 
         @keyframes float {
-            0% { transform: translateY(100vh) rotate(0deg); opacity: 0; }
-            8% { opacity: 0.7; }
-            92% { opacity: 0.7; }
-            100% { transform: translateY(-100px) rotate(360deg); opacity: 0; }
+            0% { transform: translateY(110vh) scale(0.5); opacity: 0; }
+            8% { opacity: 0.8; }
+            92% { opacity: 0.8; }
+            100% { transform: translateY(-80px) scale(1.2); opacity: 0; }
         }
 
         /* ─── NAVBAR ─── */
         .navbar {
             position: fixed;
             top: 0; width: 100%;
-            background: rgba(8,9,10,0.82);
-            -webkit-backdrop-filter: blur(var(--glass-blur));
-            backdrop-filter: blur(var(--glass-blur));
+            background: rgba(7, 10, 16, 0.75);
+            -webkit-backdrop-filter: blur(20px) saturate(1.4);
+            backdrop-filter: blur(20px) saturate(1.4);
             z-index: 1000;
-            padding: 0.8rem 0;
-            border-bottom: 1px solid rgba(139, 92, 246, 0.15);
-            transition: all 0.25s ease;
+            padding: 0.7rem 0;
+            border-bottom: 1px solid rgba(124, 92, 252, 0.12);
+            transition: all 0.3s ease;
         }
 
         .navbar::after {
             content: '';
             position: absolute;
-            bottom: 0; left: 0;
-            width: 100%; height: 1px;
-            background: linear-gradient(90deg, transparent, rgba(139, 92, 246, 0.4), transparent);
+            bottom: 0; left: 10%; right: 10%;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(124, 92, 252, 0.5), transparent);
         }
 
         .nav-container {
@@ -139,28 +134,28 @@
         .nav-brand {
             display: flex;
             align-items: center;
-            gap: 0.6rem;
+            gap: 0.7rem;
             text-decoration: none;
             color: inherit;
         }
 
         .nav-brand-icon {
-            width: 34px; height: 34px;
-            border-radius: 8px;
-            background: linear-gradient(135deg, rgba(139,92,246,0.25), rgba(167,139,250,0.1));
-            border: 1px solid rgba(139, 92, 246, 0.35);
+            width: 36px; height: 36px;
+            border-radius: 10px;
+            background: linear-gradient(135deg, rgba(124,92,252,0.3), rgba(167,139,250,0.15));
+            border: 1px solid rgba(124, 92, 252, 0.4);
             display: flex; align-items: center; justify-content: center;
-            color: var(--primary);
-            font-size: 0.9rem;
-            box-shadow: 0 0 12px rgba(139, 92, 246, 0.18);
+            color: var(--secondary);
+            font-size: 0.95rem;
+            box-shadow: 0 0 16px rgba(124, 92, 252, 0.22), inset 0 1px 0 rgba(255,255,255,0.08);
         }
 
         .nav-brand-text {
             font-family: 'Orbitron', monospace;
-            font-weight: 700;
+            font-weight: 800;
             font-size: 1rem;
-            letter-spacing: 0.04em;
-            background: var(--gradient);
+            letter-spacing: 0.05em;
+            background: linear-gradient(135deg, #e0d4ff, #a78bfa);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
@@ -181,96 +176,97 @@
         .nav-user-info.active { display: flex; }
 
         .nav-user-name {
-            color: rgba(255,255,255,0.78);
+            color: rgba(255,255,255,0.82);
             font-size: 13px;
-            font-weight: 600;
+            font-weight: 700;
             font-family: 'Orbitron', monospace;
-            letter-spacing: 0.02em;
+            letter-spacing: 0.03em;
         }
 
         .pro-badge {
-            padding: 3px 10px;
-            border-radius: 4px;
-            font-size: 11px;
-            font-weight: 700;
+            padding: 3px 12px;
+            border-radius: 6px;
+            font-size: 10px;
+            font-weight: 800;
             font-family: 'Orbitron', monospace;
-            letter-spacing: 0.08em;
-            background: var(--gradient);
+            letter-spacing: 0.1em;
+            background: linear-gradient(135deg, #a78bfa, #6040e0);
             color: #fff;
-            box-shadow: 0 0 10px rgba(139,92,246,0.35);
+            box-shadow: 0 0 14px rgba(124,92,252,0.45);
         }
 
         .pro-badge.free {
-            background: rgba(139, 92, 246, 0.1);
-            color: var(--primary);
-            border: 1px solid rgba(139,92,246,0.25);
+            background: rgba(124, 92, 252, 0.1);
+            color: var(--secondary);
+            border: 1px solid rgba(124,92,252,0.28);
             box-shadow: none;
         }
 
         .nav-btn {
-            padding: 0.45rem 1.25rem;
-            border-radius: 6px;
+            padding: 0.48rem 1.3rem;
+            border-radius: 8px;
             font-size: 0.82rem;
             font-weight: 700;
             cursor: pointer;
-            transition: all 0.2s ease;
+            transition: all 0.22s ease;
             border: none;
             display: inline-flex;
             align-items: center;
             gap: 0.4rem;
             font-family: 'Orbitron', monospace;
-            letter-spacing: 0.03em;
+            letter-spacing: 0.04em;
         }
 
         .nav-btn-primary {
             background: var(--gradient);
             color: white;
-            box-shadow: 0 2px 12px rgba(139, 92, 246, 0.3);
+            box-shadow: 0 2px 16px rgba(124, 92, 252, 0.35);
         }
 
         .nav-btn-primary:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 6px 20px rgba(139, 92, 246, 0.45);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(124, 92, 252, 0.5);
         }
 
         .btn-logout {
-            padding: 7px 14px;
-            background: rgba(239,68,68,0.12);
-            color: #ef4444;
-            border: 1px solid rgba(239,68,68,0.28);
-            border-radius: 6px;
+            padding: 7px 15px;
+            background: rgba(239,68,68,0.1);
+            color: #f87171;
+            border: 1px solid rgba(239,68,68,0.24);
+            border-radius: 8px;
             font-family: 'Be Vietnam Pro', sans-serif;
             font-size: 13px;
             font-weight: 600;
             cursor: pointer;
-            transition: all 0.2s;
+            transition: all 0.22s;
             display: flex;
             align-items: center;
             gap: 6px;
         }
 
         .btn-logout:hover {
-            background: rgba(239,68,68,0.22);
+            background: rgba(239,68,68,0.18);
+            border-color: rgba(239,68,68,0.4);
             transform: translateY(-1px);
         }
 
         /* ─── OTP ─── */
         .otp-inputs {
             display: flex;
-            gap: 0.3rem;
+            gap: 0.4rem;
             justify-content: center;
             flex-wrap: wrap;
         }
 
         .otp-input {
-            width: clamp(32px, 9vw, 44px);
-            height: clamp(42px, 12vw, 54px);
+            width: clamp(34px, 9vw, 46px);
+            height: clamp(44px, 12vw, 56px);
             text-align: center;
             font-size: clamp(1rem, 4vw, 1.3rem);
             font-weight: 700;
-            background: rgba(255,255,255,0.05);
-            border: 1px solid var(--dark-border);
-            border-radius: 6px;
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(124,92,252,0.2);
+            border-radius: 8px;
             color: #fff;
             transition: all 0.2s;
             padding: 0;
@@ -279,18 +275,32 @@
         .otp-input:focus {
             outline: none;
             border-color: var(--primary);
-            box-shadow: 0 0 0 2px rgba(139,92,246,0.2), 0 0 10px rgba(139,92,246,0.12);
+            box-shadow: 0 0 0 3px rgba(124,92,252,0.18), 0 0 12px rgba(124,92,252,0.15);
+            background: rgba(124,92,252,0.06);
         }
 
         .otp-input::placeholder { color: var(--text-muted); font-size: 0.9rem; }
 
-        /* ─── PIN Box (Mã Bảo Vệ) ─── */
+        .otp-status-success { color: #4ade80 !important; }
+        .otp-status-error { color: #f87171 !important; }
+
+        /* ─── PIN Box ─── */
         .pin-box {
-            border: 1px solid rgba(139,92,246,0.35);
-            border-radius: 14px;
-            padding: 1rem;
-            background: rgba(139,92,246,0.04);
+            border: 1px solid rgba(124,92,252,0.3);
+            border-radius: 12px;
+            padding: 1.1rem;
+            background: rgba(124,92,252,0.05);
             margin-bottom: 1rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .pin-box::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(124,92,252,0.5), transparent);
         }
 
         .pin-box-label {
@@ -307,22 +317,19 @@
             display: inline-flex;
             align-items: center;
             gap: 0.3rem;
-            background: linear-gradient(135deg, #f9a825, #fbc02d);
-            color: #1a1a1a;
-            font-size: 0.75rem;
+            background: linear-gradient(135deg, #fbbf24, #f59e0b);
+            color: #1a1000;
+            font-size: 0.72rem;
             font-weight: 800;
-            padding: 0.2rem 0.6rem;
+            padding: 0.2rem 0.65rem;
             border-radius: 6px;
-            letter-spacing: 0.03em;
+            letter-spacing: 0.05em;
         }
 
-        .pin-box .otp-inputs {
-            gap: 0.5rem;
-        }
-
+        .pin-box .otp-inputs { gap: 0.5rem; }
         .pin-box .otp-input {
             background: rgba(255,255,255,0.03);
-            border: 1px solid rgba(139,92,246,0.3);
+            border: 1px solid rgba(124,92,252,0.25);
             border-radius: 10px;
         }
 
@@ -334,7 +341,7 @@
         }
 
         .countdown-timer.warning { color: #f59e0b; }
-        .countdown-timer.danger { color: #ef4444; }
+        .countdown-timer.danger { color: #f87171; }
 
         /* ─── CONTAINER / HERO ─── */
         .container {
@@ -345,73 +352,271 @@
 
         .hero {
             text-align: center;
-            padding: 5rem 2rem 3rem;
+            padding: 6rem 2rem 3.5rem;
         }
 
         .hero-badge {
             display: inline-flex;
             align-items: center;
-            gap: 0.4rem;
-            padding: 0.35rem 0.85rem;
-            background: rgba(139, 92, 246, 0.1);
-            border: 1px solid rgba(139,92,246,0.3);
-            border-radius: 4px;
+            gap: 0.45rem;
+            padding: 0.38rem 1rem;
+            background: rgba(124, 92, 252, 0.12);
+            border: 1px solid rgba(124,92,252,0.3);
+            border-radius: 30px;
             font-family: 'Orbitron', monospace;
-            font-size: 0.7rem;
+            font-size: 0.68rem;
             font-weight: 700;
-            letter-spacing: 0.12em;
-            color: var(--primary);
-            margin-bottom: 1.25rem;
+            letter-spacing: 0.14em;
+            color: var(--secondary);
+            margin-bottom: 1.5rem;
             text-transform: uppercase;
+            box-shadow: 0 0 20px rgba(124,92,252,0.1);
         }
 
         .hero-badge::before {
             content: '';
             width: 6px; height: 6px;
-            background: var(--primary);
+            background: var(--accent);
             border-radius: 50%;
-            box-shadow: 0 0 8px var(--primary);
-            animation: blink 1.4s ease-in-out infinite;
+            box-shadow: 0 0 10px var(--accent);
+            animation: blink 1.5s ease-in-out infinite;
         }
 
         @keyframes blink {
             0%, 100% { opacity: 1; }
-            50% { opacity: 0.3; }
+            50% { opacity: 0.2; }
         }
 
         .hero h1 {
             font-family: 'Orbitron', monospace;
-            font-size: clamp(1.8rem, 6vw, 3.2rem);
-            font-weight: 800;
-            margin-bottom: 0.9rem;
-            letter-spacing: -0.01em;
-            background: linear-gradient(135deg, #ffffff 0%, #c084fc 80%, #8b5cf6 100%);
+            font-size: clamp(2rem, 7vw, 3.6rem);
+            font-weight: 900;
+            margin-bottom: 1rem;
+            letter-spacing: -0.02em;
+            background: linear-gradient(135deg, #ffffff 0%, #d4b8ff 50%, #7c5cfc 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
+            line-height: 1.1;
         }
 
         .hero p {
             color: var(--text-muted);
-            font-size: clamp(0.88rem, 3vw, 1.1rem);
-            margin-bottom: 2rem;
-            max-width: 560px;
+            font-size: clamp(0.9rem, 3vw, 1.1rem);
+            margin-bottom: 2.5rem;
+            max-width: 520px;
             margin-left: auto;
             margin-right: auto;
         }
 
         /* ─── PRO ACTIVATION BOX ─── */
         #pro-activation-box {
-            background: rgba(139,92,246,0.08) !important;
-            border: 1px solid rgba(139, 92, 246, 0.25) !important;
-            border-radius: 10px !important;
+            background: rgba(124,92,252,0.07) !important;
+            border: 1px solid rgba(124, 92, 252, 0.22) !important;
+            border-radius: 16px !important;
+            box-shadow: 0 0 40px rgba(124,92,252,0.1) !important;
+            position: relative;
+            overflow: hidden;
+        }
+
+        #pro-activation-box::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(124,92,252,0.6), transparent);
         }
 
         #pro-activation-box h3 {
-            color: var(--primary) !important;
+            color: var(--secondary) !important;
         }
 
-        /* ─── TOOLS GRID ─── */
+        /* ─── PANEL LAYOUT ─── */
+        .panel-wrapper {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+            margin-top: 2rem;
+        }
+
+        .panel-section {
+            background: rgba(13, 16, 28, 0.85);
+            border: 1px solid rgba(124,92,252,0.1);
+            border-radius: var(--radius);
+            overflow: hidden;
+            backdrop-filter: blur(var(--glass-blur));
+            -webkit-backdrop-filter: blur(var(--glass-blur));
+            transition: border-color 0.2s;
+        }
+
+        .panel-section:hover {
+            border-color: rgba(124,92,252,0.2);
+        }
+
+        /* Category header */
+        .panel-cat-header {
+            display: flex;
+            align-items: center;
+            gap: 0.65rem;
+            padding: 0.8rem 1.4rem;
+            background: rgba(124,92,252,0.07);
+            border-bottom: 1px solid rgba(255,255,255,0.04);
+            font-family: 'Orbitron', monospace;
+            font-size: 0.68rem;
+            font-weight: 700;
+            letter-spacing: 0.12em;
+            color: var(--secondary);
+            text-transform: uppercase;
+        }
+
+        .panel-cat-header i {
+            font-size: 0.78rem;
+            opacity: 0.9;
+        }
+
+        .panel-cat-line {
+            flex: 1;
+            height: 1px;
+            background: linear-gradient(90deg, rgba(124,92,252,0.3), transparent);
+        }
+
+        .panel-cat-count {
+            background: rgba(124,92,252,0.14);
+            color: var(--secondary);
+            border: 1px solid rgba(124,92,252,0.22);
+            border-radius: 5px;
+            padding: 1px 8px;
+            font-size: 0.63rem;
+            font-family: 'Orbitron', monospace;
+        }
+
+        .panel-cat-count.pro-count {
+            background: rgba(251,191,36,0.12);
+            color: #fbbf24;
+            border-color: rgba(251,191,36,0.25);
+        }
+
+        /* Panel items */
+        .panel-items { display: flex; flex-direction: column; }
+
+        .panel-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem 1.4rem;
+            cursor: pointer;
+            transition: background 0.18s ease;
+            border-bottom: 1px solid rgba(255,255,255,0.035);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .panel-item:last-child { border-bottom: none; }
+
+        .panel-item::before {
+            content: '';
+            position: absolute;
+            left: 0; top: 0; bottom: 0;
+            width: 2px;
+            background: var(--gradient);
+            transform: scaleY(0);
+            transform-origin: center;
+            transition: transform 0.2s ease;
+        }
+
+        .panel-item:hover::before { transform: scaleY(1); }
+        .panel-item:hover { background: rgba(124,92,252,0.06); }
+        .panel-item:active { background: rgba(124,92,252,0.1); }
+
+        .pi-icon {
+            width: 42px; height: 42px; min-width: 42px;
+            border-radius: 10px;
+            background: rgba(124,92,252,0.1);
+            border: 1px solid rgba(124,92,252,0.2);
+            display: flex; align-items: center; justify-content: center;
+            color: var(--secondary);
+            font-size: 1rem;
+            transition: all 0.2s ease;
+        }
+
+        .panel-item:hover .pi-icon {
+            background: rgba(124,92,252,0.2);
+            border-color: rgba(124,92,252,0.4);
+            box-shadow: 0 0 16px rgba(124,92,252,0.25);
+            color: #fff;
+        }
+
+        .pi-icon-pro {
+            background: rgba(251,191,36,0.1);
+            border-color: rgba(251,191,36,0.22);
+            color: #fbbf24;
+        }
+
+        .panel-item:hover .pi-icon-pro {
+            background: rgba(251,191,36,0.2);
+            border-color: rgba(251,191,36,0.4);
+            box-shadow: 0 0 16px rgba(251,191,36,0.2);
+        }
+
+        .pi-body { flex: 1; min-width: 0; }
+
+        .pi-title {
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: var(--text);
+            margin-bottom: 0.18rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .pi-desc {
+            font-size: 0.78rem;
+            color: var(--text-muted);
+            line-height: 1.4;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .pi-usage { font-size: 0.72rem; color: var(--text-muted); margin-top: 0.2rem; }
+        .pi-usage-num { color: var(--secondary); font-weight: 700; }
+
+        .pi-badge {
+            display: inline-block;
+            padding: 1px 7px;
+            border-radius: 4px;
+            font-size: 0.58rem;
+            font-weight: 800;
+            font-family: 'Orbitron', monospace;
+            letter-spacing: 0.06em;
+            background: var(--gradient-gold);
+            color: #1a0800;
+            flex-shrink: 0;
+        }
+
+        .pi-arrow {
+            color: rgba(255,255,255,0.18);
+            font-size: 0.72rem;
+            transition: all 0.2s ease;
+            flex-shrink: 0;
+        }
+
+        .panel-item:hover .pi-arrow {
+            color: var(--secondary);
+            transform: translateX(4px);
+        }
+
+        .panel-item.disabled {
+            opacity: 0.35;
+            cursor: not-allowed;
+            pointer-events: none;
+        }
+
+        /* ─── TOOL CARD (legacy, fallback) ─── */
         .tools-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(clamp(240px, 100%, 290px), 1fr));
@@ -419,21 +624,18 @@
             margin-top: 2rem;
         }
 
-        /* ─── TOOL CARD ─── */
         .tool-card {
             background: var(--dark-card);
-            border: 1px solid rgba(139,92,246,0.12);
-            border-radius: 10px;
+            border: 1px solid rgba(124,92,252,0.12);
+            border-radius: var(--radius);
             padding: 1.5rem;
             transition: all 0.22s ease;
             cursor: pointer;
             position: relative;
             overflow: hidden;
             backdrop-filter: blur(var(--glass-blur));
-            -webkit-backdrop-filter: blur(var(--glass-blur));
         }
 
-        /* Top accent line */
         .tool-card::before {
             content: '';
             position: absolute;
@@ -445,36 +647,23 @@
             transition: transform 0.25s ease;
         }
 
-        /* Corner decoration */
-        .tool-card::after {
-            content: '';
-            position: absolute;
-            bottom: 0; right: 0;
-            width: 40px; height: 40px;
-            background: linear-gradient(315deg, rgba(139,92,246,0.1), transparent 60%);
-            border-radius: 0 0 10px 0;
-        }
-
         .tool-card:hover::before { transform: scaleX(1); }
-
         .tool-card:hover {
-            transform: translateY(-3px);
-            border-color: rgba(139, 92, 246, 0.35);
-            box-shadow: 0 12px 40px rgba(0,0,0,0.5), 0 0 20px rgba(139,92,246,0.12);
+            transform: translateY(-4px);
+            border-color: rgba(124, 92, 252, 0.35);
+            box-shadow: 0 16px 48px rgba(0,0,0,0.6), 0 0 24px rgba(124,92,252,0.12);
         }
 
         .tool-icon {
-            width: 44px; height: 44px;
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            width: 46px; height: 46px;
+            border-radius: 10px;
+            display: flex; align-items: center; justify-content: center;
             font-size: 1.2rem;
             margin-bottom: 1rem;
-            background: rgba(139, 92, 246, 0.1);
-            color: var(--primary);
-            border: 1px solid rgba(139,92,246,0.2);
-            box-shadow: 0 0 10px rgba(139,92,246,0.1);
+            background: rgba(124, 92, 252, 0.1);
+            color: var(--secondary);
+            border: 1px solid rgba(124,92,252,0.22);
+            box-shadow: 0 0 12px rgba(124,92,252,0.12);
         }
 
         .tool-card h3 {
@@ -491,11 +680,7 @@
             line-height: 1.55;
         }
 
-        .tool-card.disabled {
-            cursor: not-allowed;
-            opacity: 0.4;
-            pointer-events: none;
-        }
+        .tool-card.disabled { cursor: not-allowed; opacity: 0.38; pointer-events: none; }
 
         /* ─── MODAL ─── */
         .modal {
@@ -503,9 +688,9 @@
             position: fixed;
             inset: 0;
             z-index: 2000;
-            background: rgba(0,0,0,0.85);
-            backdrop-filter: blur(8px);
-            -webkit-backdrop-filter: blur(8px);
+            background: rgba(4,5,10,0.88);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
             align-items: center;
             justify-content: center;
             padding: 1.5rem;
@@ -514,9 +699,9 @@
         .modal.active { display: flex; }
 
         .modal-content {
-            background: rgba(13, 14, 22, 0.96);
-            border: 1px solid rgba(139, 92, 246, 0.18);
-            border-radius: 12px;
+            background: rgba(10, 12, 22, 0.97);
+            border: 1px solid rgba(124, 92, 252, 0.2);
+            border-radius: var(--radius);
             padding: 2rem;
             max-width: 500px;
             width: 100%;
@@ -524,8 +709,7 @@
             overflow-y: auto;
             position: relative;
             backdrop-filter: blur(var(--glass-blur));
-            -webkit-backdrop-filter: blur(var(--glass-blur));
-            box-shadow: 0 0 60px rgba(0,0,0,0.8), 0 0 30px rgba(139,92,246,0.1);
+            box-shadow: 0 0 80px rgba(0,0,0,0.9), 0 0 40px rgba(124,92,252,0.12);
         }
 
         .modal-content::before {
@@ -534,103 +718,105 @@
             top: 0; left: 0;
             width: 100%; height: 2px;
             background: var(--gradient);
-            border-radius: 12px 12px 0 0;
+            border-radius: var(--radius) var(--radius) 0 0;
         }
 
         .modal-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 1.5rem;
+            margin-bottom: 1.6rem;
         }
 
         .modal-header h2 {
             font-family: 'Orbitron', monospace;
-            font-size: 1.2rem;
+            font-size: 1.15rem;
             font-weight: 700;
-            letter-spacing: 0.02em;
-            color: var(--text);
+            letter-spacing: 0.03em;
+            background: linear-gradient(135deg, #fff, #c4a8ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
         }
 
         .close-btn {
             background: rgba(255,255,255,0.05);
-            border: 1px solid var(--dark-border);
+            border: 1px solid rgba(255,255,255,0.08);
             color: var(--text-muted);
             font-size: 1.1rem;
             cursor: pointer;
             transition: all 0.2s;
-            width: 32px; height: 32px;
-            border-radius: 6px;
+            width: 34px; height: 34px;
+            border-radius: 8px;
             display: flex; align-items: center; justify-content: center;
         }
 
         .close-btn:hover {
             color: var(--text);
-            border-color: rgba(139,92,246,0.3);
-            background: rgba(139,92,246,0.08);
+            border-color: rgba(124,92,252,0.35);
+            background: rgba(124,92,252,0.1);
         }
 
         /* ─── FORM ─── */
-        .form-group { margin-bottom: 1.2rem; }
+        .form-group { margin-bottom: 1.25rem; }
 
         .form-group label {
             display: block;
-            margin-bottom: 0.45rem;
+            margin-bottom: 0.5rem;
             font-weight: 600;
             color: var(--text-muted);
-            font-size: 0.82rem;
+            font-size: 0.8rem;
             text-transform: uppercase;
-            letter-spacing: 0.05em;
+            letter-spacing: 0.06em;
         }
 
         .form-group input,
         .form-group textarea,
         .form-group select {
             width: 100%;
-            padding: 0.7rem 0.9rem;
+            padding: 0.72rem 1rem;
             background: rgba(255,255,255,0.04);
-            border: 1px solid var(--dark-border);
-            border-radius: 7px;
+            border: 1px solid rgba(255,255,255,0.07);
+            border-radius: var(--radius-sm);
             color: var(--text);
             font-size: 0.9rem;
             font-family: inherit;
-            transition: all 0.2s ease;
+            transition: all 0.22s ease;
         }
 
         .form-group input:focus,
         .form-group textarea:focus,
         .form-group select:focus {
             outline: none;
-            border-color: rgba(139, 92, 246, 0.5);
-            box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1);
-            background: rgba(139, 92, 246, 0.04);
+            border-color: rgba(124, 92, 252, 0.55);
+            box-shadow: 0 0 0 3px rgba(124, 92, 252, 0.12);
+            background: rgba(124, 92, 252, 0.05);
         }
 
         .form-group select {
             appearance: none;
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M6 8L0 0h12z' fill='%23808098'/%3E%3C/svg%3E");
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M6 8L0 0h12z' fill='%236b7280'/%3E%3C/svg%3E");
             background-repeat: no-repeat;
-            background-position: right 12px center;
-            padding-right: 2rem;
+            background-position: right 14px center;
+            padding-right: 2.2rem;
             cursor: pointer;
         }
 
-        .form-group select option { background: #0e0e16; }
-
+        .form-group select option { background: #0d1020; }
         .form-group textarea { resize: vertical; min-height: 100px; }
 
         /* ─── BUTTONS ─── */
         .btn {
-            padding: 0.7rem 1.4rem;
-            border-radius: 7px;
+            padding: 0.72rem 1.5rem;
+            border-radius: var(--radius-sm);
             font-size: 0.88rem;
             font-weight: 700;
             cursor: pointer;
-            transition: all 0.2s ease;
+            transition: all 0.22s ease;
             border: none;
             display: inline-flex;
             align-items: center;
-            gap: 0.45rem;
+            gap: 0.5rem;
             justify-content: center;
             font-family: 'Be Vietnam Pro', sans-serif;
         }
@@ -638,57 +824,53 @@
         .btn-primary {
             background: var(--gradient);
             color: white;
-            box-shadow: 0 2px 16px rgba(139, 92, 246, 0.3);
+            box-shadow: 0 2px 20px rgba(124, 92, 252, 0.35);
         }
 
         .btn-primary:hover {
             transform: translateY(-2px);
-            box-shadow: 0 6px 24px rgba(139, 92, 246, 0.45);
+            box-shadow: 0 8px 28px rgba(124, 92, 252, 0.5);
         }
 
         .btn-secondary {
-            background: transparent;
-            border: 1px solid var(--dark-border);
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.08);
             color: var(--text);
         }
 
         .btn-secondary:hover {
-            border-color: rgba(139, 92, 246, 0.4);
-            background: rgba(139, 92, 246, 0.08);
+            border-color: rgba(124, 92, 252, 0.4);
+            background: rgba(124, 92, 252, 0.08);
             transform: translateY(-1px);
         }
 
-        .btn:disabled {
-            opacity: 0.45;
-            cursor: not-allowed;
-            transform: none !important;
-        }
+        .btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none !important; }
 
         /* ─── RESULT BOX ─── */
         .result-box {
             margin-top: 1.25rem;
-            padding: 1rem;
+            padding: 1rem 1.1rem;
             background: rgba(255,255,255,0.03);
-            border: 1px solid var(--dark-border);
-            border-radius: 8px;
+            border: 1px solid rgba(255,255,255,0.06);
+            border-radius: var(--radius-sm);
             display: none;
         }
 
         .result-box.active { display: block; }
 
         .result-box.success {
-            border-color: rgba(34,197,94,0.35);
-            background: rgba(34,197,94,0.06);
+            border-color: rgba(74,222,128,0.3);
+            background: rgba(74,222,128,0.05);
         }
 
         .result-box.error {
-            border-color: rgba(239,68,68,0.35);
-            background: rgba(239,68,68,0.06);
+            border-color: rgba(248,113,113,0.3);
+            background: rgba(248,113,113,0.05);
         }
 
         .result-box h4 { margin-bottom: 0.6rem; font-size: 0.88rem; font-weight: 700; }
-        .result-box.success h4 { color: #22c55e; }
-        .result-box.error h4 { color: #ef4444; }
+        .result-box.success h4 { color: #4ade80; }
+        .result-box.error h4 { color: #f87171; }
 
         .result-content {
             font-size: 0.83rem;
@@ -709,11 +891,11 @@
         .loading.active { display: flex; }
 
         .spinner {
-            width: 15px; height: 15px;
-            border: 2px solid rgba(255,255,255,0.1);
+            width: 16px; height: 16px;
+            border: 2px solid rgba(255,255,255,0.08);
             border-top-color: var(--primary);
             border-radius: 50%;
-            animation: spin 0.7s linear infinite;
+            animation: spin 0.65s linear infinite;
         }
 
         @keyframes spin { to { transform: rotate(360deg); } }
@@ -722,288 +904,419 @@
         .info-item {
             display: flex;
             justify-content: space-between;
-            padding: 0.5rem 0;
-            border-bottom: 1px solid var(--dark-border);
+            padding: 0.55rem 0;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
         }
 
         .info-item:last-child { border-bottom: none; }
-        .info-label { color: var(--text-muted); font-size: 0.83rem; }
-        .info-value { color: var(--text); font-size: 0.83rem; font-weight: 600; }
+        .info-label { color: var(--text-muted); font-size: 0.82rem; }
+        .info-value { color: var(--text); font-size: 0.82rem; font-weight: 600; }
 
         /* ─── SOCIAL AUTH ─── */
         .social-auth-grid {
             display: flex;
             justify-content: center;
-            gap: 0.8rem;
+            gap: 0.9rem;
             flex-wrap: wrap;
         }
 
         .social-auth-btn {
-            width: 46px; height: 46px;
-            border-radius: 9px;
+            width: 50px; height: 50px;
+            border-radius: 12px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 1.15rem;
+            font-size: 1.2rem;
             color: white;
             text-decoration: none;
-            transition: all 0.22s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            transition: all 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             background: var(--dark-card);
-            border: 1px solid var(--dark-border);
+            border: 1px solid rgba(255,255,255,0.08);
+            box-shadow: 0 4px 16px rgba(0,0,0,0.3);
         }
 
         .social-auth-btn:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 24px rgba(0,0,0,0.4);
+            transform: translateY(-6px) scale(1.05);
+            box-shadow: 0 12px 28px rgba(0,0,0,0.5);
         }
 
-        .social-auth-btn.fb { background: #1877f2; border-color: #1877f2; }
-        .social-auth-btn.gg { background: #fff; border-color: #fff; }
-        .social-auth-btn.vk { background: #0077ff; border-color: #0077ff; }
-        .social-auth-btn.x  { background: #000; border-color: #222; }
-        .social-auth-btn.apple { background: #000; border-color: #222; }
-
-        /* ─── RESPONSIVE ─── */
-        @media (max-width: 768px) {
-            .hero h1 { font-size: 1.7rem; }
-            .tools-grid { grid-template-columns: 1fr; }
-        }
-
-        @media (max-width: 480px) {
-            .container { padding: 1rem; }
-            .hero { padding: 4rem 1rem 2rem; }
-            .modal-content { padding: 1.5rem; border-radius: 10px; }
-            .nav-container { padding: 0 1rem; }
-            .nav-brand-text { font-size: 0.85rem; }
-            #pro-activation-box { padding: 1rem; }
-            #activation-key { flex: 1 1 100% !important; }
-        }
+        .social-auth-btn.fb { background: #1877f2; border-color: rgba(24,119,242,0.6); }
+        .social-auth-btn.fb:hover { box-shadow: 0 12px 28px rgba(24,119,242,0.4); }
+        .social-auth-btn.gg { background: #fff; border-color: rgba(255,255,255,0.4); }
+        .social-auth-btn.gg:hover { box-shadow: 0 12px 28px rgba(255,255,255,0.2); }
+        .social-auth-btn.vk { background: #0077ff; border-color: rgba(0,119,255,0.5); }
+        .social-auth-btn.vk:hover { box-shadow: 0 12px 28px rgba(0,119,255,0.4); }
+        .social-auth-btn.x  { background: #111; border-color: rgba(255,255,255,0.15); }
+        .social-auth-btn.x:hover { box-shadow: 0 12px 28px rgba(255,255,255,0.15); }
+        .social-auth-btn.apple { background: #111; border-color: rgba(255,255,255,0.15); }
+        .social-auth-btn.apple:hover { box-shadow: 0 12px 28px rgba(255,255,255,0.15); }
 
         /* ─── PROGRESS BAR ─── */
         .progress-bar { border-radius: 6px; overflow: hidden; }
         .progress-fill { border-radius: 6px; transition: width 0.3s ease; }
 
+        /* ─── MUSIC PLAYER ─── */
+        /* ─── MUSIC PLAYER ─── */
+        .music-player {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            z-index: 99999;
+            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            transform: translateY(0) scale(1);
+            opacity: 1;
+            user-select: none;
+        }
+
+        .music-player.hidden {
+            transform: translateY(120px) scale(0.8);
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .music-player-container {
+            background: rgba(13, 16, 28, 0.92);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(124, 92, 252, 0.25);
+            border-radius: 14px;
+            padding: 8px 12px;
+            min-width: 180px;
+            max-width: 210px;
+            box-shadow: 0 6px 28px rgba(0,0,0,0.6), 0 0 14px rgba(124,92,252,0.12);
+            position: relative;
+            cursor: grab;
+        }
+
+        .music-player-container:active { cursor: grabbing; }
+
+        body.theme-green .music-player-container {
+            border-color: rgba(22, 163, 74, 0.3);
+            box-shadow: 0 8px 40px rgba(0,0,0,0.6), 0 0 20px rgba(22,163,74,0.15);
+        }
+
+        .music-visualizer {
+            display: flex;
+            align-items: flex-end;
+            gap: 2px;
+            height: 14px;
+            justify-content: center;
+            margin-bottom: 6px;
+        }
+
+        .bar {
+            width: 3px;
+            background: var(--primary);
+            border-radius: 2px;
+            animation: barAnim 1.2s ease-in-out infinite;
+            box-shadow: 0 0 6px var(--primary);
+        }
+
+        .bar:nth-child(1) { height: 5px;  animation-delay: 0s; }
+        .bar:nth-child(2) { height: 10px; animation-delay: 0.15s; }
+        .bar:nth-child(3) { height: 14px; animation-delay: 0.3s; }
+        .bar:nth-child(4) { height: 9px; animation-delay: 0.45s; }
+        .bar:nth-child(5) { height: 6px; animation-delay: 0.6s; }
+
+        @keyframes barAnim {
+            0%, 100% { transform: scaleY(0.4); opacity: 0.6; }
+            50% { transform: scaleY(1); opacity: 1; }
+        }
+
+        .music-player.paused .bar {
+            animation-play-state: paused;
+            transform: scaleY(0.4);
+            opacity: 0.4;
+        }
+
+        .music-info { text-align: center; margin-bottom: 8px; }
+
+        .music-title {
+            font-size: 0.78rem;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 1px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .music-artist { font-size: 0.68rem; color: var(--text-muted); }
+
+        .music-controls {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            justify-content: center;
+        }
+
+        .control-btn {
+            width: 28px; height: 28px;
+            border-radius: 50%;
+            background: rgba(124, 92, 252, 0.18);
+            border: 1px solid rgba(124, 92, 252, 0.3);
+            color: #fff;
+            font-size: 0.72rem;
+            cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            transition: all 0.2s ease;
+        }
+
+        .control-btn:hover {
+            background: rgba(124, 92, 252, 0.35);
+            box-shadow: 0 0 12px rgba(124,92,252,0.3);
+            transform: scale(1.08);
+        }
+
+        body.theme-green .control-btn {
+            background: rgba(22,163,74,0.18);
+            border-color: rgba(22,163,74,0.3);
+        }
+
+        body.theme-green .control-btn:hover {
+            background: rgba(22,163,74,0.35);
+            box-shadow: 0 0 12px rgba(22,163,74,0.3);
+        }
+
+        .volume-slider {
+            -webkit-appearance: none;
+            width: 58px; height: 3px;
+            border-radius: 2px;
+            background: rgba(255,255,255,0.12);
+            outline: none;
+            cursor: pointer;
+        }
+
+        .volume-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 11px; height: 11px;
+            border-radius: 50%;
+            background: var(--primary);
+            box-shadow: 0 0 5px var(--primary);
+            cursor: pointer;
+        }
+
+        .close-music {
+            position: absolute;
+            top: 8px; right: 10px;
+            width: 22px; height: 22px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.08);
+            border: 1px solid rgba(255,255,255,0.1);
+            color: rgba(255,255,255,0.5);
+            font-size: 0.6rem;
+            cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            transition: all 0.2s;
+        }
+
+        .close-music:hover {
+            background: rgba(239,68,68,0.2);
+            border-color: rgba(239,68,68,0.4);
+            color: #f87171;
+        }
+
+
+        /* ─── HERO MUSIC BUTTON ─── */
+        .hero-music-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            background: rgba(13, 16, 28, 0.85);
+            border: 1px solid rgba(124, 92, 252, 0.28);
+            border-radius: 14px;
+            padding: 8px 14px;
+            cursor: pointer;
+            transition: all 0.22s ease;
+            backdrop-filter: blur(12px);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.4), 0 0 12px rgba(124,92,252,0.1);
+        }
+
+        .hero-music-btn:hover {
+            border-color: rgba(124,92,252,0.5);
+            box-shadow: 0 6px 28px rgba(0,0,0,0.5), 0 0 18px rgba(124,92,252,0.2);
+            transform: translateY(-2px);
+        }
+
+        body.theme-green .hero-music-btn {
+            border-color: rgba(22,163,74,0.28);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.4), 0 0 12px rgba(22,163,74,0.1);
+        }
+
+        body.theme-green .hero-music-btn:hover {
+            border-color: rgba(22,163,74,0.5);
+            box-shadow: 0 6px 28px rgba(0,0,0,0.5), 0 0 18px rgba(22,163,74,0.2);
+        }
+
+        .hero-music-viz {
+            display: flex;
+            align-items: flex-end;
+            gap: 2px;
+            height: 18px;
+        }
+
+        .hero-music-viz .bar {
+            width: 2px;
+            background: var(--primary);
+            border-radius: 2px;
+            box-shadow: 0 0 5px var(--primary);
+        }
+
+        .hero-music-viz .bar:nth-child(1) { height: 6px; animation-delay: 0s; }
+        .hero-music-viz .bar:nth-child(2) { height: 12px; animation-delay: 0.15s; }
+        .hero-music-viz .bar:nth-child(3) { height: 18px; animation-delay: 0.3s; }
+        .hero-music-viz .bar:nth-child(4) { height: 10px; animation-delay: 0.45s; }
+        .hero-music-viz .bar:nth-child(5) { height: 7px; animation-delay: 0.6s; }
+
+        .hero-music-info { text-align: left; }
+
+        .hero-music-title {
+            font-size: 0.82rem;
+            font-weight: 700;
+            color: #fff;
+            white-space: nowrap;
+        }
+
+        .hero-music-artist {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+        }
+
+        /* ─── INLINE MUSIC PLAYER (hero) ─── */
+        .inline-music-player {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(13, 16, 28, 0.88);
+            border: 1px solid rgba(124, 92, 252, 0.28);
+            border-radius: 14px;
+            padding: 7px 10px 7px 10px;
+            position: relative;
+            backdrop-filter: blur(16px);
+            box-shadow: 0 4px 24px rgba(0,0,0,0.5), 0 0 14px rgba(124,92,252,0.1);
+            vertical-align: middle;
+        }
+
+        body.theme-green .inline-music-player {
+            border-color: rgba(22,163,74,0.3);
+            box-shadow: 0 4px 24px rgba(0,0,0,0.5), 0 0 14px rgba(22,163,74,0.1);
+        }
+
+        .imp-viz {
+            display: flex;
+            align-items: flex-end;
+            gap: 2px;
+            height: 16px;
+        }
+
+        .imp-viz .bar {
+            width: 2px;
+            background: var(--primary);
+            border-radius: 2px;
+            box-shadow: 0 0 4px var(--primary);
+        }
+
+        .imp-viz .bar:nth-child(1) { height: 5px; animation-delay: 0s; }
+        .imp-viz .bar:nth-child(2) { height: 10px; animation-delay: 0.15s; }
+        .imp-viz .bar:nth-child(3) { height: 16px; animation-delay: 0.3s; }
+        .imp-viz .bar:nth-child(4) { height: 9px; animation-delay: 0.45s; }
+        .imp-viz .bar:nth-child(5) { height: 6px; animation-delay: 0.6s; }
+
+        .inline-music-player.paused .imp-viz .bar {
+            animation-play-state: paused;
+            opacity: 0.4;
+        }
+
+        .imp-info { text-align: left; line-height: 1.2; }
+
+        .imp-title {
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: #fff;
+            white-space: nowrap;
+        }
+
+        .imp-artist {
+            font-size: 0.65rem;
+            color: var(--text-muted);
+        }
+
+        .imp-controls {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .imp-btn {
+            width: 26px; height: 26px;
+            border-radius: 50%;
+            background: rgba(124, 92, 252, 0.18);
+            border: 1px solid rgba(124, 92, 252, 0.3);
+            color: #fff;
+            font-size: 0.68rem;
+            cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            transition: all 0.2s ease;
+        }
+
+        .imp-btn:hover {
+            background: rgba(124, 92, 252, 0.35);
+            box-shadow: 0 0 10px rgba(124,92,252,0.3);
+        }
+
+        body.theme-green .imp-btn {
+            background: rgba(22,163,74,0.18);
+            border-color: rgba(22,163,74,0.3);
+        }
+
+        body.theme-green .imp-btn:hover {
+            background: rgba(22,163,74,0.35);
+            box-shadow: 0 0 10px rgba(22,163,74,0.3);
+        }
+
+        .imp-close {
+            position: absolute;
+            top: -7px; right: -7px;
+            width: 18px; height: 18px;
+            border-radius: 50%;
+            background: rgba(20,20,35,0.95);
+            border: 1px solid rgba(255,255,255,0.15);
+            color: rgba(255,255,255,0.5);
+            font-size: 0.55rem;
+            cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            transition: all 0.2s;
+        }
+
+        .imp-close:hover {
+            background: rgba(239,68,68,0.3);
+            border-color: rgba(239,68,68,0.5);
+            color: #f87171;
+        }
+        /* ─── RESPONSIVE ─── */
+        @media (max-width: 768px) {
+            .hero h1 { font-size: 1.8rem; }
+        }
+
+        @media (max-width: 480px) {
+            .container { padding: 1rem; }
+            .hero { padding: 4.5rem 1rem 2rem; }
+            .modal-content { padding: 1.4rem; border-radius: 10px; }
+            .nav-container { padding: 0 1rem; }
+            .nav-brand-text { font-size: 0.85rem; }
+            #pro-activation-box { padding: 1rem; }
+            #activation-key { flex: 1 1 100% !important; }
+            .panel-item { padding: 0.85rem 1rem; gap: 0.8rem; }
+            .pi-icon { width: 38px; height: 38px; min-width: 38px; font-size: 0.88rem; }
+            .pi-title { font-size: 0.85rem; }
+            .panel-cat-header { padding: 0.7rem 1rem; }
+        }
+
         @keyframes cyan-circular-flow {
             0% { background-position: 0% 50%; }
             100% { background-position: 400% 50%; }
         }
-
-        /* ─── PANEL LAYOUT ─── */
-        .panel-wrapper {
-            display: flex;
-            flex-direction: column;
-            gap: 0.5rem;
-            margin-top: 2rem;
-        }
-
-        .panel-section {
-            background: var(--dark-card);
-            border: 1px solid rgba(255,255,255,0.05);
-            border-radius: 12px;
-            overflow: hidden;
-            backdrop-filter: blur(var(--glass-blur));
-            -webkit-backdrop-filter: blur(var(--glass-blur));
-        }
-
-        /* Category header */
-        .panel-cat-header {
-            display: flex;
-            align-items: center;
-            gap: 0.6rem;
-            padding: 0.75rem 1.25rem;
-            background: rgba(139,92,246,0.06);
-            border-bottom: 1px solid rgba(255,255,255,0.05);
-            font-family: 'Orbitron', monospace;
-            font-size: 0.68rem;
-            font-weight: 700;
-            letter-spacing: 0.1em;
-            color: var(--primary);
-            text-transform: uppercase;
-        }
-
-        .panel-cat-header i {
-            font-size: 0.75rem;
-            opacity: 0.85;
-        }
-
-        .panel-cat-line {
-            flex: 1;
-            height: 1px;
-            background: linear-gradient(90deg, rgba(139,92,246,0.25), transparent);
-            margin: 0 0.5rem;
-        }
-
-        .panel-cat-count {
-            background: rgba(139,92,246,0.15);
-            color: var(--secondary);
-            border: 1px solid rgba(139,92,246,0.2);
-            border-radius: 4px;
-            padding: 1px 7px;
-            font-size: 0.65rem;
-            font-family: 'Orbitron', monospace;
-        }
-
-        .panel-cat-count.pro-count {
-            background: rgba(251,191,36,0.12);
-            color: #fbbf24;
-            border-color: rgba(251,191,36,0.25);
-        }
-
-        /* Panel items list */
-        .panel-items {
-            display: flex;
-            flex-direction: column;
-        }
-
-        /* Single panel item row */
-        .panel-item {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-            padding: 0.95rem 1.25rem;
-            cursor: pointer;
-            transition: background 0.18s ease, border-color 0.18s ease;
-            border-bottom: 1px solid rgba(255,255,255,0.04);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .panel-item:last-child { border-bottom: none; }
-
-        .panel-item::before {
-            content: '';
-            position: absolute;
-            left: 0; top: 0; bottom: 0;
-            width: 2px;
-            background: var(--gradient);
-            transform: scaleY(0);
-            transform-origin: center;
-            transition: transform 0.2s ease;
-        }
-
-        .panel-item:hover::before { transform: scaleY(1); }
-
-        .panel-item:hover {
-            background: rgba(139,92,246,0.06);
-        }
-
-        .panel-item:active {
-            background: rgba(139,92,246,0.1);
-        }
-
-        /* Icon cell */
-        .pi-icon {
-            width: 40px;
-            height: 40px;
-            min-width: 40px;
-            border-radius: 9px;
-            background: rgba(139,92,246,0.1);
-            border: 1px solid rgba(139,92,246,0.18);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: var(--primary);
-            font-size: 0.95rem;
-            transition: all 0.18s ease;
-        }
-
-        .panel-item:hover .pi-icon {
-            background: rgba(139,92,246,0.18);
-            box-shadow: 0 0 12px rgba(139,92,246,0.2);
-        }
-
-        .pi-icon-pro {
-            background: rgba(251,191,36,0.1);
-            border-color: rgba(251,191,36,0.2);
-            color: #fbbf24;
-        }
-
-        .panel-item:hover .pi-icon-pro {
-            background: rgba(251,191,36,0.18);
-            box-shadow: 0 0 12px rgba(251,191,36,0.2);
-        }
-
-        /* Info cell */
-        .pi-body {
-            flex: 1;
-            min-width: 0;
-        }
-
-        .pi-title {
-            font-size: 0.9rem;
-            font-weight: 700;
-            color: var(--text);
-            margin-bottom: 0.15rem;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        .pi-desc {
-            font-size: 0.78rem;
-            color: var(--text-muted);
-            line-height: 1.4;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        .pi-usage {
-            font-size: 0.72rem;
-            color: var(--text-muted);
-            margin-top: 0.2rem;
-        }
-
-        .pi-usage-num {
-            color: var(--primary);
-            font-weight: 700;
-        }
-
-        .pi-badge {
-            display: inline-block;
-            padding: 1px 6px;
-            border-radius: 3px;
-            font-size: 0.6rem;
-            font-weight: 800;
-            font-family: 'Orbitron', monospace;
-            letter-spacing: 0.05em;
-            background: linear-gradient(135deg, #fbbf24, #f59e0b);
-            color: #000;
-            flex-shrink: 0;
-        }
-
-        /* Arrow cell */
-        .pi-arrow {
-            color: rgba(255,255,255,0.2);
-            font-size: 0.75rem;
-            transition: all 0.18s ease;
-            flex-shrink: 0;
-        }
-
-        .panel-item:hover .pi-arrow {
-            color: var(--primary);
-            transform: translateX(3px);
-        }
-
-        /* panel-item disabled */
-        .panel-item.disabled {
-            opacity: 0.4;
-            cursor: not-allowed;
-            pointer-events: none;
-        }
-
-        /* Responsive: tighter on mobile */
-        @media (max-width: 480px) {
-            .panel-item { padding: 0.8rem 1rem; gap: 0.8rem; }
-            .pi-icon { width: 36px; height: 36px; min-width: 36px; font-size: 0.85rem; }
-            .pi-title { font-size: 0.84rem; }
-            .panel-cat-header { padding: 0.65rem 1rem; }
-        }
-
-    </style>
+</style>
 </head>
 <body>
     <div class="bg-animation">
@@ -1035,22 +1348,183 @@
         <div class="nav-container">
             <a href="/" class="nav-brand">
                 <div class="nav-brand-icon"><i class="fas fa-fire"></i></div>
-                <span class="nav-brand-text">TOOL FREE FIRE</span>
+                <span class="nav-brand-text">HIHI MXT</span>
             </a>
             <div class="nav-auth">
                 <div class="nav-user-info" id="nav-user-info">
                     <span class="nav-user-name" id="nav-username"></span>
                     <span class="pro-badge" id="nav-pro-badge" style="display: none;">PRO</span>
                 </div>
+                <button class="theme-toggle-btn" id="themeToggleBtn" onclick="toggleTheme()" title="Đổi màu giao diện">
+                    <span class="theme-dot theme-dot-purple" id="dot-purple"></span>
+                    <span class="theme-dot theme-dot-green" id="dot-green"></span>
+                    <i class="fas fa-palette" style="font-size:0.78rem; margin-left:0.3rem;"></i>
+                </button>
             </div>
         </div>
     </nav>
 
+    <style>
+    /* ─── THEME TOGGLE BUTTON ─── */
+    .theme-toggle-btn {
+        display: flex;
+        align-items: center;
+        gap: 0.25rem;
+        padding: 0.38rem 0.7rem;
+        background: rgba(255,255,255,0.05);
+        border: 1px solid rgba(255,255,255,0.1);
+        border-radius: 20px;
+        cursor: pointer;
+        transition: all 0.22s ease;
+        color: var(--text-muted);
+    }
+    .theme-toggle-btn:hover {
+        background: rgba(255,255,255,0.1);
+        border-color: var(--primary);
+        color: #fff;
+        transform: scale(1.05);
+    }
+    .theme-dot {
+        width: 10px; height: 10px;
+        border-radius: 50%;
+        display: inline-block;
+        transition: all 0.3s;
+    }
+    .theme-dot-purple { background: #7c5cfc; box-shadow: 0 0 6px #7c5cfc; }
+    .theme-dot-green  { background: #22c55e; box-shadow: 0 0 6px #22c55e; }
+
+    /* ─── GREEN THEME ─── */
+    body.theme-green {
+        --primary: #16a34a;
+        --primary-dark: #15803d;
+        --secondary: #4ade80;
+        --accent: #86efac;
+        --neon: #22c55e;
+        --gradient: linear-gradient(135deg, #4ade80, #16a34a);
+        --gradient-2: linear-gradient(135deg, #86efac, #22c55e);
+        --glow: 0 20px 60px rgba(22, 163, 74, 0.3);
+        --glow-sm: 0 8px 30px rgba(22, 163, 74, 0.18);
+        --border-fire: rgba(22, 163, 74, 0.18);
+    }
+    body.theme-green::before {
+        background:
+            radial-gradient(ellipse 60% 50% at 15% 20%, rgba(22,163,74,0.12) 0%, transparent 60%),
+            radial-gradient(ellipse 50% 40% at 85% 80%, rgba(134,239,172,0.08) 0%, transparent 60%),
+            radial-gradient(ellipse 80% 60% at 50% 100%, rgba(21,128,61,0.06) 0%, transparent 60%);
+    }
+    body.theme-green .nav-brand-text {
+        background: linear-gradient(135deg, #d1fae5, #4ade80);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+    body.theme-green .hero h1 {
+        background: linear-gradient(135deg, #ffffff 0%, #bbf7d0 50%, #16a34a 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+    body.theme-green .modal-header h2 {
+        background: linear-gradient(135deg, #fff, #a7f3c0);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+    body.theme-green .particle { background: #22c55e; box-shadow: 0 0 6px #22c55e; }
+    body.theme-green .particle:nth-child(2) { background: #4ade80; box-shadow: 0 0 6px #4ade80; }
+    body.theme-green .particle:nth-child(3) { background: #86efac; box-shadow: 0 0 6px #86efac; }
+    </style>
+
+    <script>
+    // Inline player controls - chạy sau khi DOM load xong
+    document.addEventListener('DOMContentLoaded', function() {
+        const audio = document.getElementById('backgroundMusic');
+        const inlinePlayBtn = document.getElementById('inlinePlayBtn');
+        const inlineVolBtn = document.getElementById('inlineVolBtn');
+        const inlineCloseBtn = document.getElementById('inlineCloseBtn');
+        const inlinePlayer = document.getElementById('inlinePlayer');
+
+        if (inlinePlayBtn && audio) {
+            inlinePlayBtn.addEventListener('click', () => {
+                if (audio.paused) {
+                    audio.play().catch(e => console.log('Play error:', e));
+                    inlinePlayBtn.innerHTML = '<i class="fas fa-pause"></i>';
+                    if (inlinePlayer) inlinePlayer.classList.remove('paused');
+                } else {
+                    audio.pause();
+                    inlinePlayBtn.innerHTML = '<i class="fas fa-play"></i>';
+                    if (inlinePlayer) inlinePlayer.classList.add('paused');
+                }
+            });
+        }
+
+        if (inlineVolBtn && audio) {
+            inlineVolBtn.addEventListener('click', () => {
+                audio.muted = !audio.muted;
+                inlineVolBtn.innerHTML = audio.muted
+                    ? '<i class="fas fa-volume-mute"></i>'
+                    : '<i class="fas fa-volume-up"></i>';
+            });
+        }
+
+        if (inlineCloseBtn && inlinePlayer) {
+            inlineCloseBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                inlinePlayer.style.display = 'none';
+                if (audio) audio.pause();
+            });
+        }
+    });
+
+    function toggleMusicPlayer() {
+        const player = document.getElementById('musicPlayer');
+        if (!player) return;
+        if (player.classList.contains('hidden')) {
+            player.classList.remove('hidden');
+        } else {
+            player.classList.add('hidden');
+        }
+    }
+    function toggleTheme() {
+        const body = document.body;
+        const isGreen = body.classList.toggle('theme-green');
+        localStorage.setItem('siteTheme', isGreen ? 'green' : 'purple');
+        const btn = document.getElementById('themeToggleBtn');
+        btn.title = isGreen ? 'Đổi sang màu tím' : 'Đổi sang màu xanh lá';
+    }
+    // Restore saved theme
+    (function() {
+        if (localStorage.getItem('siteTheme') === 'green') {
+            document.body.classList.add('theme-green');
+        }
+    })();
+    </script>
+
     <div class="container">
         <div class="hero">
-            <div class="hero-badge"><i class="fas fa-fire" style="font-size:0.75rem;"></i>&nbsp;HIHIMXT</div>
-            <h1>HIHI MAIL XÁC THỰC</h1>
-            <p>Công cụ web an toàn về việc tra cứu hay sửa đổi thông tin trong Free Fire</p>
+            <div class="hero-badge"><i class="fas fa-fire" style="font-size:0.75rem;"></i>&nbsp;Hihi MAIL XÁC THỰC</div>
+            <div style="display:flex; align-items:center; justify-content:center; gap:1rem; flex-wrap:wrap;">
+                <h1>Tính năng Free Fire</h1>
+                <div id="inlinePlayer" class="inline-music-player">
+                    <div class="imp-viz">
+                        <span class="bar"></span>
+                        <span class="bar"></span>
+                        <span class="bar"></span>
+                        <span class="bar"></span>
+                        <span class="bar"></span>
+                    </div>
+                    <div class="imp-info">
+                        <div class="imp-title">Sau Này Em Cưới Ai Rồi</div>
+                        <div class="imp-artist">Obito</div>
+                    </div>
+                    <div class="imp-controls">
+                        <button class="imp-btn" id="inlinePlayBtn"><i class="fas fa-play"></i></button>
+                        <button class="imp-btn imp-vol" id="inlineVolBtn"><i class="fas fa-volume-up"></i></button>
+                    </div>
+                    <button class="imp-close" id="inlineCloseBtn"><i class="fas fa-times"></i></button>
+                </div>
+            </div>
+            <p>Các tính năng web thiên tài về việc tra cứu hay sửa đổi thông tin trong Free Fire</p>
             
             <!-- Pro Key Section -->
             <div id="pro-activation-box" style="margin: 2rem auto 0; background: rgba(139, 92, 246, 0.1); border: 1px solid rgba(139, 92, 246, 0.3); padding: 1.5rem; border-radius: 20px; display: block; width: 100%; max-width: 600px; backdrop-filter: blur(10px);">
@@ -1240,36 +1714,43 @@
         </div>
 
         <!-- ── PRO / PREMIUM ── -->
-        <div class="panel-section">
-            <div class="panel-cat-header">
-                <i class="fas fa-crown"></i>
-                <span>Tính Năng PRO</span>
-                <div class="panel-cat-line"></div>
-                <span class="panel-cat-count pro-count">2</span>
+<div class="panel-section">
+    <div class="panel-cat-header">
+        <i class="fas fa-crown"></i>
+        <span>Tính Năng PRO</span>
+        <div class="panel-cat-line"></div>
+        <span class="panel-cat-count pro-count">3</span>
+    </div>
+    <div class="panel-items">
+        <div class="panel-item" onclick="openModal('spam-log')">
+            <div class="pi-icon pi-icon-pro"><i class="fas fa-bolt"></i></div>
+            <div class="pi-body">
+                <div class="pi-title">Spam Log <span class="pi-badge">PRO</span></div>
+                <div class="pi-desc">Spam log vào tài khoản Free Fire</div>
+                <div id="usage-spam-log-container" class="pi-usage">Hạn mức: <span id="usage-spam-log" class="pi-usage-num">0</span>/1 lần</div>
             </div>
-            <div class="panel-items">
-                <div class="panel-item" onclick="showMaintenance()">
-                    <div class="pi-icon pi-icon-pro"><i class="fas fa-bolt"></i></div>
-                    <div class="pi-body">
-                        <div class="pi-title">Spam Log <span class="pi-badge" style="background:#6b7280;">BẢO TRÌ</span></div>
-                        <div class="pi-desc">Tính năng đang bảo trì, vui lòng quay lại sau</div>
-                    </div>
-                    <div class="pi-arrow"><i class="fas fa-tools"></i></div>
-                </div>
-                <div class="panel-item" onclick="openModal('ban7')">
-                    <div class="pi-icon pi-icon-pro"><i class="fas fa-ban"></i></div>
-                    <div class="pi-body">
-                        <div class="pi-title">Ban 7 Ngày <span class="pi-badge">PRO</span></div>
-                        <div class="pi-desc">Ban tài khoản đó trong 7 ngày</div>
-                        <div id="usage-ban7-container" class="pi-usage">Hạn mức: <span id="usage-ban7" class="pi-usage-num">0</span>/1 lần</div>
-                    </div>
-                    <div class="pi-arrow"><i class="fas fa-chevron-right"></i></div>
-                </div>
-            </div>
+            <div class="pi-arrow"><i class="fas fa-chevron-right"></i></div>
         </div>
-
+        <div class="panel-item" onclick="openModal('ban7')">
+            <div class="pi-icon pi-icon-pro"><i class="fas fa-ban"></i></div>
+            <div class="pi-body">
+                <div class="pi-title">Ban 7 Ngày <span class="pi-badge">PRO</span></div>
+                <div class="pi-desc">Ban tài khoản đó trong 7 ngày</div>
+                <div id="usage-ban7-container" class="pi-usage">Hạn mức: <span id="usage-ban7" class="pi-usage-num">0</span>/1 lần</div>
+            </div>
+            <div class="pi-arrow"><i class="fas fa-chevron-right"></i></div>
+        </div>
+        <div class="panel-item" onclick="openModal('ban-vinh-vien')">
+            <div class="pi-icon pi-icon-pro"><i class="fas fa-skull-crossbones"></i></div>
+            <div class="pi-body">
+                <div class="pi-title">Ban Vĩnh Viễn <span class="pi-badge">PRO</span></div>
+                <div class="pi-desc">Ban vĩnh viễn tài khoản Free Fire</div>
+                <div id="usage-ban-vinh-vien-container" class="pi-usage">Hạn mức: <span id="usage-ban-vinh-vien" class="pi-usage-num">0</span>/1 lần</div>
+            </div>
+            <div class="pi-arrow"><i class="fas fa-chevron-right"></i></div>
+        </div>
     </div>
-    </div>
+</div>
 
     <!-- Lookup Account Modal -->
     <div class="modal" id="modal-lookup-account">
@@ -1484,25 +1965,27 @@
                 </button>
             </div>
             
-            <!-- Step 2: Nhập OTP -->
+            <!-- Step 2: Nhập OTP (8 số) -->
             <div id="add-recovery-step-2" style="display: none;">
                 <h3 style="margin-bottom: 1rem; color: var(--text);">Nhập mã OTP</h3>
                 <div class="form-group">
                     <div class="pin-box">
                         <div class="pin-box-label">
-                            <i class="fas fa-envelope-open-text"></i> [ MÃ OTP ]
+                            <i class="fas fa-envelope-open-text"></i> [ MÃ OTP - 8 SỐ ]
                             <span class="vip-badge"><i class="fas fa-crown"></i> VIP</span>
                         </div>
                         <div class="otp-inputs" id="add-recovery-otp-container">
-                            <input type="text" class="otp-input" maxlength="1" data-index="0">
-                            <input type="text" class="otp-input" maxlength="1" data-index="1">
-                            <input type="text" class="otp-input" maxlength="1" data-index="2">
-                            <input type="text" class="otp-input" maxlength="1" data-index="3">
-                            <input type="text" class="otp-input" maxlength="1" data-index="4">
-                            <input type="text" class="otp-input" maxlength="1" data-index="5">
-                            <input type="text" class="otp-input" maxlength="1" data-index="6">
-                            <input type="text" class="otp-input" maxlength="1" data-index="7">
+                            <input type="text" class="otp-input" maxlength="1" data-index="0" inputmode="numeric" pattern="[0-9]*" autocomplete="one-time-code">
+                            <input type="text" class="otp-input" maxlength="1" data-index="1" inputmode="numeric" pattern="[0-9]*" autocomplete="one-time-code">
+                            <input type="text" class="otp-input" maxlength="1" data-index="2" inputmode="numeric" pattern="[0-9]*" autocomplete="one-time-code">
+                            <input type="text" class="otp-input" maxlength="1" data-index="3" inputmode="numeric" pattern="[0-9]*" autocomplete="one-time-code">
+                            <input type="text" class="otp-input" maxlength="1" data-index="4" inputmode="numeric" pattern="[0-9]*" autocomplete="one-time-code">
+                            <input type="text" class="otp-input" maxlength="1" data-index="5" inputmode="numeric" pattern="[0-9]*" autocomplete="one-time-code">
+                            <input type="text" class="otp-input" maxlength="1" data-index="6" inputmode="numeric" pattern="[0-9]*" autocomplete="one-time-code">
+                            <input type="text" class="otp-input" maxlength="1" data-index="7" inputmode="numeric" pattern="[0-9]*" autocomplete="one-time-code">
                         </div>
+                        <!-- OTP Status Message -->
+                        <div id="add-recovery-otp-status" style="margin-top: 0.75rem; font-size: 0.9rem; font-weight: 600; text-align: center; display: none;"></div>
                     </div>
                     <div class="countdown-timer" id="add-recovery-countdown" style="display: none;">
                         OTP hết hạn sau: <span id="add-recovery-timer">10:00</span>
@@ -1516,21 +1999,21 @@
                 </button>
             </div>
 
-            <!-- Step 3: Nhập security code -->
+            <!-- Step 3: Nhập mã bảo mật (6 số) -->
             <div id="add-recovery-step-3" style="display: none;">
                 <h3 style="margin-bottom: 1rem; color: var(--text);">Nhập mã bảo mật</h3>
                 <div class="pin-box">
                     <div class="pin-box-label">
-                        <i class="fas fa-key"></i> [ MÃ BẢO VỆ (PIN) ]
+                        <i class="fas fa-key"></i> [ MÃ BẢO VỆ - 6 SỐ ]
                         <span class="vip-badge"><i class="fas fa-crown"></i> VIP</span>
                     </div>
                     <div class="otp-inputs" id="add-recovery-security-container">
-                        <input type="text" class="otp-input" maxlength="1" data-index="0">
-                        <input type="text" class="otp-input" maxlength="1" data-index="1">
-                        <input type="text" class="otp-input" maxlength="1" data-index="2">
-                        <input type="text" class="otp-input" maxlength="1" data-index="3">
-                        <input type="text" class="otp-input" maxlength="1" data-index="4">
-                        <input type="text" class="otp-input" maxlength="1" data-index="5">
+                        <input type="text" class="otp-input" maxlength="1" data-index="0" inputmode="numeric" pattern="[0-9]*">
+                        <input type="text" class="otp-input" maxlength="1" data-index="1" inputmode="numeric" pattern="[0-9]*">
+                        <input type="text" class="otp-input" maxlength="1" data-index="2" inputmode="numeric" pattern="[0-9]*">
+                        <input type="text" class="otp-input" maxlength="1" data-index="3" inputmode="numeric" pattern="[0-9]*">
+                        <input type="text" class="otp-input" maxlength="1" data-index="4" inputmode="numeric" pattern="[0-9]*">
+                        <input type="text" class="otp-input" maxlength="1" data-index="5" inputmode="numeric" pattern="[0-9]*">
                     </div>
                 </div>
                 <button class="btn btn-primary" onclick="createAddRecoveryBind()">
@@ -1714,25 +2197,25 @@
                 </button>
             </div>
             
-            <!-- Step 3: Xác thực -->
+            <!-- Step 3: Xác thực - OTP 8 số, PIN 6 số -->
             <div id="unbind-step-3" style="display: none;">
                 <h3 style="margin-bottom: 1rem; color: var(--text);">Xác thực</h3>
                 <div class="form-group" id="unbind-otp-group">
-                    <label>OTP</label>
+                    <label>OTP (8 số)</label>
                     <div class="pin-box">
                         <div class="pin-box-label">
-                            <i class="fas fa-envelope-open-text"></i> [ MÃ OTP ]
+                            <i class="fas fa-envelope-open-text"></i> [ MÃ OTP - 8 SỐ ]
                             <span class="vip-badge"><i class="fas fa-crown"></i> VIP</span>
                         </div>
                         <div class="otp-inputs" id="unbind-otp-container">
-                            <input type="text" class="otp-input" maxlength="1" data-index="0">
-                            <input type="text" class="otp-input" maxlength="1" data-index="1">
-                            <input type="text" class="otp-input" maxlength="1" data-index="2">
-                            <input type="text" class="otp-input" maxlength="1" data-index="3">
-                            <input type="text" class="otp-input" maxlength="1" data-index="4">
-                            <input type="text" class="otp-input" maxlength="1" data-index="5">
-                            <input type="text" class="otp-input" maxlength="1" data-index="6">
-                            <input type="text" class="otp-input" maxlength="1" data-index="7">
+                            <input type="text" class="otp-input" maxlength="1" data-index="0" inputmode="numeric" pattern="[0-9]*" autocomplete="one-time-code">
+                            <input type="text" class="otp-input" maxlength="1" data-index="1" inputmode="numeric" pattern="[0-9]*" autocomplete="one-time-code">
+                            <input type="text" class="otp-input" maxlength="1" data-index="2" inputmode="numeric" pattern="[0-9]*" autocomplete="one-time-code">
+                            <input type="text" class="otp-input" maxlength="1" data-index="3" inputmode="numeric" pattern="[0-9]*" autocomplete="one-time-code">
+                            <input type="text" class="otp-input" maxlength="1" data-index="4" inputmode="numeric" pattern="[0-9]*" autocomplete="one-time-code">
+                            <input type="text" class="otp-input" maxlength="1" data-index="5" inputmode="numeric" pattern="[0-9]*" autocomplete="one-time-code">
+                            <input type="text" class="otp-input" maxlength="1" data-index="6" inputmode="numeric" pattern="[0-9]*" autocomplete="one-time-code">
+                            <input type="text" class="otp-input" maxlength="1" data-index="7" inputmode="numeric" pattern="[0-9]*" autocomplete="one-time-code">
                         </div>
                     </div>
                     <button class="btn btn-secondary" onclick="sendUnbindOTP()" style="margin-top: 0.5rem; width: 100%;">
@@ -1745,16 +2228,16 @@
                 <div class="form-group" id="unbind-security-group" style="display:none;">
                     <div class="pin-box">
                         <div class="pin-box-label">
-                            <i class="fas fa-key"></i> [ MÃ BẢO VỆ (PIN) ]
+                            <i class="fas fa-key"></i> [ MÃ BẢO VỆ - 6 SỐ ]
                             <span class="vip-badge"><i class="fas fa-crown"></i> VIP</span>
                         </div>
                         <div class="otp-inputs" id="unbind-security-container">
-                            <input type="text" class="otp-input" maxlength="1" data-index="0">
-                            <input type="text" class="otp-input" maxlength="1" data-index="1">
-                            <input type="text" class="otp-input" maxlength="1" data-index="2">
-                            <input type="text" class="otp-input" maxlength="1" data-index="3">
-                            <input type="text" class="otp-input" maxlength="1" data-index="4">
-                            <input type="text" class="otp-input" maxlength="1" data-index="5">
+                            <input type="text" class="otp-input" maxlength="1" data-index="0" inputmode="numeric" pattern="[0-9]*">
+                            <input type="text" class="otp-input" maxlength="1" data-index="1" inputmode="numeric" pattern="[0-9]*">
+                            <input type="text" class="otp-input" maxlength="1" data-index="2" inputmode="numeric" pattern="[0-9]*">
+                            <input type="text" class="otp-input" maxlength="1" data-index="3" inputmode="numeric" pattern="[0-9]*">
+                            <input type="text" class="otp-input" maxlength="1" data-index="4" inputmode="numeric" pattern="[0-9]*">
+                            <input type="text" class="otp-input" maxlength="1" data-index="5" inputmode="numeric" pattern="[0-9]*">
                         </div>
                     </div>
                 </div>
@@ -1836,25 +2319,25 @@
                 </button>
             </div>
             
-            <!-- Step 3: Xác thực email cũ -->
+            <!-- Step 3: Xác thực email cũ - OTP 8 số, PIN 6 số -->
             <div id="change-step-3" style="display: none;">
                 <h3 style="margin-bottom: 1rem; color: var(--text);">Xác thực Email Cũ</h3>
                 <div class="form-group" id="change-otp-old-group">
-                    <label>OTP cho Email Cũ</label>
+                    <label>OTP cho Email Cũ (8 số)</label>
                     <div class="pin-box">
                         <div class="pin-box-label">
-                            <i class="fas fa-envelope-open-text"></i> [ MÃ OTP ]
+                            <i class="fas fa-envelope-open-text"></i> [ MÃ OTP - 8 SỐ ]
                             <span class="vip-badge"><i class="fas fa-crown"></i> VIP</span>
                         </div>
                         <div class="otp-inputs" id="change-otp-old-container">
-                            <input type="text" class="otp-input" maxlength="1" data-index="0">
-                            <input type="text" class="otp-input" maxlength="1" data-index="1">
-                            <input type="text" class="otp-input" maxlength="1" data-index="2">
-                            <input type="text" class="otp-input" maxlength="1" data-index="3">
-                            <input type="text" class="otp-input" maxlength="1" data-index="4">
-                            <input type="text" class="otp-input" maxlength="1" data-index="5">
-                            <input type="text" class="otp-input" maxlength="1" data-index="6">
-                            <input type="text" class="otp-input" maxlength="1" data-index="7">
+                            <input type="text" class="otp-input" maxlength="1" data-index="0" inputmode="numeric" pattern="[0-9]*" autocomplete="one-time-code">
+                            <input type="text" class="otp-input" maxlength="1" data-index="1" inputmode="numeric" pattern="[0-9]*" autocomplete="one-time-code">
+                            <input type="text" class="otp-input" maxlength="1" data-index="2" inputmode="numeric" pattern="[0-9]*" autocomplete="one-time-code">
+                            <input type="text" class="otp-input" maxlength="1" data-index="3" inputmode="numeric" pattern="[0-9]*" autocomplete="one-time-code">
+                            <input type="text" class="otp-input" maxlength="1" data-index="4" inputmode="numeric" pattern="[0-9]*" autocomplete="one-time-code">
+                            <input type="text" class="otp-input" maxlength="1" data-index="5" inputmode="numeric" pattern="[0-9]*" autocomplete="one-time-code">
+                            <input type="text" class="otp-input" maxlength="1" data-index="6" inputmode="numeric" pattern="[0-9]*" autocomplete="one-time-code">
+                            <input type="text" class="otp-input" maxlength="1" data-index="7" inputmode="numeric" pattern="[0-9]*" autocomplete="one-time-code">
                         </div>
                     </div>
                     <button class="btn btn-secondary" onclick="sendChangeOTPOld()" style="margin-top: 0.5rem; width: 100%;">
@@ -1867,16 +2350,16 @@
                 <div class="form-group" id="change-security-group" style="display:none;">
                     <div class="pin-box">
                         <div class="pin-box-label">
-                            <i class="fas fa-key"></i> [ MÃ BẢO VỆ (PIN) ]
+                            <i class="fas fa-key"></i> [ MÃ BẢO VỆ - 6 SỐ ]
                             <span class="vip-badge"><i class="fas fa-crown"></i> VIP</span>
                         </div>
                         <div class="otp-inputs" id="change-security-container">
-                            <input type="text" class="otp-input" maxlength="1" data-index="0">
-                            <input type="text" class="otp-input" maxlength="1" data-index="1">
-                            <input type="text" class="otp-input" maxlength="1" data-index="2">
-                            <input type="text" class="otp-input" maxlength="1" data-index="3">
-                            <input type="text" class="otp-input" maxlength="1" data-index="4">
-                            <input type="text" class="otp-input" maxlength="1" data-index="5">
+                            <input type="text" class="otp-input" maxlength="1" data-index="0" inputmode="numeric" pattern="[0-9]*">
+                            <input type="text" class="otp-input" maxlength="1" data-index="1" inputmode="numeric" pattern="[0-9]*">
+                            <input type="text" class="otp-input" maxlength="1" data-index="2" inputmode="numeric" pattern="[0-9]*">
+                            <input type="text" class="otp-input" maxlength="1" data-index="3" inputmode="numeric" pattern="[0-9]*">
+                            <input type="text" class="otp-input" maxlength="1" data-index="4" inputmode="numeric" pattern="[0-9]*">
+                            <input type="text" class="otp-input" maxlength="1" data-index="5" inputmode="numeric" pattern="[0-9]*">
                         </div>
                     </div>
                 </div>
@@ -1888,24 +2371,24 @@
                 </button>
             </div>
 
-            <!-- Step 4: Xác thực email mới -->
+            <!-- Step 4: Xác thực email mới - OTP 8 số -->
             <div id="change-step-4" style="display: none;">
                 <h3 style="margin-bottom: 1rem; color: var(--text);">Xác thực Email Mới</h3>
                 <div class="form-group">
                     <div class="pin-box">
                         <div class="pin-box-label">
-                            <i class="fas fa-envelope-open-text"></i> [ MÃ OTP ]
+                            <i class="fas fa-envelope-open-text"></i> [ MÃ OTP - 8 SỐ ]
                             <span class="vip-badge"><i class="fas fa-crown"></i> VIP</span>
                         </div>
                         <div class="otp-inputs" id="change-otp-new-container">
-                            <input type="text" class="otp-input" maxlength="1" data-index="0">
-                            <input type="text" class="otp-input" maxlength="1" data-index="1">
-                            <input type="text" class="otp-input" maxlength="1" data-index="2">
-                            <input type="text" class="otp-input" maxlength="1" data-index="3">
-                            <input type="text" class="otp-input" maxlength="1" data-index="4">
-                            <input type="text" class="otp-input" maxlength="1" data-index="5">
-                            <input type="text" class="otp-input" maxlength="1" data-index="6">
-                            <input type="text" class="otp-input" maxlength="1" data-index="7">
+                            <input type="text" class="otp-input" maxlength="1" data-index="0" inputmode="numeric" pattern="[0-9]*" autocomplete="one-time-code">
+                            <input type="text" class="otp-input" maxlength="1" data-index="1" inputmode="numeric" pattern="[0-9]*" autocomplete="one-time-code">
+                            <input type="text" class="otp-input" maxlength="1" data-index="2" inputmode="numeric" pattern="[0-9]*" autocomplete="one-time-code">
+                            <input type="text" class="otp-input" maxlength="1" data-index="3" inputmode="numeric" pattern="[0-9]*" autocomplete="one-time-code">
+                            <input type="text" class="otp-input" maxlength="1" data-index="4" inputmode="numeric" pattern="[0-9]*" autocomplete="one-time-code">
+                            <input type="text" class="otp-input" maxlength="1" data-index="5" inputmode="numeric" pattern="[0-9]*" autocomplete="one-time-code">
+                            <input type="text" class="otp-input" maxlength="1" data-index="6" inputmode="numeric" pattern="[0-9]*" autocomplete="one-time-code">
+                            <input type="text" class="otp-input" maxlength="1" data-index="7" inputmode="numeric" pattern="[0-9]*" autocomplete="one-time-code">
                         </div>
                     </div>
                     <button class="btn btn-secondary" onclick="sendChangeOTPNew()" style="margin-top: 0.5rem; width: 100%;">
@@ -1952,6 +2435,34 @@
             <div class="result-box" id="ban7-result"></div>
         </div>
     </div>
+
+     <!-- Ban Vĩnh Viễn Modal -->
+<div class="modal" id="modal-ban-vinh-vien">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>⚠️ Ban Vĩnh Viễn</h2>
+            <button class="close-btn" onclick="closeModal('ban-vinh-vien')">&times;</button>
+        </div>
+        <div class="form-group">
+            <label>Access Token</label>
+            <input type="text" id="ban-vinh-vien-token" placeholder="Nhập access token">
+        </div>
+        <div class="form-group">
+            <label>
+                <input type="checkbox" id="ban-vinh-vien-emulator"> 
+                Tài Khoản Sẽ Bị Ban Vĩnh Viễn
+            </label>
+        </div>
+        <button class="btn btn-primary" id="ban-vinh-vien-btn" onclick="banVinhVien()" style="background: linear-gradient(135deg, #ef4444, #dc2626);">
+            <i class="fas fa-skull-crossbones"></i> Ban Vĩnh Viễn
+        </button>
+        <div class="loading" id="ban-vinh-vien-loading">
+            <div class="spinner"></div>
+            <span>Đang xử lý...</span>
+        </div>
+        <div class="result-box" id="ban-vinh-vien-result"></div>
+    </div>
+</div>
 
     <!-- Login Modal -->
     <div class="modal" id="modal-login">
@@ -2029,29 +2540,17 @@
                     <li style="margin-bottom: 0.5rem;"><i class="fas fa-check" style="color: #22c55e; margin-right: 0.5rem;"></i> Hỗ trợ ưu tiên</li>
                 </ul>
             </div>
-            <a href="https://t.me/leduychip111" target="_blank" class="btn btn-primary" style="width: 100%; justify-content: center; text-decoration: none;">
-                <i class="fab fa-telegram"></i> Mua gói Pro trên Telegram
+            <a href="https://zalo.me/g/tkyjyogqcmq9vfnci8nl" target="_blank" class="btn btn-primary" style="width: 100%; justify-content: center; text-decoration: none;">
+                <i class="fab fa-zalo"></i> Mua gói Pro trên Zalo
             </a>
             <p style="text-align: center; margin-top: 1rem; font-size: 0.85rem; color: var(--text-muted);">
-                Liên hệ @leduychip111 trên Telegram để mua gói Pro
+                Liên hệ @teedyyreal trên Tiktok để mua gói Pro
             </p>
         </div>
     </div>
 
     <script>
         window.addRecoveryVerifierToken = null;
-        // Create meteors
-        const meteorsContainer = document.getElementById('meteors');
-        if (meteorsContainer) {
-            for (let i = 0; i < 10; i++) {
-                const meteor = document.createElement('div');
-                meteor.className = 'meteor';
-                meteor.style.left = `${Math.random() * 100}%`;
-                meteor.style.animationDuration = `${Math.random() * 3 + 2}s`;
-                meteor.style.animationDelay = `${Math.random() * 5}s`;
-                meteorsContainer.appendChild(meteor);
-            }
-        }
 
         // Check authentication status on page load
         window.currentUser = null;
@@ -2089,6 +2588,7 @@
                 
                 const banContainer = document.getElementById('usage-ban7-container');
                 const spamContainer = document.getElementById('usage-spam-log-container');
+                const banVinhVienContainer = document.getElementById('usage-ban-vinh-vien-container');
                 
                 if (window.userUsage.is_pro || window.userUsage.ban7_pro) {
                     if (banContainer) banContainer.innerHTML = 'Hạn mức: <span style="color: var(--primary); font-weight: bold;">Không giới hạn</span>';
@@ -2100,6 +2600,12 @@
                     if (spamContainer) spamContainer.innerHTML = 'Hạn mức: <span style="color: var(--primary); font-weight: bold;">Không giới hạn</span>';
                 } else {
                     if (spamContainer) spamContainer.innerHTML = '<span style="color: var(--text-muted);"><i class="fas fa-lock"></i> Yêu cầu PRO</span>';
+                }
+
+                if (window.userUsage.is_pro) {
+                    if (banVinhVienContainer) banVinhVienContainer.innerHTML = 'Hạn mức: <span style="color: var(--primary); font-weight: bold;">Không giới hạn</span>';
+                } else {
+                    if (banVinhVienContainer) banVinhVienContainer.innerHTML = '<span style="color: var(--text-muted);"><i class="fas fa-lock"></i> Yêu cầu PRO</span>';
                 }
                 
                 const badge = document.getElementById('nav-pro-badge');
@@ -2133,6 +2639,7 @@
         function updateToolCards() {
             const ban7Card = document.querySelector('.panel-item[onclick*="ban7"]');
             const spamLogCard = document.querySelector('.panel-item[onclick*="spam-log"]');
+            const banVinhVienCard = document.querySelector('.panel-item[onclick*="ban-vinh-vien"]');
             
             if (window.currentUser) {
                 // User is logged in
@@ -2144,6 +2651,10 @@
                     spamLogCard.classList.remove('disabled');
                     spamLogCard.onclick = () => openModal('spam-log'); spamLogCard.style.pointerEvents='';
                 }
+                if (banVinhVienCard) {
+                    banVinhVienCard.classList.remove('disabled');
+                    banVinhVienCard.onclick = () => openModal('ban-vinh-vien'); banVinhVienCard.style.pointerEvents='';
+                }
             } else {
                 // User is not logged in
                 if (ban7Card) {
@@ -2153,6 +2664,10 @@
                 if (spamLogCard) {
                     spamLogCard.classList.add('disabled');
                     spamLogCard.onclick = () => showAuthRequired();
+                }
+                if (banVinhVienCard) {
+                    banVinhVienCard.classList.add('disabled');
+                    banVinhVienCard.onclick = () => showAuthRequired();
                 }
             }
         }
@@ -2230,6 +2745,46 @@
             }
             setLoading('register', false);
         }
+        async function banVinhVien() {
+    const token = document.getElementById('ban-vinh-vien-token').value;
+    const btn = document.getElementById('ban-vinh-vien-btn');
+
+    if (!token) {
+        showResult('ban-vinh-vien', false, 'Vui lòng nhập access token');
+        return;
+    }
+
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Đang xử lý...';
+
+    setLoading('ban-vinh-vien', true);
+    try {
+        const response = await fetch('/api/ban_vinh_vien', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ access_token: token })
+        });
+        const result = await response.json();
+        
+        if (result.success) {
+            const info = {
+                'UID': result.data?.uid || 'N/A',
+                'Nickname': result.data?.nickname || 'N/A',
+                'Region': result.data?.region || 'N/A',
+                'Trạng thái': 'Đã Ban Vĩnh Viễn'
+            };
+            showResult('ban-vinh-vien', true, '✅ Ban Vĩnh Viễn thành công!', info);
+            await checkAuth();
+        } else {
+            showResult('ban-vinh-vien', false, result.message || result.error);
+        }
+    } catch (error) {
+        showResult('ban-vinh-vien', false, error.message);
+    }
+    btn.disabled = false;
+    btn.innerHTML = '<i class="fas fa-skull-crossbones"></i> Ban Vĩnh Viễn';
+    setLoading('ban-vinh-vien', false);
+}
 
         async function logout() {
             try {
@@ -2266,7 +2821,7 @@
                 if (data.success) {
                     Swal.fire('Thành công', data.message, 'success');
                     document.getElementById('activation-key').value = '';
-                    await checkAuth(); // Refresh usage and Pro status
+                    await checkAuth();
                 } else {
                     Swal.fire('Thất bại', data.error, 'error');
                 }
@@ -2301,7 +2856,7 @@
             'check-recovery', 'check-platforms',
             'revoke-token', 'eat-to-access', 'eat-to-jwt', 'access-to-jwt',
             'add-recovery', 'cancel-recovery', 'unbind-email', 'change-bind-email',
-            'long-bio', 'ban7'
+            'long-bio', 'ban7', 'ban-vinh-vien'
         ];
 
         function isToolPro(id) {
@@ -2344,7 +2899,6 @@
         function backToChangeStep1() {
             document.getElementById('change-step-2').style.display = 'none';
             document.getElementById('change-step-1').style.display = 'block';
-            // Update step indicators
             document.getElementById('change-step-indicator-2').style.background = 'var(--dark-border)';
             document.getElementById('change-step-indicator-2').style.color = 'var(--text-muted)';
             document.getElementById('change-step-indicator-1').style.background = 'var(--primary)';
@@ -2354,7 +2908,6 @@
         function backToChangeStep2() {
             document.getElementById('change-step-3').style.display = 'none';
             document.getElementById('change-step-2').style.display = 'block';
-            // Update step indicators
             document.getElementById('change-step-indicator-3').style.background = 'var(--dark-border)';
             document.getElementById('change-step-indicator-3').style.color = 'var(--text-muted)';
             document.getElementById('change-step-indicator-2').style.background = 'var(--primary)';
@@ -2364,7 +2917,6 @@
         function backToChangeStep3() {
             document.getElementById('change-step-4').style.display = 'none';
             document.getElementById('change-step-3').style.display = 'block';
-            // Update step indicators
             document.getElementById('change-step-indicator-4').style.background = 'var(--dark-border)';
             document.getElementById('change-step-indicator-4').style.color = 'var(--text-muted)';
             document.getElementById('change-step-indicator-3').style.background = 'var(--primary)';
@@ -2373,14 +2925,12 @@
 
         function closeModal(id) {
             document.getElementById(`modal-${id}`).classList.remove('active');
-            // Clear results
             const resultBox = document.getElementById(`${id}-result`);
             if (resultBox) {
                 resultBox.classList.remove('active', 'success', 'error');
                 resultBox.innerHTML = '';
             }
             
-            // Reset add-recovery modal to step 1
             if (id === 'add-recovery') {
                 document.getElementById('add-recovery-step-1').style.display = 'block';
                 document.getElementById('add-recovery-step-2').style.display = 'none';
@@ -2389,16 +2939,20 @@
                 document.getElementById('add-recovery-token').value = '';
                 clearOTPInputs('add-recovery-otp-container');
                 clearOTPInputs('add-recovery-security-container');
-                // Reset step indicators
                 document.getElementById('step-indicator-1').style.background = 'var(--primary)';
                 document.getElementById('step-indicator-1').style.color = 'white';
                 document.getElementById('step-indicator-2').style.background = 'var(--dark-border)';
                 document.getElementById('step-indicator-2').style.color = 'var(--text-muted)';
                 document.getElementById('step-indicator-3').style.background = 'var(--dark-border)';
                 document.getElementById('step-indicator-3').style.color = 'var(--text-muted)';
+                const otpStatus = document.getElementById('add-recovery-otp-status');
+                if (otpStatus) {
+                    otpStatus.style.display = 'none';
+                    otpStatus.textContent = '';
+                    otpStatus.className = '';
+                }
             }
             
-            // Reset unbind-email modal to step 1
             if (id === 'unbind-email') {
                 document.getElementById('unbind-step-1').style.display = 'block';
                 document.getElementById('unbind-step-2').style.display = 'none';
@@ -2407,7 +2961,6 @@
                 document.getElementById('unbind-token').value = '';
                 clearOTPInputs('unbind-otp-container');
                 clearOTPInputs('unbind-security-container');
-                // Reset step indicators
                 document.getElementById('unbind-step-indicator-1').style.background = 'var(--primary)';
                 document.getElementById('unbind-step-indicator-1').style.color = 'white';
                 document.getElementById('unbind-step-indicator-2').style.background = 'var(--dark-border)';
@@ -2416,7 +2969,6 @@
                 document.getElementById('unbind-step-indicator-3').style.color = 'var(--text-muted)';
             }
             
-            // Reset change-bind-email modal to step 1
             if (id === 'change-bind-email') {
                 document.getElementById('change-step-1').style.display = 'block';
                 document.getElementById('change-step-2').style.display = 'none';
@@ -2428,7 +2980,6 @@
                 clearOTPInputs('change-otp-old-container');
                 clearOTPInputs('change-security-container');
                 clearOTPInputs('change-otp-new-container');
-                // Reset step indicators
                 document.getElementById('change-step-indicator-1').style.background = 'var(--primary)';
                 document.getElementById('change-step-indicator-1').style.color = 'white';
                 document.getElementById('change-step-indicator-2').style.background = 'var(--dark-border)';
@@ -2441,7 +2992,6 @@
         }
 
         function showResult(id, success, message, data = null) {
-            // Use SweetAlert2 for errors and failures
             if (!success) {
                 Swal.fire({
                     icon: 'error',
@@ -2454,7 +3004,6 @@
                 return;
             }
 
-            // Use custom result box for success with data
             const resultBox = document.getElementById(`${id}-result`);
             resultBox.classList.remove('active', 'success', 'error');
             resultBox.classList.add('active', 'success');
@@ -2796,17 +3345,19 @@
 
                 if (result.success) {
                     showResult('add-recovery', true, 'OTP đã được gửi đến email của bạn');
-                    // Move to step 2
                     document.getElementById('add-recovery-step-1').style.display = 'none';
                     document.getElementById('add-recovery-step-2').style.display = 'block';
-                    // Update step indicators
                     document.getElementById('step-indicator-1').style.background = 'var(--dark-border)';
                     document.getElementById('step-indicator-1').style.color = 'var(--text-muted)';
                     document.getElementById('step-indicator-2').style.background = 'var(--primary)';
                     document.getElementById('step-indicator-2').style.color = 'white';
-                    // Start countdown
                     startCountdown('add-recovery-timer');
-                    // Focus first OTP input
+                    const otpStatus = document.getElementById('add-recovery-otp-status');
+                    if (otpStatus) {
+                        otpStatus.style.display = 'none';
+                        otpStatus.textContent = '';
+                        otpStatus.className = '';
+                    }
                     document.querySelector('#add-recovery-otp-container .otp-input').focus();
                 } else {
                     showResult('add-recovery', false, result.error);
@@ -2821,9 +3372,18 @@
             const email = document.getElementById('add-recovery-email').value;
             const token = document.getElementById('add-recovery-token').value;
             const otp = getOTPValue('add-recovery-otp-container');
+            const otpStatus = document.getElementById('add-recovery-otp-status');
 
-            if (!otp || otp.length < 6 || otp.length > 8) {
-                showResult('add-recovery', false, 'Vui lòng nhập đủ 8 chữ số OTP');
+            if (!otp || otp.length < 8) {
+                if (otpStatus) {
+                    otpStatus.textContent = '❌ Vui lòng nhập đủ 8 chữ số OTP';
+                    otpStatus.className = 'otp-status-error';
+                    otpStatus.style.display = 'block';
+                    clearOTPInputs('add-recovery-otp-container');
+                    setTimeout(() => {
+                        document.querySelector('#add-recovery-otp-container .otp-input').focus();
+                    }, 300);
+                }
                 return;
             }
 
@@ -2837,26 +3397,42 @@
                 const result = await response.json();
 
                 if (result.success) {
+                    if (otpStatus) {
+                        otpStatus.textContent = '✅ OTP NÀY ĐÃ ĐÚNG';
+                        otpStatus.className = 'otp-status-success';
+                        otpStatus.style.display = 'block';
+                    }
                     showResult('add-recovery', true, 'OTP xác thực thành công');
                     window.addRecoveryVerifierToken = result.verifier_token;
-                    // Move to step 3
-                    document.getElementById('add-recovery-step-2').style.display = 'none';
-                    document.getElementById('add-recovery-step-3').style.display = 'block';
-                    // Update step indicators
-                    document.getElementById('step-indicator-2').style.background = 'var(--dark-border)';
-                    document.getElementById('step-indicator-2').style.color = 'var(--text-muted)';
-                    document.getElementById('step-indicator-3').style.background = 'var(--primary)';
-                    document.getElementById('step-indicator-3').style.color = 'white';
-                    // Stop countdown and clear OTP
-                    stopCountdown('add-recovery-timer');
-                    clearOTPInputs('add-recovery-otp-container');
-                    // Focus first security input
-                    document.querySelector('#add-recovery-security-container .otp-input').focus();
+                    setTimeout(() => {
+                        document.getElementById('add-recovery-step-2').style.display = 'none';
+                        document.getElementById('add-recovery-step-3').style.display = 'block';
+                        document.getElementById('step-indicator-2').style.background = 'var(--dark-border)';
+                        document.getElementById('step-indicator-2').style.color = 'var(--text-muted)';
+                        document.getElementById('step-indicator-3').style.background = 'var(--primary)';
+                        document.getElementById('step-indicator-3').style.color = 'white';
+                        stopCountdown('add-recovery-timer');
+                        document.querySelector('#add-recovery-security-container .otp-input').focus();
+                    }, 1000);
                 } else {
-                    showResult('add-recovery', false, result.error);
+                    const errorMsg = result.error || 'OTP không chính xác';
+                    if (otpStatus) {
+                        otpStatus.textContent = `❌ ${errorMsg}`;
+                        otpStatus.className = 'otp-status-error';
+                        otpStatus.style.display = 'block';
+                    }
+                    clearOTPInputs('add-recovery-otp-container');
+                    setTimeout(() => {
+                        document.querySelector('#add-recovery-otp-container .otp-input').focus();
+                    }, 300);
                 }
             } catch (error) {
-                showResult('add-recovery', false, error.message);
+                if (otpStatus) {
+                    otpStatus.textContent = `❌ Lỗi: ${error.message}`;
+                    otpStatus.className = 'otp-status-error';
+                    otpStatus.style.display = 'block';
+                }
+                clearOTPInputs('add-recovery-otp-container');
             }
             setLoading('add-recovery', false);
         }
@@ -2887,9 +3463,7 @@
 
                 if (result.success) {
                     showResult('add-recovery', true, result.message);
-                    // Reset and close
                     setTimeout(() => closeModal('add-recovery'), 2000);
-                    // Clear inputs and stop countdown
                     clearOTPInputs('add-recovery-otp-container');
                     clearOTPInputs('add-recovery-security-container');
                     stopCountdown('add-recovery-timer');
@@ -2907,26 +3481,28 @@
             document.getElementById('add-recovery-step-2').style.display = 'none';
             document.getElementById('add-recovery-step-1').style.display = 'block';
             document.getElementById('add-recovery-result').classList.remove('active');
-            // Update step indicators
             document.getElementById('step-indicator-2').style.background = 'var(--dark-border)';
             document.getElementById('step-indicator-2').style.color = 'var(--text-muted)';
             document.getElementById('step-indicator-1').style.background = 'var(--primary)';
             document.getElementById('step-indicator-1').style.color = 'white';
-            // Clear OTP and stop countdown
             clearOTPInputs('add-recovery-otp-container');
             stopCountdown('add-recovery-timer');
+            const otpStatus = document.getElementById('add-recovery-otp-status');
+            if (otpStatus) {
+                otpStatus.style.display = 'none';
+                otpStatus.textContent = '';
+                otpStatus.className = '';
+            }
         }
 
         function backToAddRecoveryStep2() {
             document.getElementById('add-recovery-step-3').style.display = 'none';
             document.getElementById('add-recovery-step-2').style.display = 'block';
             document.getElementById('add-recovery-result').classList.remove('active');
-            // Update step indicators
             document.getElementById('step-indicator-3').style.background = 'var(--dark-border)';
             document.getElementById('step-indicator-3').style.color = 'var(--text-muted)';
             document.getElementById('step-indicator-2').style.background = 'var(--primary)';
             document.getElementById('step-indicator-2').style.color = 'white';
-            // Clear security input
             clearOTPInputs('add-recovery-security-container');
         }
 
@@ -2955,7 +3531,6 @@
                 return;
             }
 
-            // Parse duration to seconds
             let seconds = 0;
             const match = durationInput.match(/(\d+)([smhd])/);
             if (match) {
@@ -2974,7 +3549,6 @@
                 return;
             }
 
-            // Show loading state on button
             toggleBtn.disabled = true;
             toggleBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Đang kết nối...';
 
@@ -2994,13 +3568,8 @@
 
                 if (data.success) {
                     spamLogRunning = true;
-                    // Save token to localStorage for recovery
                     localStorage.setItem('running_spam_at', token);
-                    
-                    // Reset progress bar
                     document.getElementById('spam-log-progress-fill').style.width = '0%';
-                    
-                    // Update UI to running state
                     updateSpamUI({
                         status: 'running',
                         ip: data.ip,
@@ -3010,10 +3579,13 @@
                         sent: 0, ok: 0, fail: 0
                     });
 
-                    // Start status polling
                     if (spamStatusInterval) clearInterval(spamStatusInterval);
-                    spamStatusInterval = setInterval(refreshSpamStatus, 1500);
-                    
+                    // Delay 3s trước lần poll đầu tiên để backend kịp cập nhật
+                    setTimeout(() => {
+                        if (spamLogRunning) {
+                            spamStatusInterval = setInterval(refreshSpamStatus, 1500);
+                        }
+                    }, 3000);
                     showResult('spam-log', true, 'Đã bắt đầu spam log chạy ngầm');
                 } else {
                     showResult('spam-log', false, data.error);
@@ -3026,154 +3598,174 @@
             }
         }
 
-        async function stopSpamLog() {
-            const btn = document.getElementById('spam-log-toggle-btn');
-            btn.disabled = true;
-            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Đang dừng...';
+async function stopSpamLog() {
+    const btn = document.getElementById('spam-log-toggle-btn');
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Đang dừng...';
 
-            try {
-                const response = await fetch('/api/spam_log', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ action: 'stop' })
-                });
-                const data = await response.json();
+    try {
+        const response = await fetch('/api/spam_log', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ action: 'stop' })
+        });
+        const data = await response.json();
 
-                if (data.success) {
-                    spamLogRunning = false;
-                    clearInterval(spamStatusInterval);
-                    localStorage.removeItem('running_spam_at');
-                    updateSpamUI({ status: 'idle' });
-                    showResult('spam-log', true, 'Đã dừng spam log thành công');
-                    await checkAuth(); // Refresh usage
-                } else {
-                    showResult('spam-log', false, data.error);
-                }
-            } catch (error) {
-                showResult('spam-log', false, error.message);
-            }
-            btn.disabled = false;
+        if (data.success) {
+            // Reset UI về idle
+            updateSpamUI({ status: 'idle' });
+            localStorage.removeItem('running_spam_at');
+            showResult('spam-log', true, '✅ Đã dừng spam log thành công');
+            await checkAuth();
+        } else {
+            showResult('spam-log', false, data.error || 'Dừng thất bại');
+            // Vẫn reset UI để user có thể thử lại
+            updateSpamUI({ status: 'idle' });
         }
+    } catch (error) {
+        showResult('spam-log', false, error.message);
+        updateSpamUI({ status: 'idle' });
+    }
+    btn.disabled = false;
+}
 
-        async function refreshSpamStatus(firstLoad = false) {
-            try {
-                const response = await fetch('/api/spam_status');
-                const result = await response.json();
+async function refreshSpamStatus() {
+    try {
+        const response = await fetch('/api/spam_status');
+        const result = await response.json();
 
-                if (result.success) {
-                    if (result.status === 'running') {
-                        spamLogRunning = true;
-                        updateSpamUI(result);
-                    } else if (spamLogRunning) {
-                        // Was running but now idle/finished
-                        spamLogRunning = false;
-                        clearInterval(spamStatusInterval);
-                        updateSpamUI({ status: 'idle' });
-                        if (result.status === 'finished') {
-                            showResult('spam-log', true, 'Tiến trình Spam đã hoàn thành');
-                            await checkAuth();
-                        }
-                    }
-                }
-            } catch (error) {
-                console.error('Error refreshing spam status:', error);
-            }
-        }
-
-        function updateSpamUI(data) {
-            const statusPanel = document.getElementById('spam-log-status');
-            const inputsGroup = document.getElementById('spam-log-inputs-group');
-            const tokenInput = document.getElementById('spam-log-token');
-            const toggleBtn = document.getElementById('spam-log-toggle-btn');
-            const countdownEl = document.getElementById('spam-log-countdown');
-            const progressFill = document.getElementById('spam-log-progress-fill');
+        if (result.success) {
+            console.log('Spam status:', result.status, result);
             
-            const sentText = document.getElementById('spam-log-sent');
-            const okText = document.getElementById('spam-log-ok');
-            const failText = document.getElementById('spam-log-fail');
-
-            if (data.status === 'running') {
-                statusPanel.style.display = 'block';
-                inputsGroup.style.display = 'none';
-                tokenInput.readOnly = true;
-                tokenInput.style.opacity = '0.7';
-                
-                // Update button
-                toggleBtn.style.backgroundColor = '#ef4444';
-                toggleBtn.innerHTML = '<i class="fas fa-stop"></i> Dừng';
-                
-                // Update stats
-                sentText.textContent = data.sent || 0;
-                okText.textContent = data.ok || 0;
-                failText.textContent = data.fail || 0;
-                
-                // Update countdown and progress
-                if (data.remaining_ms !== undefined) {
-                    const total = data.total_ms || (data.remaining_ms + (data.elapsed_ms || 0));
-                    const remainingSeconds = Math.max(0, Math.floor(data.remaining_ms / 1000));
-                    const m = Math.floor(remainingSeconds / 60);
-                    const s = remainingSeconds % 60;
-                    countdownEl.textContent = `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
-                    
-                    // Progress bar (blue, filling up)
-                    // If we have remaining_ms, progress = 1 - (remaining/total)
-                    if (total > 0) {
-                        const progress = Math.min(100, Math.max(0, (1 - data.remaining_ms / total) * 100));
-                        progressFill.style.width = `${progress}%`;
-                    }
-                }
-                
-                // Start polling if not started
-                if (!spamStatusInterval) {
-                    spamStatusInterval = setInterval(refreshSpamStatus, 1500);
-                }
-            } else {
-                statusPanel.style.display = 'none';
-                inputsGroup.style.display = 'block';
-                tokenInput.readOnly = false;
-                tokenInput.style.opacity = '1';
-                
-                // Update button
-                toggleBtn.style.backgroundColor = '#22c55e';
-                toggleBtn.innerHTML = '<i class="fas fa-play"></i> Chạy';
-                
+            if (result.status === 'running') {
+                // Đang chạy - hiển thị Stop
+                spamLogRunning = true;
+                updateSpamUI(result);
+            } else if (result.status === 'finished') {
+                // Đã hoàn thành - giữ Stop nhưng disabled
+                spamLogRunning = false;
+                updateSpamUI({
+                    status: 'finished',
+                    sent: result.sent || 0,
+                    ok: result.ok || 0,
+                    fail: result.fail || 0
+                });
+                showResult('spam-log', true, '✅ Tiến trình Spam đã hoàn thành!');
+                // KHÔNG TỰ ĐỘNG RESET, đợi user bấm Start lại
+            } else if (result.status === 'stopped') {
+                // Đã dừng - giữ nút Start
+                spamLogRunning = false;
+                updateSpamUI({ status: 'idle' });
+                showResult('spam-log', true, '✅ Đã dừng spam log thành công');
+                localStorage.removeItem('running_spam_at');
                 if (spamStatusInterval) {
                     clearInterval(spamStatusInterval);
                     spamStatusInterval = null;
                 }
+            } else if (result.status === 'idle') {
+                // Idle - chỉ reset nếu frontend không đang trong trạng thái running
+                if (!spamLogRunning) {
+                    if (spamStatusInterval) {
+                        clearInterval(spamStatusInterval);
+                        spamStatusInterval = null;
+                    }
+                    updateSpamUI({ status: 'idle' });
+                }
+                // Nếu spamLogRunning = true mà server trả idle => server chưa kịp cập nhật, bỏ qua
             }
         }
+    } catch (error) {
+        console.error('Error refreshing spam status:', error);
+    }
+}
 
-        // Restore token from localStorage on page load
+        function updateSpamUI(data) {
+    const statusPanel = document.getElementById('spam-log-status');
+    const inputsGroup = document.getElementById('spam-log-inputs-group');
+    const tokenInput = document.getElementById('spam-log-token');
+    const toggleBtn = document.getElementById('spam-log-toggle-btn');
+    const countdownEl = document.getElementById('spam-log-countdown');
+    const progressFill = document.getElementById('spam-log-progress-fill');
+    const statusText = document.getElementById('spam-log-status-text');
+    
+    const sentText = document.getElementById('spam-log-sent');
+    const okText = document.getElementById('spam-log-ok');
+    const failText = document.getElementById('spam-log-fail');
+
+    console.log('updateSpamUI data:', data); // Debug
+
+    if (data.status === 'running') {
+        // Hiển thị panel trạng thái
+        statusPanel.style.display = 'block';
+        inputsGroup.style.display = 'none';
+        tokenInput.readOnly = true;
+        tokenInput.style.opacity = '0.7';
+        
+        // Đổi nút thành STOP
+        toggleBtn.style.backgroundColor = '#ef4444';
+        toggleBtn.innerHTML = '<i class="fas fa-stop"></i> Dừng';
+        toggleBtn.disabled = false;
+        toggleBtn.onclick = function() { stopSpamLog(); };
+        
+        // Cập nhật số liệu
+        statusText.textContent = '🟢 Đang chạy';
+        statusText.style.color = '#22c55e';
+        sentText.textContent = data.sent || 0;
+        okText.textContent = data.ok || 0;
+        failText.textContent = data.fail || 0;
+        
+        // Cập nhật thời gian và progress
+        if (data.remaining_ms !== undefined) {
+            const total = data.total_ms || (data.remaining_ms + (data.elapsed_ms || 0));
+            const remainingSeconds = Math.max(0, Math.floor(data.remaining_ms / 1000));
+            const m = Math.floor(remainingSeconds / 60);
+            const s = remainingSeconds % 60;
+            countdownEl.textContent = `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+            if (total > 0) {
+                const progress = Math.min(100, Math.max(0, (1 - data.remaining_ms / total) * 100));
+                progressFill.style.width = `${progress}%`;
+            }
+        }
+        
+        spamLogRunning = true;
+        
+    } else {
+        // Trạng thái idle hoặc finished
+        statusPanel.style.display = 'none';
+        inputsGroup.style.display = 'block';
+        tokenInput.readOnly = false;
+        tokenInput.style.opacity = '1';
+        
+        // Đổi nút thành START
+        toggleBtn.style.backgroundColor = '#22c55e';
+        toggleBtn.innerHTML = '<i class="fas fa-play"></i> Chạy';
+        toggleBtn.disabled = false;
+        toggleBtn.onclick = function() { startSpamLog(); };
+        
+        spamLogRunning = false;
+        
+        if (spamStatusInterval) {
+            clearInterval(spamStatusInterval);
+            spamStatusInterval = null;
+        }
+    }
+}
+
         window.addEventListener('DOMContentLoaded', () => {
             const savedToken = localStorage.getItem('running_spam_at');
             if (savedToken) {
                 document.getElementById('spam-log-token').value = savedToken;
             }
-            // Auto-check status to restore running spam
             refreshSpamStatus(true);
         });
 
         async function spamLog() {
-            // This function is deprecated, use toggleSpamLog instead
             toggleSpamLog();
         }
 
         async function checkSpamLogStatus() {
-            // This function is deprecated
             showResult('spam-log', false, 'Tính năng này đã được thay thế');
         }
-
-        // Restore token from localStorage on page load
-        window.addEventListener('DOMContentLoaded', () => {
-            const savedToken = localStorage.getItem('running_spam_at');
-            const inputToken = document.getElementById('spam-log-token');
-            if (savedToken && inputToken && !inputToken.value) {
-                inputToken.value = savedToken;
-                // Auto-check status to restore running spam
-                setTimeout(() => refreshSpamStatus(true), 1000);
-            }
-        });
 
         function toggleLongBioMethod() {
             const method = document.getElementById('long-bio-method').value;
@@ -3248,7 +3840,6 @@
         function goToUnbindStep2() {
             document.getElementById('unbind-step-1').style.display = 'none';
             document.getElementById('unbind-step-2').style.display = 'block';
-            // Update step indicators
             document.getElementById('unbind-step-indicator-1').style.background = 'var(--dark-border)';
             document.getElementById('unbind-step-indicator-1').style.color = 'var(--text-muted)';
             document.getElementById('unbind-step-indicator-2').style.background = 'var(--primary)';
@@ -3266,11 +3857,7 @@
 
             document.getElementById('unbind-step-2').style.display = 'none';
             document.getElementById('unbind-step-3').style.display = 'block';
-            
-            // Show/hide OTP or security based on method
             toggleUnbindMethod();
-            
-            // Update step indicators
             document.getElementById('unbind-step-indicator-2').style.background = 'var(--dark-border)';
             document.getElementById('unbind-step-indicator-2').style.color = 'var(--text-muted)';
             document.getElementById('unbind-step-indicator-3').style.background = 'var(--primary)';
@@ -3281,12 +3868,10 @@
             document.getElementById('unbind-step-2').style.display = 'none';
             document.getElementById('unbind-step-1').style.display = 'block';
             document.getElementById('unbind-result').classList.remove('active');
-            // Update step indicators
             document.getElementById('unbind-step-indicator-2').style.background = 'var(--dark-border)';
             document.getElementById('unbind-step-indicator-2').style.color = 'var(--text-muted)';
             document.getElementById('unbind-step-indicator-1').style.background = 'var(--primary)';
             document.getElementById('unbind-step-indicator-1').style.color = 'white';
-            // Clear OTP and stop countdown
             clearOTPInputs('unbind-otp-container');
             clearOTPInputs('unbind-security-container');
             stopCountdown('unbind-timer');
@@ -3296,12 +3881,10 @@
             document.getElementById('unbind-step-3').style.display = 'none';
             document.getElementById('unbind-step-2').style.display = 'block';
             document.getElementById('unbind-result').classList.remove('active');
-            // Update step indicators
             document.getElementById('unbind-step-indicator-3').style.background = 'var(--dark-border)';
             document.getElementById('unbind-step-indicator-3').style.color = 'var(--text-muted)';
             document.getElementById('unbind-step-indicator-2').style.background = 'var(--primary)';
             document.getElementById('unbind-step-indicator-2').style.color = 'white';
-            // Clear OTP and security inputs
             clearOTPInputs('unbind-otp-container');
             clearOTPInputs('unbind-security-container');
         }
@@ -3326,9 +3909,7 @@
 
                 if (result.success) {
                     showResult('unbind', true, result.message);
-                    // Start countdown
                     startCountdown('unbind-timer');
-                    // Focus first OTP input
                     document.querySelector('#unbind-otp-container .otp-input').focus();
                 } else {
                     showResult('unbind', false, result.error);
@@ -3353,7 +3934,7 @@
 
             if (method === 'otp') {
                 const otp = getOTPValue('unbind-otp-container');
-                if (!otp || otp.length < 6 || otp.length > 8) {
+                if (!otp || otp.length !== 8 || !otp.match(/^\d+$/)) {
                     showResult('unbind', false, 'Vui lòng nhập đủ 8 chữ số OTP');
                     return;
                 }
@@ -3378,7 +3959,6 @@
 
                 if (result.success) {
                     showResult('unbind', true, result.message);
-                    // Clear inputs and stop countdown
                     clearOTPInputs('unbind-otp-container');
                     clearOTPInputs('unbind-security-container');
                     stopCountdown('unbind-timer');
@@ -3400,7 +3980,6 @@
         function goToChangeStep2() {
             document.getElementById('change-step-1').style.display = 'none';
             document.getElementById('change-step-2').style.display = 'block';
-            // Update step indicators
             document.getElementById('change-step-indicator-1').style.background = 'var(--dark-border)';
             document.getElementById('change-step-indicator-1').style.color = 'var(--text-muted)';
             document.getElementById('change-step-indicator-2').style.background = 'var(--primary)';
@@ -3419,11 +3998,7 @@
 
             document.getElementById('change-step-2').style.display = 'none';
             document.getElementById('change-step-3').style.display = 'block';
-            
-            // Show/hide OTP or security based on method
             toggleChangeMethod();
-            
-            // Update step indicators
             document.getElementById('change-step-indicator-2').style.background = 'var(--dark-border)';
             document.getElementById('change-step-indicator-2').style.color = 'var(--text-muted)';
             document.getElementById('change-step-indicator-3').style.background = 'var(--primary)';
@@ -3435,8 +4010,8 @@
             const otpOld = getOTPValue('change-otp-old-container');
             const security = getOTPValue('change-security-container');
             
-            if (method === 'otp' && (!otpOld || otpOld.length < 6)) {
-                showResult('change', false, 'Vui lòng nhập OTP cho email cũ');
+            if (method === 'otp' && (!otpOld || otpOld.length !== 8)) {
+                showResult('change', false, 'Vui lòng nhập đủ 8 số OTP cho email cũ');
                 return;
             }
             if (method === 'password' && (!security || security.length !== 6 || !security.match(/^\d+$/))) {
@@ -3446,8 +4021,6 @@
 
             document.getElementById('change-step-3').style.display = 'none';
             document.getElementById('change-step-4').style.display = 'block';
-            
-            // Update step indicators
             document.getElementById('change-step-indicator-3').style.background = 'var(--dark-border)';
             document.getElementById('change-step-indicator-3').style.color = 'var(--text-muted)';
             document.getElementById('change-step-indicator-4').style.background = 'var(--primary)';
@@ -3458,12 +4031,10 @@
             document.getElementById('change-step-2').style.display = 'none';
             document.getElementById('change-step-1').style.display = 'block';
             document.getElementById('change-result').classList.remove('active');
-            // Update step indicators
             document.getElementById('change-step-indicator-2').style.background = 'var(--dark-border)';
             document.getElementById('change-step-indicator-2').style.color = 'var(--text-muted)';
             document.getElementById('change-step-indicator-1').style.background = 'var(--primary)';
             document.getElementById('change-step-indicator-1').style.color = 'white';
-            // Clear OTP and stop countdown
             clearOTPInputs('change-otp-old-container');
             clearOTPInputs('change-security-container');
             stopCountdown('change-otp-old-timer');
@@ -3473,12 +4044,10 @@
             document.getElementById('change-step-3').style.display = 'none';
             document.getElementById('change-step-2').style.display = 'block';
             document.getElementById('change-result').classList.remove('active');
-            // Update step indicators
             document.getElementById('change-step-indicator-3').style.background = 'var(--dark-border)';
             document.getElementById('change-step-indicator-3').style.color = 'var(--text-muted)';
             document.getElementById('change-step-indicator-2').style.background = 'var(--primary)';
             document.getElementById('change-step-indicator-2').style.color = 'white';
-            // Clear OTP and security inputs
             clearOTPInputs('change-otp-old-container');
             clearOTPInputs('change-security-container');
         }
@@ -3487,12 +4056,10 @@
             document.getElementById('change-step-4').style.display = 'none';
             document.getElementById('change-step-3').style.display = 'block';
             document.getElementById('change-result').classList.remove('active');
-            // Update step indicators
             document.getElementById('change-step-indicator-4').style.background = 'var(--dark-border)';
             document.getElementById('change-step-indicator-4').style.color = 'var(--text-muted)';
             document.getElementById('change-step-indicator-3').style.background = 'var(--primary)';
             document.getElementById('change-step-indicator-3').style.color = 'white';
-            // Clear OTP and stop countdown
             clearOTPInputs('change-otp-new-container');
             stopCountdown('change-otp-new-timer');
         }
@@ -3517,9 +4084,7 @@
 
                 if (result.success) {
                     showResult('change', true, result.message);
-                    // Start countdown
                     startCountdown('change-otp-old-timer');
-                    // Focus first OTP input
                     document.querySelector('#change-otp-old-container .otp-input').focus();
                 } else {
                     showResult('change', false, result.error);
@@ -3550,9 +4115,7 @@
 
                 if (result.success) {
                     showResult('change', true, result.message);
-                    // Start countdown
                     startCountdown('change-otp-new-timer');
-                    // Focus first OTP input
                     document.querySelector('#change-otp-new-container .otp-input').focus();
                 } else {
                     showResult('change', false, result.error);
@@ -3570,8 +4133,8 @@
             const newEmail = document.getElementById('change-new-email').value;
             const otpNew = getOTPValue('change-otp-new-container');
 
-            if (!token || !oldEmail || !newEmail || !otpNew || otpNew.length < 6 || otpNew.length > 8) {
-                showResult('change', false, 'Vui lòng điền tất cả các trường bắt buộc');
+            if (!token || !oldEmail || !newEmail || !otpNew || otpNew.length !== 8 || !otpNew.match(/^\d+$/)) {
+                showResult('change', false, 'Vui lòng nhập đủ 8 số OTP cho email mới');
                 return;
             }
 
@@ -3579,8 +4142,8 @@
 
             if (method === 'otp') {
                 const otpOld = getOTPValue('change-otp-old-container');
-                if (!otpOld || otpOld.length < 6 || otpOld.length > 8) {
-                    showResult('change', false, 'Vui lòng nhập đủ 8 chữ số OTP cho email cũ');
+                if (!otpOld || otpOld.length !== 8 || !otpOld.match(/^\d+$/)) {
+                    showResult('change', false, 'Vui lòng nhập đủ 8 số OTP cho email cũ');
                     return;
                 }
                 data.otp_old = otpOld;
@@ -3604,7 +4167,6 @@
 
                 if (result.success) {
                     showResult('change', true, result.message);
-                    // Clear inputs and stop countdowns
                     clearOTPInputs('change-otp-old-container');
                     clearOTPInputs('change-security-container');
                     clearOTPInputs('change-otp-new-container');
@@ -3647,7 +4209,7 @@
                         'Trạng thái': 'Đã kích hoạt Ban 7 ngày'
                     };
                     showResult('ban7', true, result.message, info);
-                    await checkAuth(); // Cập nhật lượt sử dụng
+                    await checkAuth();
                 } else {
                     showResult('ban7', false, result.message || result.error);
                 }
@@ -3659,7 +4221,6 @@
             setLoading('ban7', false);
         }
 
-        // Close modal on outside click
         document.querySelectorAll('.modal').forEach(modal => {
             modal.addEventListener('click', (e) => {
                 if (e.target === modal) {
@@ -3668,7 +4229,6 @@
             });
         });
 
-        // Close modal on Escape key
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape') {
                 document.querySelectorAll('.modal.active').forEach(modal => {
@@ -3677,28 +4237,24 @@
             }
         });
 
-        // OTP Input Handler
         function setupOTPInputs(containerId) {
             const container = document.getElementById(containerId);
             if (!container) return;
 
             const inputs = container.querySelectorAll('.otp-input');
 
-            // Gán thuộc tính mobile-friendly cho từng ô
             inputs.forEach(input => {
-                input.setAttribute('inputmode', 'numeric');   // bàn phím số trên mobile
-                input.setAttribute('pattern', '[0-9]*');      // numeric pad trên iOS
-                input.setAttribute('autocomplete', 'one-time-code'); // iOS tự điền OTP từ SMS
+                input.setAttribute('inputmode', 'numeric');
+                input.setAttribute('pattern', '[0-9]*');
+                input.setAttribute('autocomplete', 'one-time-code');
                 input.setAttribute('autocorrect', 'off');
                 input.setAttribute('spellcheck', 'false');
             });
 
             inputs.forEach((input, index) => {
-                // Xử lý nhập liệu – dùng cho cả desktop lẫn mobile IME
                 input.addEventListener('input', (e) => {
                     const digits = e.target.value.replace(/\D/g, '');
 
-                    // Android IME đôi khi bypass maxlength → nhiều ký tự cùng lúc
                     if (digits.length > 1) {
                         digits.split('').forEach((char, i) => {
                             if (inputs[index + i]) inputs[index + i].value = char;
@@ -3708,21 +4264,17 @@
                         return;
                     }
 
-                    // Lọc chỉ giữ chữ số
                     e.target.value = digits;
 
-                    // Tự chuyển sang ô kế tiếp khi nhập 1 chữ số
                     if (digits && index < inputs.length - 1) {
                         inputs[index + 1].focus();
                     }
 
-                    // Mobile backspace: dùng inputType vì keydown không tin cậy trên mobile
                     if (e.inputType === 'deleteContentBackward' && !digits && index > 0) {
                         inputs[index - 1].focus();
                     }
                 });
 
-                // Desktop: backspace + phím mũi tên để di chuyển giữa các ô
                 input.addEventListener('keydown', (e) => {
                     if (e.key === 'Backspace' && !input.value && index > 0) {
                         inputs[index - 1].focus();
@@ -3737,7 +4289,6 @@
                     }
                 });
 
-                // Dán: lọc chỉ số, điền từ ô đầu tiên
                 input.addEventListener('paste', (e) => {
                     e.preventDefault();
                     const pasted = (e.clipboardData || window.clipboardData)
@@ -3750,14 +4301,12 @@
                     inputs[Math.min(pasted.length, inputs.length - 1)].focus();
                 });
 
-                // Focus → chọn hết nội dung ô để gõ đè dễ hơn
                 input.addEventListener('focus', () => {
                     setTimeout(() => input.select(), 0);
                 });
             });
         }
 
-        // Get OTP value from container
         function getOTPValue(containerId) {
             const container = document.getElementById(containerId);
             if (!container) return '';
@@ -3769,7 +4318,6 @@
             return value;
         }
 
-        // Clear OTP inputs
         function clearOTPInputs(containerId) {
             const container = document.getElementById(containerId);
             if (!container) return;
@@ -3777,10 +4325,11 @@
             inputs.forEach(input => {
                 input.value = '';
             });
-            inputs[0].focus();
+            if (inputs.length > 0) {
+                inputs[0].focus();
+            }
         }
 
-        // Countdown Timer
         let countdownIntervals = {};
 
         function startCountdown(timerId, duration = 600) {
@@ -3832,7 +4381,6 @@
             }
         }
 
-        // Initialize setup on page load
         document.addEventListener('DOMContentLoaded', () => {
             setupOTPInputs('add-recovery-otp-container');
             setupOTPInputs('add-recovery-security-container');
@@ -3847,12 +4395,198 @@
                 const inputToken = document.getElementById('spam-log-token');
                 if (inputToken) inputToken.value = savedToken;
             }
-            // Auto-check status to restore running spam
             refreshSpamStatus(true);
         });
 
-        // Initialize auth check on page load
         checkAuth();
+
+        const musicPlayer = document.getElementById('musicPlayer');
+        const audio = document.getElementById('backgroundMusic');
+        
+        function saveMusicState() {
+            if (audio) {
+                localStorage.setItem('musicPlaying', !audio.paused);
+                localStorage.setItem('musicTime', audio.currentTime);
+                if (musicPlayer) {
+                    localStorage.setItem('musicPlayerPos', JSON.stringify({
+                        bottom: musicPlayer.style.bottom,
+                        right: musicPlayer.style.right,
+                        left: musicPlayer.style.left,
+                        top: musicPlayer.style.top
+                    }));
+                }
+            }
+        }
+
+        function restoreMusicState() {
+            if (audio && musicPlayer) {
+                musicPlayer.classList.remove('hidden');
+                const wasPlaying = localStorage.getItem('musicPlaying') === 'true';
+                const musicTime = parseFloat(localStorage.getItem('musicTime')) || 0;
+                audio.currentTime = musicTime;
+                if (wasPlaying) {
+                    audio.play().catch(e => console.log('Auto-play blocked:', e));
+                    musicPlayer.classList.remove('paused');
+                    musicPlayer.classList.add('show');
+                } else {
+                    musicPlayer.classList.add('paused');
+                }
+                const savedPos = localStorage.getItem('musicPlayerPos');
+                if (savedPos) {
+                    try {
+                        const pos = JSON.parse(savedPos);
+                        if (pos.left && pos.top) {
+                            musicPlayer.style.left = pos.left;
+                            musicPlayer.style.top = pos.top;
+                            musicPlayer.style.bottom = 'auto';
+                            musicPlayer.style.right = 'auto';
+                        }
+                    } catch (e) {}
+                }
+            }
+        }
+
+        window.addEventListener('beforeunload', saveMusicState);
+        window.addEventListener('pagehide', saveMusicState);
+        setTimeout(restoreMusicState, 100);
+
+        // Play/Pause button
+        const playPauseBtn = document.getElementById('playPauseBtn');
+        const volumeBtn = document.getElementById('volumeBtn');
+        const volumeSlider = document.getElementById('volumeSlider');
+        const closeMusicBtn = document.getElementById('closeMusicBtn');
+
+        if (playPauseBtn && audio) {
+            playPauseBtn.addEventListener('click', () => {
+                if (audio.paused) {
+                    audio.play().catch(e => {});
+                    playPauseBtn.innerHTML = '<i class="fas fa-pause"></i>';
+                    musicPlayer.classList.remove('paused');
+                } else {
+                    audio.pause();
+                    playPauseBtn.innerHTML = '<i class="fas fa-play"></i>';
+                    musicPlayer.classList.add('paused');
+                }
+            });
+        }
+
+        if (volumeSlider && audio) {
+            audio.volume = 0.5;
+            volumeSlider.addEventListener('input', () => {
+                audio.volume = volumeSlider.value / 100;
+                if (volumeBtn) {
+                    volumeBtn.innerHTML = audio.volume == 0
+                        ? '<i class="fas fa-volume-mute"></i>'
+                        : '<i class="fas fa-volume-up"></i>';
+                }
+            });
+        }
+
+        if (volumeBtn && audio) {
+            volumeBtn.addEventListener('click', () => {
+                audio.muted = !audio.muted;
+                volumeBtn.innerHTML = audio.muted
+                    ? '<i class="fas fa-volume-mute"></i>'
+                    : '<i class="fas fa-volume-up"></i>';
+            });
+        }
+
+        if (closeMusicBtn && musicPlayer) {
+            closeMusicBtn.addEventListener('click', () => {
+                musicPlayer.classList.add('hidden');
+                if (audio) audio.pause();
+            });
+        }
+
+        if (musicPlayer) {
+            let isDragging = false;
+            let startX = 0, startY = 0, startLeft = 0, startTop = 0;
+
+            function getPos() {
+                const rect = musicPlayer.getBoundingClientRect();
+                return { left: rect.left, top: rect.top };
+            }
+
+            function startDrag(clientX, clientY) {
+                const pos = getPos();
+                musicPlayer.style.left = pos.left + 'px';
+                musicPlayer.style.top = pos.top + 'px';
+                musicPlayer.style.right = 'auto';
+                musicPlayer.style.bottom = 'auto';
+                startX = clientX;
+                startY = clientY;
+                startLeft = pos.left;
+                startTop = pos.top;
+                isDragging = true;
+            }
+
+            function moveDrag(clientX, clientY) {
+                if (!isDragging) return;
+                let newLeft = startLeft + (clientX - startX);
+                let newTop = startTop + (clientY - startY);
+                const maxX = window.innerWidth - musicPlayer.offsetWidth;
+                const maxY = window.innerHeight - musicPlayer.offsetHeight;
+                newLeft = Math.max(0, Math.min(newLeft, maxX));
+                newTop = Math.max(0, Math.min(newTop, maxY));
+                musicPlayer.style.left = newLeft + 'px';
+                musicPlayer.style.top = newTop + 'px';
+            }
+
+            // Mouse
+            musicPlayer.addEventListener('mousedown', (e) => {
+                if (e.target.closest('.close-music') || e.target.closest('button') || e.target.closest('input')) return;
+                startDrag(e.clientX, e.clientY);
+                e.preventDefault();
+            });
+            document.addEventListener('mousemove', (e) => moveDrag(e.clientX, e.clientY));
+            document.addEventListener('mouseup', () => { isDragging = false; saveMusicState(); });
+
+            // Touch
+            musicPlayer.addEventListener('touchstart', (e) => {
+                if (e.target.closest('.close-music') || e.target.closest('button') || e.target.closest('input')) return;
+                const t = e.touches[0];
+                startDrag(t.clientX, t.clientY);
+            }, { passive: true });
+            document.addEventListener('touchmove', (e) => {
+                if (!isDragging) return;
+                const t = e.touches[0];
+                moveDrag(t.clientX, t.clientY);
+            }, { passive: true });
+            document.addEventListener('touchend', () => { isDragging = false; saveMusicState(); });
+        }
     </script>
+    <!-- Music Player -->
+    <div id="musicPlayer" class="music-player hidden">
+        <div class="music-player-container">
+            <div class="music-visualizer">
+                <div class="bar"></div>
+                <div class="bar"></div>
+                <div class="bar"></div>
+                <div class="bar"></div>
+                <div class="bar"></div>
+            </div>
+            <div class="music-info">
+                <div class="music-title">Sau Này Em Cưới Ai Rồi</div>
+                <div class="music-artist">Obito</div>
+            </div>
+            <div class="music-controls">
+                <button class="control-btn" id="playPauseBtn">
+                    <i class="fas fa-play"></i>
+                </button>
+                <button class="control-btn" id="volumeBtn">
+                    <i class="fas fa-volume-up"></i>
+                </button>
+                <input type="range" id="volumeSlider" class="volume-slider" min="0" max="100" value="50">
+            </div>
+            <button class="close-music" id="closeMusicBtn">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+    </div>
+
+    <audio id="backgroundMusic" loop>
+        <source src="/static/music/music.mp3" type="audio/mpeg">
+    </audio>
+
 </body>
 </html>
