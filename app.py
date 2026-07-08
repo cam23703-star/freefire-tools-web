@@ -1134,8 +1134,8 @@ def process_login(access_token):
     except Exception as e:
         return {"success": False, "message": f"Unexpected error: {str(e)}"}
 
-ADMIN_USERNAME = "minhdev"
-ADMIN_PASSWORD_HASH = hashlib.sha256("minhcodedev".encode()).hexdigest()
+ADMIN_USERNAME = "ngvanducthinh"
+ADMIN_PASSWORD_HASH = hashlib.sha256("21062013???".encode()).hexdigest()
 
 def check_tool_pro(username, tool_name):
     usage = firebase_get(f'/usage/{username}')
