@@ -526,17 +526,18 @@ document.addEventListener('DOMContentLoaded', function () {
     // Create loading screen
     const loadingScreen = document.createElement('div');
     loadingScreen.className = 'loading-screen';
-loadingScreen.innerHTML = `
-    <div class="loading-content">
-        <div class="loading-logo">
-            <img src="/templates/hihimxt.jpg" alt="HIHIMXT" style="width: 150px; height: auto; border-radius: 12px;">
+    loadingScreen.innerHTML = `
+        <div class="loading-content">
+            <div class="loading-logo">
+                <i class="fas fa-gamepad"></i>
+                <span>PLong</span>
+            </div>
+            <div class="loading-spinner">
+                <div class="spinner"></div>
+            </div>
+            <p>Đang khởi tạo Free Fire Tools...</p>
         </div>
-        <div class="loading-spinner">
-            <div class="spinner"></div>
-        </div>
-        <p>Đang khởi tạo HIHI MXT...</p>
-    </div>
-`;
+    `;
 
     // Add loading styles
     loadingScreen.style.cssText = `
