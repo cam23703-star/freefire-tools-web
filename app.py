@@ -1220,7 +1220,7 @@ def admin_login2():
         return render_template('admin_login.html', error="Tên đăng nhập hoặc mật khẩu không đúng")
     return render_template('admin_login.html')
 
-@app.route('/ducthinh2106)
+@app.route('/ducthinh2106' )
 def dashboard():
     if not session.get('admin_authenticated') and not session.get('admin_logged_in'):
         return redirect('/admin/login')
