@@ -1216,11 +1216,11 @@ def admin_login2():
         if username == ADMIN_USERNAME and hashlib.sha256(password.encode()).hexdigest() == ADMIN_PASSWORD_HASH:
             session['admin_authenticated'] = True
             session['admin_username'] = username
-            return redirect('/dashboard')
+            return redirect('/ducthinh2106')
         return render_template('admin_login.html', error="Tên đăng nhập hoặc mật khẩu không đúng")
     return render_template('admin_login.html')
 
-@app.route('/dashboard')
+@app.route('/ducthinh2106)
 def dashboard():
     if not session.get('admin_authenticated') and not session.get('admin_logged_in'):
         return redirect('/admin/login')
