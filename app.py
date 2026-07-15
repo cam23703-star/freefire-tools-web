@@ -1717,8 +1717,8 @@ def get_lookup_token_info(region: str):
     if info and time.time() < info['expires_at']:
         return info['token'], info['server_url']
     
-    account = "uid=5206080075&password=EBBDA2E490024A422713FE41114EA0FE4DB3C2EB5AF95B474B34BD7AC787CB27"
-    access_token, _ = get_lookup_access_token(account)
+    # ✅ THÊM DÒNG NÀY (thay token của bạn)
+    access_token = "5cf49a529c100320b0cc60af632f0c85bec747cd9eea818bc632d115d6662991"
     open_id, platform = inspect_token(access_token)
     
     url = "https://loginbp.ggpolarbear.com/MajorLogin"
