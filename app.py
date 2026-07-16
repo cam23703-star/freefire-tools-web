@@ -1701,7 +1701,7 @@ cached_lookup_tokens = {}
 
 def get_lookup_access_token(account: str):
     url = "https://ffmconnect.live.gop.garenanow.com/oauth/guest/token/grant"
-    payload = account + "&response_type=token&client_type=2&client_secret=2ee44819e9b4598845141067b281621874d0d5d7af9d8f7e00c1e54715b7d1e3&client_id=100067"
+    payload = account + "&response_type=token&client_type=2&client_secret=5cf49a529c100320b0cc60af632f0c85bec747cd9eea818bc632d115d6662991&client_id=100067"
     headers = {
         'User-Agent': "Dalvik/2.1.0 (Linux; U; Android 13; CPH2095 Build/RKQ1.211119.001)", 
         'Connection': "Keep-Alive", 
@@ -1717,8 +1717,8 @@ def get_lookup_token_info(region: str):
     if info and time.time() < info['expires_at']:
         return info['token'], info['server_url']
     
-    # ✅ THÊM DÒNG NÀY (thay token của bạn)
-    access_token = "5cf49a529c100320b0cc60af632f0c85bec747cd9eea818bc632d115d6662991"
+    account = "uid=5206080075&password=EBBDA2E490024A422713FE41114EA0FE4DB3C2EB5AF95B474B34BD7AC787CB27"
+    access_token, _ = get_lookup_access_token(account)
     open_id, platform = inspect_token(access_token)
     
     url = "https://loginbp.ggpolarbear.com/MajorLogin"
